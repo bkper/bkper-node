@@ -1,0 +1,20 @@
+{
+  "name": "bkper-node",
+  "version": "1.0.0",
+  "description": "Node.js client for Bkper REST API",
+  "main": "index.js",
+  "repository": "https://github.com/bkper/bkper-node.git",
+  "author": "mael <mael@bkper.com>",
+  "license": "Apache-2.0",
+  "private": false,
+  "scripts": {
+    "build": "openapi-generator-cli generate -i https://bkper.com/openapi.json -g typescript-node -o src --additional-properties=supportsES6=true,allowUnicodeIdentifiers=true,enumNameSuffix="
+  },
+  "dependencies": {
+    "@openapitools/openapi-generator-cli": "^2.1.16",
+    "request": "^2.88.2"
+  },
+  "devDependencies": {
+    "@types/request": "^2.48.5"
+  }
+}
