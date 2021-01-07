@@ -1,6 +1,19 @@
-namespace Utils_ {
+import moment from 'moment-timezone';
+import { DecimalSeparator, Periodicity } from './Enums';
 
-  export function round(number: number | string, fractionDigits: number): number {
+export default class Utilities {
+
+  static sleep(ms: number) {
+    return new Promise((resolve) => {
+      setTimeout(resolve, ms);
+    });
+  }
+
+  static base64Decode(data: string): Buffer {
+    return Buffer.from(data, 'base64');
+  }
+
+  static round(number: number | string, fractionDigits: number): number {
     let num = +number;
     if (num == null) {
       num = 0;
@@ -17,7 +30,7 @@ namespace Utils_ {
     }
   }
   
-  export function formatValue_(value: number | string, decimalSeparator: DecimalSeparator, fractionDigits:number): string {
+  static formatValue_(value: number | string, decimalSeparator: DecimalSeparator, fractionDigits:number): string {
     
     if (value == null){
         return "";
@@ -46,7 +59,7 @@ namespace Utils_ {
     }
   }
   
-  export function parseValue(value: string, decimalSeparator: DecimalSeparator): number {
+  static parseValue(value: string, decimalSeparator: DecimalSeparator): number {
     if (value == null){
         return null;
     } 
@@ -63,18 +76,18 @@ namespace Utils_ {
     return +value;
   }  
 
-  export function convertValueToDate(dateValue: number, offsetInMinutes: number): Date {
+  static convertValueToDate(dateValue: number, offsetInMinutes: number): Date {
     if (dateValue == null) {
       return new Date();
     }
     var year =  dateValue/10000;
     var month =  (dateValue / 100) % 100;
     var day = dateValue % 100;
-    var date = createDate(year, month, day, offsetInMinutes);
+    var date = this.createDate(year, month, day, offsetInMinutes);
     return date;
   }
   
-  export function isString(obj: object): boolean {
+  static isString(obj: object): boolean {
     if (obj == null) {
       return false;
     }
@@ -85,47 +98,47 @@ namespace Utils_ {
     }
   }
   
-  export function createDate(year: number, month: number, day:number, offsetInMinutes: number): Date {
+  static createDate(year: number, month: number, day:number, offsetInMinutes: number): Date {
     var date = new Date(year, month - 1, day);
     date.setTime(date.getTime() + offsetInMinutes*60*1000 );    
     return date;
   } 
 
   
-  export function formatDate(date: Date, pattern: string, timeZone: string): string {
+  static formatDate(date: Date, pattern: string, timeZone: string): string {
     if (date == null || !(Object.prototype.toString.call(date) === '[object Date]')) {
       return '';
     }
     
     if (timeZone == null || timeZone == "") {
-      timeZone = Session.getScriptTimeZone();
+      timeZone = "UTC";
     }    
     
-    var formatedDate = Utilities.formatDate(date, timeZone, pattern);
+    var formatedDate = moment.tz(date, timeZone).format(pattern);
     return formatedDate;
   }
 
-  export function formatDateISO(date: Date, timeZone: string): string {
+  static formatDateISO(date: Date, timeZone: string): string {
     if (date == null || !(Object.prototype.toString.call(date) === '[object Date]')) {
       return '';
     }
     
     if (timeZone == null || timeZone == "") {
-      timeZone = Session.getScriptTimeZone();
+      timeZone = "UTC";
     }    
     
     var formatedDate = Utilities.formatDate(date, timeZone, 'yyyy-MM-dd');
     return formatedDate;
   }
 
-  export function parseDate(date: string, pattern: string, offsetInMinutes: number): Date {
+  static parseDate(date: string, pattern: string, offsetInMinutes: number): Date {
     if (pattern == 'dd/MM/yyyy') {
       let split = date.split('/');
       if (split.length == 3) {
         let year = +split[2];
         let month = +split[1];
         let day = +split[0];
-        return createDate(year, month, day, offsetInMinutes);
+        return this.createDate(year, month, day, offsetInMinutes);
       }
     } else if (pattern == 'MM/dd/yyyy') {
       let split = date.split('/');
@@ -133,7 +146,7 @@ namespace Utils_ {
         let year = +split[2];
         let month = +split[0];
         let day = +split[1];
-        return createDate(year, month, day, offsetInMinutes);
+        return this.createDate(year, month, day, offsetInMinutes);
       }      
     } else if (pattern == 'yyyy/MM/dd') {
       let split = date.split('/');
@@ -141,7 +154,7 @@ namespace Utils_ {
         let year = +split[0];
         let month = +split[1];
         let day = +split[2];
-        return createDate(year, month, day, offsetInMinutes);
+        return this.createDate(year, month, day, offsetInMinutes);
       }   
     } else if (pattern == 'yyyy-MM-dd') {
       let split = date.split('-');
@@ -149,15 +162,15 @@ namespace Utils_ {
         let year = +split[0];
         let month = +split[1];
         let day = +split[2];
-        return createDate(year, month, day, offsetInMinutes);
+        return this.createDate(year, month, day, offsetInMinutes);
       }   
     }
     let now = new Date()
-    return createDate(now.getFullYear(), now.getMonth()+1, now.getDate(), offsetInMinutes);
+    return this.createDate(now.getFullYear(), now.getMonth()+1, now.getDate(), offsetInMinutes);
 
   }
 
-  export function getDateFormatterPattern(datePattern: string, periodicity: Periodicity): string {
+  static getDateFormatterPattern(datePattern: string, periodicity: Periodicity): string {
     var pattern = datePattern;
 
     if (periodicity == Periodicity.MONTHLY) {
@@ -169,7 +182,7 @@ namespace Utils_ {
     return pattern;
   }
   
-  export function getRepresentativeValue(value: number, credit:boolean): number {
+  static getRepresentativeValue(value: number, credit:boolean): number {
     
     if (value == null) {
       return 0;
@@ -181,18 +194,18 @@ namespace Utils_ {
     return value;
   }
 
-  export function wrapObjects<E extends Object>(wrapper: E, wrappeds: Array<Object>): Array<E> {
+  static wrapObjects<E extends Object>(wrapper: E, wrappeds: Array<Object>): Array<E> {
     var newObjects = [];
     if (wrappeds != null) {
       for (var i = 0; i < wrappeds.length; i++) {
-        var newObject = wrapObject(wrapper, wrappeds[i]);
+        var newObject = this.wrapObject(wrapper, wrappeds[i]);
         newObjects.push(newObject);
       }
     }
     return newObjects;
   }
   
-  export function wrapObject<E extends Object>(wrapper:E, wrapped: Object): E {
+  static wrapObject<E extends Object>(wrapper:E, wrapped: Object): E {
     if (wrapped == null) {
       wrapped = new Object();
     }
@@ -201,7 +214,7 @@ namespace Utils_ {
     return w;
   }
 
-  export function buildURLParams(params: any): string {
+  static buildURLParams(params: any): string {
     var urlSegment = "";
     var i = 0;
     for (var prop in params) {
@@ -220,7 +233,7 @@ namespace Utils_ {
     return urlSegment;
   }
 
-  export function convertInMatrix(array: any[]): any[][] {
+  static convertInMatrix(array: any[]): any[][] {
     var maxLength = 0;
     for (var i = 0; i < array.length; i++) {
       if (array[i].length > maxLength) {
@@ -235,5 +248,5 @@ namespace Utils_ {
     return array;
   }  
   
-}
 
+}

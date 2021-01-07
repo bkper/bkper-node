@@ -1,5 +1,9 @@
 import BkperFile from "./BkperFile";
 import Book from "./Book";
+import Account from "./Account";
+import Utilities from "./Utilities";
+import * as TransactionService_ from './TransactionService_';
+
 
 /**
  * 
@@ -130,7 +134,7 @@ export default class Transaction {
    */
   public getFiles(): BkperFile[] {
       if (this.wrapped.files && this.wrapped.files.length > 0) {
-        const files = Utils_.wrapObjects(new BkperFile(), this.wrapped.files);
+        const files = Utilities.wrapObjects(new BkperFile(), this.wrapped.files);
         if (files != null) {
           for (const file of files) {
             file.book = this.book;
@@ -369,7 +373,7 @@ export default class Transaction {
   public setAmount(amount: number | string): Transaction {
     
     if (typeof amount == "string") {
-      amount = Utils_.parseValue(amount, this.book.getDecimalSeparator())+'';
+      amount = Utilities.parseValue(amount, this.book.getDecimalSeparator())+'';
     }
     
     if (!isNaN(+amount)) {
@@ -498,13 +502,13 @@ export default class Transaction {
   public setDate(date: string | Date): Transaction {
     if (typeof date == "string") {
       if(date.indexOf('/') > 0) {
-        let dateObject = Utils_.parseDate(date, this.book.getDatePattern(), this.book.getTimeZoneOffset())
-        this.wrapped.date = Utils_.formatDateISO(dateObject, this.book.getTimeZone())
+        let dateObject = Utilities.parseDate(date, this.book.getDatePattern(), this.book.getTimeZoneOffset())
+        this.wrapped.date = Utilities.formatDateISO(dateObject, this.book.getTimeZone())
       } else if (date.indexOf('-')) {
         this.wrapped.date = date;
       }
     } else if (Object.prototype.toString.call(date) === '[object Date]') {
-      this.wrapped.date = Utils_.formatDateISO(date, this.book.getTimeZone())
+      this.wrapped.date = Utilities.formatDateISO(date, this.book.getTimeZone())
     }
     return this;
   }
@@ -513,7 +517,7 @@ export default class Transaction {
    * @returns The Transaction Date object, on the time zone of the [[Book]].
    */
   public getDateObject(): Date {
-      return Utils_.convertValueToDate(this.getInformedDateValue(), this.book.getTimeZoneOffset());
+      return Utilities.convertValueToDate(this.getDateValue(), this.book.getTimeZoneOffset());
   }
 
   /**
@@ -573,9 +577,9 @@ export default class Transaction {
     if (accountBalance != null) {
       if (!raw) {
         var account = isCa ? this.getCreditAccount() : this.getDebitAccount();
-        accountBalance = Utils_.getRepresentativeValue(accountBalance, account.isCredit());
+        accountBalance = Utilities.getRepresentativeValue(accountBalance, account.isCredit());
       }
-      return Utils_.round(accountBalance, this.book.getFractionDigits());
+      return Utilities.round(accountBalance, this.book.getFractionDigits());
     } else {
       return null;
     }
@@ -584,8 +588,8 @@ export default class Transaction {
   /**
    * Perform create new draft transaction.
    */
-  public create(): Transaction {
-    let operation = TransactionService_.createTransaction(this.book.getId(), this.wrapped);
+  public async create(): Promise<Transaction> {
+    let operation = await TransactionService_.createTransaction(this.book.getId(), this.wrapped);
     this.wrapped = operation.transaction;
     this.book.clearAccountsCache();
     return this;
@@ -594,8 +598,8 @@ export default class Transaction {
   /**
    * Upddate transaction, applying pending changes.
    */  
-  public update(): Transaction {
-    let operation = TransactionService_.updateTransaction(this.book.getId(), this.wrapped);
+  public async update(): Promise<Transaction> {
+    let operation = await TransactionService_.updateTransaction(this.book.getId(), this.wrapped);
     this.wrapped = operation.transaction;
     this.book.clearAccountsCache();
     return this;
@@ -605,8 +609,8 @@ export default class Transaction {
   /**
    * Perform check transaction.
    */
-  public check(): Transaction {
-    let operation = TransactionService_.checkTransaction(this.book.getId(), this.wrapped);
+  public async check(): Promise<Transaction> {
+    let operation = await TransactionService_.checkTransaction(this.book.getId(), this.wrapped);
     this.wrapped = operation.transaction;
     this.book.clearAccountsCache();
     return this;
@@ -615,8 +619,8 @@ export default class Transaction {
   /**
    * Perform uncheck transaction.
    */  
-  public uncheck(): Transaction {
-    let operation = TransactionService_.uncheckTransaction(this.book.getId(), this.wrapped);
+  public async uncheck(): Promise<Transaction> {
+    let operation = await TransactionService_.uncheckTransaction(this.book.getId(), this.wrapped);
     this.wrapped = operation.transaction;
     this.book.clearAccountsCache();
     return this;
@@ -625,8 +629,8 @@ export default class Transaction {
   /**
    * Perform post transaction, changing credit and debit [[Account]] balances.
    */
-  public post(): Transaction {
-    let operation = TransactionService_.postTransaction(this.book.getId(), this.wrapped);
+  public async post(): Promise<Transaction> {
+    let operation = await TransactionService_.postTransaction(this.book.getId(), this.wrapped);
     this.wrapped = operation.transaction;
     this.book.clearAccountsCache();
     return this;
@@ -635,8 +639,8 @@ export default class Transaction {
   /**
    * Remove the transaction, sending to trash.
    */  
-  public remove(): Transaction {
-    let operation = TransactionService_.removeTransaction(this.book.getId(), this.wrapped);
+  public async remove(): Promise<Transaction> {
+    let operation = await TransactionService_.removeTransaction(this.book.getId(), this.wrapped);
     this.wrapped = operation.transaction;
     this.book.clearAccountsCache();
     return this;
@@ -645,66 +649,12 @@ export default class Transaction {
   /**
    * Restore the transaction from trash.
    */  
-  public restore(): Transaction {
-    let operation = TransactionService_.restoreTransaction(this.book.getId(), this.wrapped);
+  public async restore(): Promise<Transaction> {
+    let operation = await TransactionService_.restoreTransaction(this.book.getId(), this.wrapped);
     this.wrapped = operation.transaction;
     this.book.clearAccountsCache();
     return this;
   }  
-
-
-  //DEPRECATED
-
-   /**
-   * @returns The date the user informed for this transaction, adjusted to book's time zone.
-   * 
-   * @deprecated Use getDateObject instead.
-   */
-  public getInformedDate(): Date {
-    return this.getDateObject();
-  }
-
-
-  /**
-   * @returns The date numbe. The number format is YYYYMMDD.
-   * 
-   * @deprecated use getDateValue instead.
-   */
-  public getInformedDateValue(): number {
-    return this.getDateValue();
-  }
-
-  /**
-   * @returns The date the user informed for this transaction, formatted according to the date pattern of [[Book]].
-   * 
-   * @deprecated use getDateFormatted instead
-   */
-  public getInformedDateText(): string {
-    return this.getDateFormatted();
-  }
-
-
-  /**
-   * @returns {Date} The date time user has recorded/posted this transaction.
-   * 
-   * @deprecated use getCreatedAt instead.
-   */
-  public getPostDate(): Date {
-    return this.getCreatedAt();
-  }
-
-  /**
-   * @returns The date time user has recorded/posted this transaction, formatted according to the date pattern of [[Book]].
-   * 
-   * @deprecated use getCreatedAtFormatted instead.
-   */
-  public getPostDateText(): string {
-    return this.getCreatedAtFormatted();
-  } 
-
-  edit(): Transaction {
-    return this.update();
-  }
 
 
 }

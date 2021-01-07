@@ -1,4 +1,11 @@
-class TransactionPage_ {
+import Book from "./Book"
+import Transaction from "./Transaction"
+import Account from "./Account"
+import * as TransactionService_ from './TransactionService_';
+import Utilities from "./Utilities";
+
+
+export default class TransactionPage_ {
 
   private account: Account
   private transactions: Transaction[]
@@ -6,15 +13,15 @@ class TransactionPage_ {
   private index: number
   private reachEnd: boolean
 
-  constructor(book: Book, query: string, lastCursor: string) {
+  async init(book: Book, query: string, lastCursor: string): Promise<TransactionPage_> {
 
-    var transactionList = TransactionService_.searchTransactions(book, query, 1000, lastCursor);
+    var transactionList = await TransactionService_.searchTransactions(book, query, 1000, lastCursor);
 
     if (transactionList.items == null) {
       transactionList.items = [];
     }
 
-    this.transactions = Utils_.wrapObjects(new Transaction(), transactionList.items);
+    this.transactions = Utilities.wrapObjects(new Transaction(), transactionList.items);
     book.configureTransactions_(this.transactions);
     this.cursor = transactionList.cursor;
     if (transactionList.account) {
@@ -26,6 +33,8 @@ class TransactionPage_ {
     } else {
       this.reachEnd = false;
     }
+
+    return this;
   } 
 
   public getCursor(): string {

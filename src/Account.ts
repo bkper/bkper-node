@@ -3,6 +3,7 @@ import Book from './Book';
 import { AccountType } from './Enums';
 import Group from './Group';
 import { normalizeText } from './Normalizer_';
+import Utilities from './Utilities';
 /**
  * 
  * This class defines an [Account](https://en.wikipedia.org/wiki/Account_(bookkeeping)) of a [[Book]].
@@ -151,13 +152,13 @@ export default class Account {
   public getBalance(raw?: boolean): number {
     var balance = 0;
     if (this.wrapped.balance != null) {
-      balance = Utils_.round(this.wrapped.balance, this.book.getFractionDigits());
+      balance = Utilities.round(this.wrapped.balance, this.book.getFractionDigits());
     }
 
     if (raw) {
       return balance;
     } else {
-      return Utils_.getRepresentativeValue(balance, this.isCredit());
+      return Utilities.getRepresentativeValue(balance, this.isCredit());
     }
   }
 
@@ -171,13 +172,13 @@ export default class Account {
   public getCheckedBalance(raw?: boolean): number {
     var balance = 0;
     if (this.wrapped.balance != null) {
-      balance = Utils_.round(this.wrapped.checkedBalance, this.book.getFractionDigits());
+      balance = Utilities.round(this.wrapped.checkedBalance, this.book.getFractionDigits());
     }
 
     if (raw) {
       return balance;
     } else {
-      return Utils_.getRepresentativeValue(balance, this.isCredit());
+      return Utilities.getRepresentativeValue(balance, this.isCredit());
     }
   }
 

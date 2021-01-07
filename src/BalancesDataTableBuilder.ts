@@ -2,6 +2,7 @@ import BalancesContainer, { GroupBalancesContainer } from "./BalancesContainer";
 import { BalanceType, BalanceCheckedType, Periodicity } from "./Enums";
 
 import Book from "./Book";
+import Utilities from "./Utilities";
 
 
 /**
@@ -330,7 +331,7 @@ export default class BalancesDataTableBuilder implements BalancesDataTableBuilde
               amount = balance.getPeriodBalance();
             }            
           }
-          indexEntry[balancesContainer.getName()] = Utils_.getRepresentativeValue(amount, balancesContainer.isCredit());
+          indexEntry[balancesContainer.getName()] = Utilities.getRepresentativeValue(amount, balancesContainer.isCredit());
         }
 
       }
@@ -349,9 +350,9 @@ export default class BalancesDataTableBuilder implements BalancesDataTableBuilde
         if (amount == null) {
           amount = "null_amount";
         } else {
-          amount = Utils_.round(amount, this.book.getFractionDigits());
+          amount = Utilities.round(amount, this.book.getFractionDigits());
           if (this.shouldFormatValue) {
-            amount = Utils_.formatValue_(amount, this.book.getDecimalSeparator(), this.book.getFractionDigits());
+            amount = Utilities.formatValue_(amount, this.book.getDecimalSeparator(), this.book.getFractionDigits());
           }
         }
         row.push(amount);
@@ -373,7 +374,7 @@ export default class BalancesDataTableBuilder implements BalancesDataTableBuilde
           if (cell == "null_amount") {
             var amount: any = 0;
             if (this.shouldFormatValue) {
-              amount = Utils_.formatValue_(amount, this.book.getDecimalSeparator(), this.book.getFractionDigits());
+              amount = Utilities.formatValue_(amount, this.book.getDecimalSeparator(), this.book.getFractionDigits());
             }
             row[j] = amount;
           }
@@ -386,7 +387,7 @@ export default class BalancesDataTableBuilder implements BalancesDataTableBuilde
           } else if (cell == "null_amount") {
             var amount: any = 0;
             if (this.shouldFormatValue) {
-              amount = Utils_.formatValue_(amount, this.book.getDecimalSeparator(), this.book.getFractionDigits());
+              amount = Utilities.formatValue_(amount, this.book.getDecimalSeparator(), this.book.getFractionDigits());
             }
             row[j] = amount;
           }
@@ -398,12 +399,12 @@ export default class BalancesDataTableBuilder implements BalancesDataTableBuilde
     }
 
     if (this.shouldFormatDate && table.length > 0) {
-      var pattern = Utils_.getDateFormatterPattern(this.book.getDatePattern(), this.periodicity);
+      var pattern = Utilities.getDateFormatterPattern(this.book.getDatePattern(), this.periodicity);
       for (var j = 1; j < table.length; j++) {
         var row = table[j];
         if (row.length > 0) {
           //first column
-          row[0] = Utils_.formatDate(row[0], pattern, this.book.getTimeZone());
+          row[0] = Utilities.formatDate(row[0], pattern, this.book.getTimeZone());
         }
       }
 

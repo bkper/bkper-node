@@ -1,6 +1,7 @@
 
 import { Request, Response, Headers, BodyInit } from 'node-fetch'
 import fetch from 'node-fetch'
+import Utilities from './Utilities';
 
 
 let API_KEY_: string;

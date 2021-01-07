@@ -1,9 +1,14 @@
+import Account from "./Account";
+import Transaction from "./Transaction";
+import TransactionIterator from "./TransactionIterator";
+import Utilities from "./Utilities";
+
 /**
  * A TransactionsDataTableBuilder is used to setup and build two-dimensional arrays containing transactions.
  * 
  * @public
  */
-class TransactionsDataTableBuilder {
+export default class TransactionsDataTableBuilder {
 
   private transactionIterator: TransactionIterator;
   private shouldFormatDates: boolean;
@@ -50,15 +55,15 @@ class TransactionsDataTableBuilder {
   /**
    * @returns The account, when filtering by a single account.
    */  
-  public getAccount(): Account {
+  public async getAccount(): Promise<Account> {
     return this.transactionIterator.getAccount();
   }
 
   /**
    * @returns A two-dimensional array containing all [[Transactions]].
    */
-  public build(): any[][] {
-    var account = this.transactionIterator.getAccount();
+  public async build(): Promise<any[][]> {
+    var account = await this.transactionIterator.getAccount();
     var header = new Array();
     var transactions = new Array();
     var finalArray = new Array();
@@ -72,7 +77,7 @@ class TransactionsDataTableBuilder {
       headerLine.push("Debit");
       headerLine.push("Credit");
 
-      transactions = this.getExtract2DArray_(this.transactionIterator, account);
+      transactions = await this.getExtract2DArray_(this.transactionIterator, account);
       if (account.isPermanent()) {
         headerLine.push("Balance");
       }
@@ -93,31 +98,31 @@ class TransactionsDataTableBuilder {
       if (this.shouldAddUrls) {
         headerLine.push("Attachment");
       }
-      transactions = this.get2DArray_(this.transactionIterator);
+      transactions = await this.get2DArray_(this.transactionIterator);
       header.push(headerLine);
     }
 
     if (transactions.length > 0) {
       transactions.splice(0, 0, headerLine);
-      transactions = Utils_.convertInMatrix(transactions);
+      transactions = Utilities.convertInMatrix(transactions);
       return transactions;
     } else {
       return [headerLine];
     }
   }
 
-  private get2DArray_(iterator: TransactionIterator) {
+  private async get2DArray_(iterator: TransactionIterator) {
     var transactions = new Array();
 
     while (iterator.hasNext()) {
-      var transaction = iterator.next();
+      var transaction = await iterator.next();
 
       var line = new Array();
 
       if (this.shouldFormatDates) {
-        line.push(transaction.getInformedDateText());
+        line.push(transaction.getDateFormatted());
       } else {
-        line.push(transaction.getInformedDate());
+        line.push(transaction.getDate());
       }
 
       line.push(transaction.getCreditAccountName());
@@ -132,7 +137,7 @@ class TransactionsDataTableBuilder {
         if (this.shouldFormatValues) {
           var decimalSeparator = iterator.getBook().getDecimalSeparator();
           var fractionDigits = iterator.getBook().getFractionDigits();
-          line.push(Utils_.formatValue_(transaction.getAmount(), decimalSeparator, fractionDigits));
+          line.push(Utilities.formatValue_(transaction.getAmount(), decimalSeparator, fractionDigits));
         } else {
           line.push(transaction.getAmount());
         }
@@ -141,9 +146,9 @@ class TransactionsDataTableBuilder {
       }
 
       if (this.shouldFormatDates) {
-        line.push(transaction.getPostDateText());
+        line.push(transaction.getCreatedAtFormatted());
       } else {
-        line.push(transaction.getPostDate());
+        line.push(transaction.getCreatedAt());
       }
 
       var urls = transaction.getUrls();
@@ -170,17 +175,17 @@ class TransactionsDataTableBuilder {
     return transactions;
   }
 
-  private getExtract2DArray_(iterator: TransactionIterator, account: Account): any[][] {
+  private async getExtract2DArray_(iterator: TransactionIterator, account: Account): Promise<any[][]> {
     var transactions = new Array<Array<any>>();
 
     while (iterator.hasNext()) {
-      var transaction = iterator.next();
+      var transaction = await iterator.next();
       var line = new Array();
 
       if (this.shouldFormatDates) {
-        line.push(transaction.getInformedDateText());
+        line.push(transaction.getDateFormatted());
       } else {
-        line.push(transaction.getInformedDate());
+        line.push(transaction.getDate());
       }
 
       if (transaction.getCreditAccount() != null && transaction.getDebitAccount() != null) {
@@ -206,7 +211,7 @@ class TransactionsDataTableBuilder {
         var amount: string | number = transaction.getAmount();
 
         if (this.shouldFormatValues) {
-          amount = Utils_.formatValue_(transaction.getAmount(), iterator.getBook().getDecimalSeparator(), iterator.getBook().getFractionDigits());
+          amount = Utilities.formatValue_(transaction.getAmount(), iterator.getBook().getDecimalSeparator(), iterator.getBook().getFractionDigits());
         };
 
         if (this.isCreditOnTransaction_(transaction, account)) {
@@ -225,7 +230,7 @@ class TransactionsDataTableBuilder {
         if (transaction.getAccountBalance() != null) {
           var balance: string | number = transaction.getAccountBalance();
           if (this.shouldFormatValues) {
-            balance = Utils_.formatValue_(balance, iterator.getBook().getDecimalSeparator(), iterator.getBook().getFractionDigits());
+            balance = Utilities.formatValue_(balance, iterator.getBook().getDecimalSeparator(), iterator.getBook().getFractionDigits());
           };
           line.push(balance);
         } else {
@@ -234,9 +239,9 @@ class TransactionsDataTableBuilder {
       }
 
       if (this.shouldFormatDates) {
-        line.push(transaction.getPostDateText());
+        line.push(transaction.getCreatedAtFormatted());
       } else {
-        line.push(transaction.getPostDate());
+        line.push(transaction.getCreatedAt());
       }
 
       var urls = transaction.getUrls();
@@ -258,40 +263,6 @@ class TransactionsDataTableBuilder {
       return false;
     }
     return transaction.getCreditAccount().getId() == account.getId();
-  }
-
-
-
-
-/******************* DEPRECATED METHODS *******************/
-
-
-  /**
-   * @deprecated
-   */
-  getFilteredByAccount(): Account {
-    return this.getAccount();
-  }  
-  
-  /**
-   * @deprecated
-   */
-  formatDate(): TransactionsDataTableBuilder {
-    return this.formatDates(true);
-  }
-  
-  /**
-   * @deprecated
-   */
-  formatValue(): TransactionsDataTableBuilder {
-    return this.formatValues(true);
-  }
-  
-  /**
-   * @deprecated
-   */
-  addUrls(): TransactionsDataTableBuilder {
-    return this.includeUrls(true);
   }
 
 }

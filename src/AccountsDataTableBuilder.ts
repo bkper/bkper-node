@@ -1,6 +1,7 @@
 import Account from './Account'
 import { AccountType } from './Enums';
 import Group from './Group';
+import Utilities from './Utilities';
 
 /**
  * A AccountsDataTableBuilder is used to setup and build two-dimensional arrays containing transactions.
@@ -90,7 +91,7 @@ export default class AccountsDataTableBuilder {
 
     table.unshift(headers);
 
-    table = Utils_.convertInMatrix(table);
+    table = Utilities.convertInMatrix(table);
 
     return table;
 

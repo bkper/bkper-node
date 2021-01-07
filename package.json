@@ -14,7 +14,9 @@
   },
   "dependencies": {
     "@openapitools/openapi-generator-cli": "^2.1.16",
+    "@types/moment-timezone": "^0.5.30",
     "@types/node-fetch": "^2.5.7",
+    "moment-timezone": "^0.5.32",
     "node-fetch": "^2.6.1",
     "request": "^2.88.2"
   },

@@ -1,4 +1,5 @@
 import * as AccountService_ from './AccountService_';
+import * as TransactionService_ from './TransactionService_';
 import * as BalancesService_ from './BalancesService_';
 import * as BookService_ from './BookService_';
 import * as SavedQueryService_ from './SavedQueryService_';
@@ -14,6 +15,9 @@ import { normalizeName } from './Normalizer_';
 import { DecimalSeparator, Permission } from './Enums';
 import Group from './Group';
 import Transaction from './Transaction';
+import TransactionIterator from './TransactionIterator';
+import TransactionsDataTableBuilder from './TransactionsDataTableBuilder';
+import Utilities from './Utilities';
 
 /**
  *
@@ -283,7 +287,7 @@ export default class Book {
     if (timeZone == null || timeZone.trim() == "") {
       timeZone = this.getTimeZone();
     }
-    return Utils_.formatDate(date, this.getDatePattern(), timeZone);
+    return Utilities.formatDate(date, this.getDatePattern(), timeZone);
   }
 
 
@@ -295,14 +299,14 @@ export default class Book {
    * @return The value formated
    */
   public formatValue(value: number): string {
-    return Utils_.formatValue_(value, this.getDecimalSeparator(), this.getFractionDigits());
+    return Utilities.formatValue_(value, this.getDecimalSeparator(), this.getFractionDigits());
   }
 
   /**
    * Parse a value string according to [[DecimalSeparator]] and fraction digits of the Book.
    */
   public parseValue(value: string): number {
-    return Utils_.parseValue(value, this.getDecimalSeparator());
+    return Utilities.parseValue(value, this.getDecimalSeparator());
   }
 
 
@@ -314,17 +318,17 @@ export default class Book {
    * @returns The value rounded
    */
   public round(value: number): number {
-    return Utils_.round(value, this.getFractionDigits());
+    return Utilities.round(value, this.getFractionDigits());
   }
 
   /**
    * Create [[Transactions]] on the Book, in batch. 
    */
-  public batchCreateTransactions(transactions: Transaction[]): Transaction[] {
+  public async batchCreateTransactions(transactions: Transaction[]): Promise<Transaction[]> {
     let transactionPayloads: bkper.Transaction[] = [];
     transactions.forEach(tx => transactionPayloads.push(tx.wrapped))
-    transactionPayloads = TransactionService_.createTransactionsBatch(this.getId(), transactionPayloads);
-    transactions = Utils_.wrapObjects(new Transaction(), transactionPayloads);
+    transactionPayloads = await TransactionService_.createTransactionsBatch(this.getId(), transactionPayloads);
+    transactions = Utilities.wrapObjects(new Transaction(), transactionPayloads);
     this.configureTransactions_(transactions);
     this.clearAccountsCache();
     return transactions;
@@ -387,7 +391,7 @@ export default class Book {
    * 
    */
   public newTransaction(): Transaction {
-    let transaction = Utils_.wrapObject(new Transaction(), {});
+    let transaction = Utilities.wrapObject(new Transaction(), {});
     this.configureTransaction_(transaction);
     return transaction;
   }
@@ -408,7 +412,7 @@ export default class Book {
    * ```
    */
   public newAccount(): Account {
-    let account = Utils_.wrapObject(new Account(), {});
+    let account = Utilities.wrapObject(new Account(), {});
     account.setArchived(false);
     account.book = this;
     return account;
@@ -428,7 +432,7 @@ export default class Book {
    * ```
    */
   public newGroup(): Group {
-    let group = Utils_.wrapObject(new Group(), {});
+    let group = Utilities.wrapObject(new Group(), {});
     group.book = this;
     return group;
   }
@@ -479,7 +483,7 @@ export default class Book {
     }
     if (accountsPayloads.length > 0) {
       let createdAccountsPlain = await AccountService_.createAccounts(this.getId(), accountsPayloads);
-      let createdAccounts = Utils_.wrapObjects(new Account(), createdAccountsPlain);
+      let createdAccounts = Utilities.wrapObjects(new Account(), createdAccountsPlain);
       this.clearBookCache_();
       for (var i = 0; i < createdAccounts.length; i++) {
         var account = createdAccounts[i];
@@ -493,7 +497,7 @@ export default class Book {
 
 
   private configureAccounts_(accounts: bkper.Account[]): void {
-    this.accounts = Utils_.wrapObjects(new Account(), accounts);
+    this.accounts = Utilities.wrapObjects(new Account(), accounts);
     this.idAccountMap = new Object();
     this.nameAccountMap = new Object();
     for (var i = 0; i < this.accounts.length; i++) {
@@ -520,7 +524,7 @@ export default class Book {
     if (groups.length > 0) {
       let groupsSave: bkper.Group[] = groups.map(g => { return g.wrapped });
       let createdGroupsPlain = await GroupService_.createGroups(this.getId(), groupsSave);
-      let createdGroups = Utils_.wrapObjects(new Group(), createdGroupsPlain);
+      let createdGroups = Utilities.wrapObjects(new Group(), createdGroupsPlain);
       this.clearBookCache_();
 
       for (var i = 0; i < createdGroups.length; i++) {
@@ -568,7 +572,7 @@ export default class Book {
   }
 
   private configureGroups_(groups: bkper.Group[]): void {
-    this.groups = Utils_.wrapObjects(new Group(), groups);
+    this.groups = Utilities.wrapObjects(new Group(), groups);
     this.idGroupMap = new Object();
     this.nameGroupMap = new Object();
     for (var i = 0; i < this.groups.length; i++) {
@@ -688,7 +692,7 @@ export default class Book {
    */
   public getTransaction(id: string): Transaction {
     let wrapped = TransactionService_.getTransaction(this.getId(), id);
-    let transaction = Utils_.wrapObject(new Transaction(), wrapped);
+    let transaction = Utilities.wrapObject(new Transaction(), wrapped);
     this.configureTransaction_(transaction);
     return transaction;
   }
@@ -706,7 +710,7 @@ export default class Book {
    * ```
    */
   public newFile(): BkperFile {
-    let file = Utils_.wrapObject(new BkperFile(), {});
+    let file = Utilities.wrapObject(new BkperFile(), {});
     file.book = this;
     return file;
   }
@@ -716,7 +720,7 @@ export default class Book {
    */
   public async getFile(id: string): Promise<BkperFile> {
     let wrapped = await FileService_.getFile(this.getId(), id);
-    let file = Utils_.wrapObject(new BkperFile(), wrapped);
+    let file = Utilities.wrapObject(new BkperFile(), wrapped);
     return file;
   }
 

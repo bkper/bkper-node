@@ -1,3 +1,8 @@
+import Book from "./Book"
+import Transaction from "./Transaction"
+import Account from "./Account"
+import TransactionPage_ from "./TransactionPage_"
+
 /**
  *
  * An iterator that allows scripts to iterate over a potentially large collection of transactions.
@@ -17,7 +22,7 @@
  *
  * @public
  */
-class TransactionIterator {
+export default class TransactionIterator {
 
   private book: Book
   private query: string
@@ -70,7 +75,7 @@ class TransactionIterator {
   /**
    * Sets a continuation token from previous paused iteration
    */
-  public setContinuationToken(continuationToken: string): void {
+  public async setContinuationToken(continuationToken: string): Promise<void> {
 
     if (continuationToken == null) {
       return;
@@ -87,17 +92,17 @@ class TransactionIterator {
       this.lastCursor = cursor
     }
     let indexNum = new Number(index).valueOf()
-    this.currentPage = new TransactionPage_(this.book, this.query, this.lastCursor)
+    this.currentPage = await new TransactionPage_().init(this.book, this.query, this.lastCursor)
     this.currentPage.setIndex(indexNum);
   }
 
   /**
    * Determines whether calling next() will return a transaction.
    */
-  public hasNext(): boolean {
+  public async hasNext(): Promise<boolean> {
 
     if (this.currentPage == null) {
-      this.currentPage = new TransactionPage_(this.book, this.query, this.lastCursor);
+      this.currentPage = await new TransactionPage_().init(this.book, this.query, this.lastCursor);
     }
 
     if (this.currentPage.hasNext()) {
@@ -105,7 +110,7 @@ class TransactionIterator {
     } else if (!this.currentPage.hasReachEnd()) {
       this.lastCursor = this.currentPage.getCursor();
       if (this.nextPage == null) {
-        this.nextPage = new TransactionPage_(this.book, this.query, this.lastCursor);
+        this.nextPage = await new TransactionPage_().init(this.book, this.query, this.lastCursor);
       }
       return this.nextPage.hasNext();
     } else {
@@ -116,10 +121,10 @@ class TransactionIterator {
   /**
    * Gets the next transaction in the collection of transactions.
    */
-  public next(): Transaction {
+  public async next(): Promise<Transaction> {
 
     if (this.currentPage == null) {
-      this.currentPage = new TransactionPage_(this.book, this.query, this.lastCursor);
+      this.currentPage = await new TransactionPage_().init(this.book, this.query, this.lastCursor);
     }
 
     if (this.currentPage.hasNext()) {
@@ -130,7 +135,7 @@ class TransactionIterator {
         this.currentPage = this.nextPage;
         this.nextPage = null;
       } else {
-        this.currentPage = new TransactionPage_(this.book, this.query, this.lastCursor);
+        this.currentPage = await new TransactionPage_().init(this.book, this.query, this.lastCursor);
       }
       return this.currentPage.next();
     } else {
@@ -142,19 +147,13 @@ class TransactionIterator {
   /**
    * @returns The account, when filtering by a single account.
    */  
-  public getAccount(): Account {
+  public async getAccount(): Promise<Account> {
     if (this.currentPage == null) {
-      this.currentPage = new TransactionPage_(this.book, this.query, this.lastCursor);
+      this.currentPage = await new TransactionPage_().init(this.book, this.query, this.lastCursor);
     }    
     return this.currentPage.getAccount();
   }
 
-  /**
-   * @deprecated
-   */
-  getFilteredByAccount(): Account {
-    return this.getAccount();
-  }
 
 }
 
