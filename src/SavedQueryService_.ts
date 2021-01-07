@@ -1,0 +1,11 @@
+import { HttpBooksApiV3Request } from "./HttpApiRequest";
+
+export async function getSavedQueries(bookId: string): Promise<bkper.Query[]> {
+  var responseJSON = await new HttpBooksApiV3Request(`${bookId}/queries`).fetch();
+  var savedQueriesPlain = await responseJSON.json();
+  if (savedQueriesPlain == null || savedQueriesPlain.items == null) {
+    return [];
+  } else {
+    return savedQueriesPlain.items;
+  }
+}
