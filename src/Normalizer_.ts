@@ -6,7 +6,7 @@ export function normalizeName(name: string): string {
 
 export function normalizeText(text: string, spaceReplacement?: string): string {
   if (text == null || typeof text != 'string') {
-    return;
+    return null;
   }
 
   if (spaceReplacement) {

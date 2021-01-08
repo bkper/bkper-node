@@ -12,8 +12,10 @@
   "license": "Apache-2.0",
   "private": false,
   "scripts": {
-    "clean": "rimraf lib",
-    "build": "yarn clean && tsc -p ."
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "clean": "gts clean",
+    "build": "tsc -p .",
+    "prepare": "yarn build"
   },
   "dependencies": {
     "moment-timezone": "^0.5.32",
@@ -24,8 +26,7 @@
     "@bkper/bkper-api-types": "^3.7.1",
     "@types/moment-timezone": "^0.5.30",
     "@types/node-fetch": "^2.5.7",
-    "@types/request": "^2.48.5",
-    "rimraf": "^3.0.2",
+    "gts": "^3.0.3",
     "typescript": "^4.1.3"
   }
 }

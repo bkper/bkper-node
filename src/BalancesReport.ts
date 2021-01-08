@@ -115,6 +115,7 @@ export default class BalancesReport {
         return groupBalances[i];
       }
     }
+    return null;
   }
 
 }
