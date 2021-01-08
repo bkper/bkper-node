@@ -10,7 +10,7 @@ import Collection from './Collection';
 import AccountsDataTableBuilder from './AccountsDataTableBuilder';
 import BalancesDataTableBuilder from './BalancesDataTableBuilder';
 import BalancesReport from './BalancesReport';
-import BkperFile from './BkperFile';
+import File from './File';
 import { normalizeName } from './Normalizer_';
 import { DecimalSeparator, Permission } from './Enums';
 import Group from './Group';
@@ -709,8 +709,8 @@ export default class Book {
    *  .create();
    * ```
    */
-  public newFile(): BkperFile {
-    let file = Utilities.wrapObject(new BkperFile(), {});
+  public newFile(): File {
+    let file = Utilities.wrapObject(new File(), {});
     file.book = this;
     return file;
   }
@@ -718,9 +718,9 @@ export default class Book {
   /** 
    * Retrieve a file by id
    */
-  public async getFile(id: string): Promise<BkperFile> {
+  public async getFile(id: string): Promise<File> {
     let wrapped = await FileService_.getFile(this.getId(), id);
-    let file = Utilities.wrapObject(new BkperFile(), wrapped);
+    let file = Utilities.wrapObject(new File(), wrapped);
     return file;
   }
 

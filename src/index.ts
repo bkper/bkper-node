@@ -3,12 +3,12 @@ import Book from "./Book";
 /**
  * Gets the [[Book]] with the specified bookId from url param.
  *
- * This is the main Entry Point to start interacting with BkperApp
+ * This is the main Entry Point to start interacting with Bkper.
  *
  * Example:
  *
  * ```js
- * var book = BkperApp.getBook("agtzfmJrcGVyLWhyZHITCxIGTGVkZ2VyGICAgIDggqALDA");
+ * var book = bkper.getBook("agtzfmJrcGVyLWhyZHITCxIGTGVkZ2VyGICAgIDggqALDA");
  * book.record("#fuel for my Land Rover 126.50 28/01/2013");
  * ```
  *

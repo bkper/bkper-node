@@ -9,7 +9,7 @@ import * as FileService_ from './FileService_';
  * 
  * @public
  */
-export default class BkperFile {
+export default class File {
 
   wrapped: bkper.File;
 
@@ -35,7 +35,7 @@ export default class BkperFile {
    * 
    * @returns This File, for chainning.
    */    
-  public setName(name: string): BkperFile {
+  public setName(name: string): File {
     this.wrapped.name = name;
     return this;
   }  
@@ -53,7 +53,7 @@ export default class BkperFile {
    * 
    * @returns This File, for chainning.
    */    
-  public setContentType(contentType: string): BkperFile {
+  public setContentType(contentType: string): File {
     this.wrapped.contentType = contentType;
     return this;
   }    
@@ -74,7 +74,7 @@ export default class BkperFile {
    * 
    * @returns This File, for chainning.
    */    
-  public setContent(content: string): BkperFile {
+  public setContent(content: string): File {
     this.wrapped.content = content;
     return this;
   } 
@@ -97,7 +97,7 @@ export default class BkperFile {
   /**
    * Perform create new File.
    */
-  public async create(): Promise<BkperFile> {
+  public async create(): Promise<File> {
     this.wrapped = await FileService_.createFile(this.book.getId(), this.wrapped);
     return this;
   }

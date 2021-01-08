@@ -1,28 +1,31 @@
 {
-  "name": "bkper-api-node",
+  "name": "bkper-node",
   "version": "1.0.0",
   "description": "Node.js client for Bkper REST API",
-  "main": "lib/api.js",
+  "main": "lib/index.js",
   "types": "lib",
+  "files": [
+    "lib/**/*"
+  ],
   "repository": "https://github.com/bkper/bkper-node.git",
   "author": "mael <mael@bkper.com>",
   "license": "Apache-2.0",
   "private": false,
   "scripts": {
-    "build": "tsc -p .",
-    "api": "openapi-generator-cli generate -i https://bkper.com/openapi.json -g typescript-node -o gen --additional-properties=supportsES6=true,allowUnicodeIdentifiers=true,enumNameSuffix="
+    "clean": "rimraf lib",
+    "build": "yarn clean && tsc -p ."
   },
   "dependencies": {
-    "@openapitools/openapi-generator-cli": "^2.1.16",
-    "@types/moment-timezone": "^0.5.30",
-    "@types/node-fetch": "^2.5.7",
     "moment-timezone": "^0.5.32",
     "node-fetch": "^2.6.1",
     "request": "^2.88.2"
   },
   "devDependencies": {
     "@bkper/bkper-api-types": "^3.7.1",
+    "@types/moment-timezone": "^0.5.30",
+    "@types/node-fetch": "^2.5.7",
     "@types/request": "^2.48.5",
+    "rimraf": "^3.0.2",
     "typescript": "^4.1.3"
   }
 }

@@ -1,4 +1,4 @@
-import BkperFile from "./BkperFile";
+import File from "./File";
 import Book from "./Book";
 import Account from "./Account";
 import Utilities from "./Utilities";
@@ -132,9 +132,9 @@ export default class Transaction {
   /**
    * @returns The files attached to the transaction.
    */
-  public getFiles(): BkperFile[] {
+  public getFiles(): File[] {
       if (this.wrapped.files && this.wrapped.files.length > 0) {
-        const files = Utilities.wrapObjects(new BkperFile(), this.wrapped.files);
+        const files = Utilities.wrapObjects(new File(), this.wrapped.files);
         if (files != null) {
           for (const file of files) {
             file.book = this.book;
@@ -156,7 +156,7 @@ export default class Transaction {
    * 
    * @returns This Transaction, for chainning.
    */
-  public async addFile(file: BkperFile): Promise<Transaction> {
+  public async addFile(file: File): Promise<Transaction> {
 
     if (this.wrapped.files == null) {
       this.wrapped.files = [];
