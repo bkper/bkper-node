@@ -29,7 +29,6 @@ import Utilities from './Utilities';
  */
 export default class Book {
 
-  private id: string
   private wrapped: bkper.Book;
   private accounts: Account[];
   private groups: Group[];
@@ -41,8 +40,7 @@ export default class Book {
   private savedQueries: bkper.Query[];
 
 
-  constructor(id: string, wrapped?: bkper.Book) {
-    this.id = id;
+  constructor(wrapped: bkper.Book) {
     this.wrapped = wrapped;
   }
 
@@ -50,14 +48,13 @@ export default class Book {
    * Same as bookId param
    */
   public getId(): string {
-    return this.id;
+    return this.wrapped.id;
   }
 
   /**
    * @return The name of this Book
    */
-  public async getName(): Promise<string> {
-    await this.checkBookLoaded_();
+  public getName(): string {
     return this.wrapped.name;
   }
 
@@ -76,7 +73,6 @@ export default class Book {
    * @return The number of fraction digits (decimal places) supported by this Book
    */
   public getFractionDigits(): number {
-    this.checkBookLoaded_();
     return this.wrapped.fractionDigits;
   }
 
@@ -95,33 +91,21 @@ export default class Book {
    * @return The name of the owner of the Book
    */
   public getOwnerName(): string {
-    this.checkBookLoaded_();
     return this.wrapped.ownerName;
   }
 
-  private async checkBookLoaded_(): Promise<void> {
-    if (this.wrapped == null) {
-      await this.loadBook_();
-    }
-  }
 
   private checkAccountsLoaded_(): void {
-    if (this.wrapped == null || this.idAccountMap == null || this.idAccountMap == null) {
-      this.loadBook_();
+    if (this.idAccountMap == null || this.idAccountMap == null) {
+      this.configureGroups_(this.wrapped.groups);
+      this.configureAccounts_(this.wrapped.accounts);
     }
-  }
-
-  private async loadBook_() {
-    this.wrapped = await BookService_.loadBookWrapped(this.getId());
-    this.configureGroups_(this.wrapped.groups);
-    this.configureAccounts_(this.wrapped.accounts);
   }
 
   /**
    * @return The permission for the current user
    */
   public getPermission(): Permission {
-    this.checkBookLoaded_();
     return this.wrapped.permission as Permission;
   }
 
@@ -141,7 +125,6 @@ export default class Book {
    * @return The date pattern of the Book. Current: dd/MM/yyyy | MM/dd/yyyy | yyyy/MM/dd
    */
   public getDatePattern(): string {
-    this.checkBookLoaded_();
     return this.wrapped.datePattern;
   }
 
@@ -163,7 +146,6 @@ export default class Book {
    * @return The decimal separator of the Book
    */
   public getDecimalSeparator(): DecimalSeparator {
-    this.checkBookLoaded_();
     return this.wrapped.decimalSeparator as DecimalSeparator;
   }
 
@@ -183,7 +165,6 @@ export default class Book {
    * @return The time zone of the Book
    */
   public getTimeZone(): string {
-    this.checkBookLoaded_();
     return this.wrapped.timeZone;
   }
 
@@ -202,7 +183,6 @@ export default class Book {
    * @return The time zone offset of the book, in minutes
    */
   public getTimeZoneOffset(): number {
-    this.checkBookLoaded_();
     return this.wrapped.timeZoneOffset;
   }
 
@@ -210,7 +190,6 @@ export default class Book {
    * @return The last update date of the book, in in milliseconds
    */
   public getLastUpdateMs(): number {
-    this.checkBookLoaded_();
     return +this.wrapped.lastUpdateMs;
   }
 
@@ -219,7 +198,6 @@ export default class Book {
    * Gets the custom properties stored in this Book
    */
   public getProperties(): {[key: string]: string} {
-    this.checkBookLoaded_();
     return this.wrapped.properties != null ? {...this.wrapped.properties} : {};
   }
 
@@ -229,7 +207,6 @@ export default class Book {
    * @param keys The property key
    */
   public getProperty(...keys: string[]): string {
-    this.checkBookLoaded_();
 
     for (let index = 0; index < keys.length; index++) {
       const key = keys[index];
@@ -266,7 +243,6 @@ export default class Book {
     if (key == null || key.trim() == '') {
       return this;
     }    
-    this.checkBookLoaded_();
     if (this.wrapped.properties == null) {
       this.wrapped.properties = {};
     }

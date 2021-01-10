@@ -36,7 +36,7 @@ export default class Collection {
       return books;
     }
     for (const bookPayload of this.wrapped.books) {
-      let book = new Book(bookPayload.id, bookPayload);
+      let book = new Book(bookPayload);
       books.push(book);
     }
     return books;
