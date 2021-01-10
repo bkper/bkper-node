@@ -56,8 +56,8 @@ export default class Book {
   /**
    * @return The name of this Book
    */
-  public getName(): string {
-    this.checkBookLoaded_();
+  public async getName(): Promise<string> {
+    await this.checkBookLoaded_();
     return this.wrapped.name;
   }
 
@@ -99,9 +99,9 @@ export default class Book {
     return this.wrapped.ownerName;
   }
 
-  private checkBookLoaded_(): void {
+  private async checkBookLoaded_(): Promise<void> {
     if (this.wrapped == null) {
-      this.loadBook_();
+      await this.loadBook_();
     }
   }
 

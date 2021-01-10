@@ -1,108 +1,52 @@
 
-import { Request, Response, Headers, BodyInit } from 'node-fetch'
-import fetch from 'node-fetch'
+import fetch, { Response } from 'node-fetch'
 import Utilities from './Utilities';
+import Logger from './Logger';
+import OAuthTokenProvider from './OAuthTokenProvider';
 
+type HttpMethod = "get"|"post"|"put"|"patch"|"delete";
 
-let API_KEY_: string;
-let OAUTH_TOKEN_PROVIDER_: OAuthTokenProvider;
+export class HttpApiRequest  {
 
-/**
- * Interface to provide OAuth2 tokens upon calling the API.
- * 
- * Implement your own if you need to use one other than the default built-in [ScriptApp](https://developers.google.com/apps-script/reference/script/script-app#getoauthtoken).
- * 
- * Its specially usefull on environments where you can use the built-in ScriptApp services such as [Custom Functions in Google Sheets](https://developers.google.com/apps-script/guides/sheets/functions).
- * 
- * Learn more how to [OAuth 2 library](https://github.com/gsuitedevs/apps-script-oauth2) for Google Apps Script
- * 
- * @public
- */
-interface OAuthTokenProvider {
+  private params: Array<{name: string, value: string}> = [];
+  private url: string;
+  private headers: {[key: string]: string} = {};
+  private method: HttpMethod = 'get';
+  private payload: any = null;
 
-  /**
-   * A valid OAuth2 access token with **email** scope authorized.
-   */
-  getOAuthToken(): string;
-}
-
-/**
- * Sets the API key to identify the agent.
- * 
- * API keys are intended for agent identification only, not for authentication. [Learn more](https://cloud.google.com/endpoints/docs/frameworks/java/when-why-api-key)
- * 
- * See how to create your api key [here](https://cloud.google.com/docs/authentication/api-keys).
- *
- * @param key The key from GCP API &  Services Credentials console.
- * 
- * @public
- */
-function setApiKey(key: string): void {
-  API_KEY_ = key;
-}
-
-/**
- * Sets the [[OAuthTokenProvider]]. 
- * 
- * If none set, the default built-in [ScriptApp](https://developers.google.com/apps-script/reference/script/script-app#getoauthtoken) will be used.
- * 
- * @param tokenProvider The [[OAuthTokenProvider]] implementation.
- * 
- * @public
- */
-function setOAuthTokenProvider(tokenProvider: OAuthTokenProvider) {
-  OAUTH_TOKEN_PROVIDER_ = tokenProvider;
-}
-
-
-class HttpApiRequest  {
-
-  private params: Array<{name: string, value: string}>;
-
-  private httpRequest: Request;
+  public static API_KEY_: string;
+  public static OAUTH_TOKEN_PROVIDER_: OAuthTokenProvider;
   
   constructor(path: string) {
-    this.httpRequest = new Request(`https://app.bkper.com/_ah/api/bkper/${path}`);
+    this.url = `https://app.bkper.com/_ah/api/bkper/${path}`;
   }
 
-  public setMethod(method: "get"|"post"|"put"|"patch"|"delete") {
-    this.httpRequest.method = method;
+  public setMethod(method: HttpMethod) {
+    this.method = method;
     return this;
   }
 
   public setHeader(name: string, value: string) {
-    if (this.httpRequest.headers == null) {
-      this.httpRequest.headers = new Headers();
-    }
-    this.httpRequest.headers.set(name, value);
+    this.headers[name] = value;
     return this;
   }
 
   public addParam(name: string, value: any) {
-    if (this.params == null) {
-      this.params = [];
-    }
     this.params.push({name, value});
     return this;
   }
 
   public setContentType(contentType: string) {
-    if (this.httpRequest.headers == null) {
-      this.httpRequest.headers = new Headers();
-    }
-    this.httpRequest.headers.set('Content-Type', contentType);
+    this.headers['Content-Type'] = contentType;
     return this;
   }
 
   public getContentType(): string {
-    if (this.httpRequest.headers == null) {
-      this.httpRequest.headers = new Headers();
-    }
-    return this.httpRequest.headers.get('Content-Type');
+    return this.headers['Content-Type'];
   }
 
-  public setPayload(payload: BodyInit) {
-    this.httpRequest.body = payload as NodeJS.ReadableStream;
+  public setPayload(payload: any) {
+    this.payload = payload;
     return this;
   }
 
@@ -110,7 +54,7 @@ class HttpApiRequest  {
    * Gets the result url, with query params appended.
    */
   private getUrl(): string {
-    let url = this.httpRequest.url;
+    let url = this.url;
     if (this.params != null) {
       let i = 0
       if (url.indexOf('?') < 0) {
@@ -137,26 +81,27 @@ class HttpApiRequest  {
 
   async fetch(): Promise<Response> {
 
-    if (this.httpRequest.headers == null) {
-      this.httpRequest.headers = new Headers();
-    }
-
-    this.httpRequest.headers.set('Authorization', `Bearer ${OAUTH_TOKEN_PROVIDER_.getOAuthToken()}`);
-    this.addParam('key', API_KEY_);
+    this.headers['Authorization'] = `Bearer ${HttpApiRequest.OAUTH_TOKEN_PROVIDER_()}`;
+    this.addParam('key', HttpApiRequest.API_KEY_);
     if (this.getContentType() == null) {
       this.setContentType('application/json; charset=UTF-8')
     }
     // this.httpRequest.setMuteHttpExceptions(true);
-
-    //Rebuild url to append params
-    this.httpRequest.url = this.getUrl();
 
     var retries = 0;
     var sleepTime = 1000;
     while (true) {
       let response: Response;
       try {
-        response = await fetch(this.httpRequest);
+        let body = this.payload;
+
+        console.log(`BODY: ${body}`)
+
+        response = await fetch(this.getUrl(), {
+          method: this.method,
+          body: body,
+          headers: this.headers,
+        })
       } catch (addressUnavailable) {
         //Error on fetch service
         if (retries > 4) {

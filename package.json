@@ -14,16 +14,17 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "gts clean",
-    "build": "tsc -p .",
+    "build": "tsc",
+    "watch": "tsc -w",
     "prepare": "yarn build"
   },
   "dependencies": {
+    "@bkper/bkper-api-types": "^3.7.1",
     "moment-timezone": "^0.5.32",
     "node-fetch": "^2.6.1",
     "request": "^2.88.2"
   },
   "devDependencies": {
-    "@bkper/bkper-api-types": "^3.7.1",
     "@types/moment-timezone": "^0.5.30",
     "@types/node-fetch": "^2.5.7",
     "gts": "^3.0.3",
