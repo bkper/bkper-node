@@ -1,7 +1,7 @@
 import Book from "./Book"
 import Transaction from "./Transaction"
 import Account from "./Account"
-import TransactionPage_ from "./TransactionPage_"
+import TransactionPage from "./TransactionPage"
 
 /**
  *
@@ -26,8 +26,8 @@ export default class TransactionIterator {
 
   private book: Book
   private query: string
-  private currentPage: TransactionPage_
-  private nextPage: TransactionPage_
+  private currentPage: TransactionPage
+  private nextPage: TransactionPage
   private lastCursor: string
 
   constructor(book: Book, query?: string) {
@@ -92,7 +92,7 @@ export default class TransactionIterator {
       this.lastCursor = cursor
     }
     let indexNum = new Number(index).valueOf()
-    this.currentPage = await new TransactionPage_().init(this.book, this.query, this.lastCursor)
+    this.currentPage = await new TransactionPage().init(this.book, this.query, this.lastCursor)
     this.currentPage.setIndex(indexNum);
   }
 
@@ -102,7 +102,7 @@ export default class TransactionIterator {
   public async hasNext(): Promise<boolean> {
 
     if (this.currentPage == null) {
-      this.currentPage = await new TransactionPage_().init(this.book, this.query, this.lastCursor);
+      this.currentPage = await new TransactionPage().init(this.book, this.query, this.lastCursor);
     }
 
     if (this.currentPage.hasNext()) {
@@ -110,7 +110,7 @@ export default class TransactionIterator {
     } else if (!this.currentPage.hasReachEnd()) {
       this.lastCursor = this.currentPage.getCursor();
       if (this.nextPage == null) {
-        this.nextPage = await new TransactionPage_().init(this.book, this.query, this.lastCursor);
+        this.nextPage = await new TransactionPage().init(this.book, this.query, this.lastCursor);
       }
       return this.nextPage.hasNext();
     } else {
@@ -124,7 +124,7 @@ export default class TransactionIterator {
   public async next(): Promise<Transaction> {
 
     if (this.currentPage == null) {
-      this.currentPage = await new TransactionPage_().init(this.book, this.query, this.lastCursor);
+      this.currentPage = await new TransactionPage().init(this.book, this.query, this.lastCursor);
     }
 
     if (this.currentPage.hasNext()) {
@@ -135,7 +135,7 @@ export default class TransactionIterator {
         this.currentPage = this.nextPage;
         this.nextPage = null;
       } else {
-        this.currentPage = await new TransactionPage_().init(this.book, this.query, this.lastCursor);
+        this.currentPage = await new TransactionPage().init(this.book, this.query, this.lastCursor);
       }
       return this.currentPage.next();
     } else {
@@ -149,7 +149,7 @@ export default class TransactionIterator {
    */  
   public async getAccount(): Promise<Account> {
     if (this.currentPage == null) {
-      this.currentPage = await new TransactionPage_().init(this.book, this.query, this.lastCursor);
+      this.currentPage = await new TransactionPage().init(this.book, this.query, this.lastCursor);
     }    
     return this.currentPage.getAccount();
   }

@@ -1,7 +1,7 @@
+import { convertInMatrix, formatValue } from "../utils";
 import Account from "./Account";
 import Transaction from "./Transaction";
 import TransactionIterator from "./TransactionIterator";
-import Utilities from "./Utilities";
 
 /**
  * A TransactionsDataTableBuilder is used to setup and build two-dimensional arrays containing transactions.
@@ -104,7 +104,7 @@ export default class TransactionsDataTableBuilder {
 
     if (transactions.length > 0) {
       transactions.splice(0, 0, headerLine);
-      transactions = Utilities.convertInMatrix(transactions);
+      transactions = convertInMatrix(transactions);
       return transactions;
     } else {
       return [headerLine];
@@ -137,7 +137,7 @@ export default class TransactionsDataTableBuilder {
         if (this.shouldFormatValues) {
           var decimalSeparator = iterator.getBook().getDecimalSeparator();
           var fractionDigits = iterator.getBook().getFractionDigits();
-          line.push(Utilities.formatValue_(transaction.getAmount(), decimalSeparator, fractionDigits));
+          line.push(formatValue(transaction.getAmount(), decimalSeparator, fractionDigits));
         } else {
           line.push(transaction.getAmount());
         }
@@ -211,7 +211,7 @@ export default class TransactionsDataTableBuilder {
         var amount: string | number = transaction.getAmount();
 
         if (this.shouldFormatValues) {
-          amount = Utilities.formatValue_(transaction.getAmount(), iterator.getBook().getDecimalSeparator(), iterator.getBook().getFractionDigits());
+          amount = formatValue(transaction.getAmount(), iterator.getBook().getDecimalSeparator(), iterator.getBook().getFractionDigits());
         };
 
         if (this.isCreditOnTransaction_(transaction, account)) {
@@ -230,7 +230,7 @@ export default class TransactionsDataTableBuilder {
         if (transaction.getAccountBalance() != null) {
           var balance: string | number = transaction.getAccountBalance();
           if (this.shouldFormatValues) {
-            balance = Utilities.formatValue_(balance, iterator.getBook().getDecimalSeparator(), iterator.getBook().getFractionDigits());
+            balance = formatValue(balance, iterator.getBook().getDecimalSeparator(), iterator.getBook().getFractionDigits());
           };
           line.push(balance);
         } else {

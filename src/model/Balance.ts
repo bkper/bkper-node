@@ -1,5 +1,5 @@
+import { createDate } from "../utils";
 import BalancesContainer from "./BalancesContainer";
-import Utilities from "./Utilities";
 
 /**
  * Class that represents an [[Account]], [[Group]] or #hashtag balance on a window of time (Day / Month / Year). 
@@ -58,7 +58,7 @@ export default class Balance {
     if (day == null || day == 0) {
       month++;
     }
-    var date = Utilities.createDate(year, month, day, this.container.getBalancesReport().getBook().getTimeZoneOffset());
+    var date = createDate(year, month, day, this.container.getBalancesReport().getBook().getTimeZoneOffset());
     return date;
   }
 

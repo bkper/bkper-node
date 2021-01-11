@@ -1,5 +1,5 @@
 import Book from "./Book";
-import * as FileService_ from './FileService_';
+import * as FileService from '../service/file-service';
 
 /**
  * 
@@ -63,7 +63,7 @@ export default class File {
    */
   public async getContent(): Promise<string> {
     if (this.getId() != null && (this.wrapped == null || this.wrapped.content == null)) {
-      this.wrapped = await FileService_.getFile(this.book.getId(), this.getId());
+      this.wrapped = await FileService.getFile(this.book.getId(), this.getId());
     }
     return this.wrapped.content;
   }
@@ -98,7 +98,7 @@ export default class File {
    * Perform create new File.
    */
   public async create(): Promise<File> {
-    this.wrapped = await FileService_.createFile(this.book.getId(), this.wrapped);
+    this.wrapped = await FileService.createFile(this.book.getId(), this.wrapped);
     return this;
   }
 

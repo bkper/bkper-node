@@ -1,5 +1,4 @@
-import Book from "./Book";
-import { HttpBooksApiV3Request } from "./HttpApiRequest";
+import { HttpBooksApiV3Request } from "./api/HttpApiRequest";
 
 export async function createTransaction(bookId: string, transaction: bkper.Transaction): Promise<bkper.TransactionOperation> {
   var payload = JSON.stringify(transaction);
@@ -64,11 +63,11 @@ export async function getTransaction(bookId: string, id: string): Promise<bkper.
   return response.data;
 }
 
-export async function searchTransactions(book: Book, query: string, limit: number, cursor?: string): Promise<bkper.TransactionList> {
+export async function searchTransactions(bookId: string, query: string, limit: number, cursor?: string): Promise<bkper.TransactionList> {
   if (query == null) {
     query = "";
   }
-  var request = new HttpBooksApiV3Request(`${book.getId()}/transactions`);
+  var request = new HttpBooksApiV3Request(`${bookId}/transactions`);
   request.addParam('query', query);
   request.addParam('limit', limit);
   if (cursor != null) {

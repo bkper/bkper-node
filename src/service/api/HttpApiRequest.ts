@@ -1,6 +1,5 @@
 
 import {GaxiosError, request, GaxiosResponse} from 'gaxios';
-import Utilities from './Utilities';
 import OAuthTokenProvider from './OAuthTokenProvider';
 
 type HttpMethod = "GET"|"POST"|"PUT"|"PATCH"|"DELETE";

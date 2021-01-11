@@ -1,7 +1,7 @@
 import Book from "./Book";
 import Account from "./Account";
-import { normalizeText } from "./Normalizer_";
-import * as GroupService_ from  './GroupService_';
+import { normalizeText } from "../utils";
+import * as GroupService from  '../service/group-service';
 
 /**
  * This class defines a Group of [[Accounts]].
@@ -162,7 +162,7 @@ export default class Group {
    * Perform create new group.
    */
   public async create(): Promise<Group> {
-    this.wrapped = await GroupService_.createGroup(this.book.getId(), this.wrapped);
+    this.wrapped = await GroupService.createGroup(this.book.getId(), this.wrapped);
     this.book.clearAccountsCache();
     return this;
   }   
@@ -171,7 +171,7 @@ export default class Group {
    * Perform update group, applying pending changes.
    */
   public async update(): Promise<Group> {
-    this.wrapped = await GroupService_.updateGroup(this.book.getId(), this.wrapped);
+    this.wrapped = await GroupService.updateGroup(this.book.getId(), this.wrapped);
     this.book.clearAccountsCache();
     return this;
 
@@ -181,7 +181,7 @@ export default class Group {
    * Perform delete group.
    */
   public async remove(): Promise<Group> {
-    this.wrapped = await GroupService_.deleteGroup(this.book.getId(), this.wrapped);
+    this.wrapped = await GroupService.deleteGroup(this.book.getId(), this.wrapped);
     this.book.clearAccountsCache();
     return this;
   }   

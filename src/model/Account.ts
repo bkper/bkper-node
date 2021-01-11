@@ -1,9 +1,9 @@
-import * as AccountService_  from './AccountService_'
+import * as AccountService  from '../service/account-service'
 import Book from './Book';
 import { AccountType } from './Enums';
 import Group from './Group';
-import { normalizeText } from './Normalizer_';
-import Utilities from './Utilities';
+import { getRepresentativeValue, normalizeText, round } from '../utils';
+
 /**
  * 
  * This class defines an [Account](https://en.wikipedia.org/wiki/Account_(bookkeeping)) of a [[Book]].
@@ -152,13 +152,13 @@ export default class Account {
   public getBalance(raw?: boolean): number {
     var balance = 0;
     if (this.wrapped.balance != null) {
-      balance = Utilities.round(this.wrapped.balance, this.book.getFractionDigits());
+      balance = round(this.wrapped.balance, this.book.getFractionDigits());
     }
 
     if (raw) {
       return balance;
     } else {
-      return Utilities.getRepresentativeValue(balance, this.isCredit());
+      return getRepresentativeValue(balance, this.isCredit());
     }
   }
 
@@ -172,13 +172,13 @@ export default class Account {
   public getCheckedBalance(raw?: boolean): number {
     var balance = 0;
     if (this.wrapped.balance != null) {
-      balance = Utilities.round(this.wrapped.checkedBalance, this.book.getFractionDigits());
+      balance = round(this.wrapped.checkedBalance, this.book.getFractionDigits());
     }
 
     if (raw) {
       return balance;
     } else {
-      return Utilities.getRepresentativeValue(balance, this.isCredit());
+      return getRepresentativeValue(balance, this.isCredit());
     }
   }
 
@@ -368,7 +368,7 @@ export default class Account {
    * Perform create new account.
    */
   public async create(): Promise<Account> {
-    this.wrapped = await AccountService_.createAccount(this.book.getId(), this.wrapped);
+    this.wrapped = await AccountService.createAccount(this.book.getId(), this.wrapped);
     this.book.clearAccountsCache();
     return this;
   }   
@@ -377,7 +377,7 @@ export default class Account {
    * Perform update account, applying pending changes.
    */
   public async update(): Promise<Account> {
-    this.wrapped = await AccountService_.updateAccount(this.book.getId(), this.wrapped);
+    this.wrapped = await AccountService.updateAccount(this.book.getId(), this.wrapped);
     this.book.clearAccountsCache();
     return this;
 
@@ -387,7 +387,7 @@ export default class Account {
    * Perform delete account.
    */
   public async remove(): Promise<Account> {
-    this.wrapped = await AccountService_.deleteAccount(this.book.getId(), this.wrapped);
+    this.wrapped = await AccountService.deleteAccount(this.book.getId(), this.wrapped);
     this.book.clearAccountsCache();
     return this;
   }   

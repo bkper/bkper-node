@@ -1,11 +1,11 @@
 import Book from "./Book"
 import Transaction from "./Transaction"
 import Account from "./Account"
-import * as TransactionService_ from './TransactionService_';
-import Utilities from "./Utilities";
+import * as TransactionService from '../service/transaction-service';
+import { wrapObjects } from "../utils";
 
 
-export default class TransactionPage_ {
+export default class TransactionPage {
 
   private account: Account
   private transactions: Transaction[]
@@ -13,15 +13,15 @@ export default class TransactionPage_ {
   private index: number
   private reachEnd: boolean
 
-  async init(book: Book, query: string, lastCursor: string): Promise<TransactionPage_> {
+  async init(book: Book, query: string, lastCursor: string): Promise<TransactionPage> {
 
-    var transactionList = await TransactionService_.searchTransactions(book, query, 1000, lastCursor);
+    var transactionList = await TransactionService.searchTransactions(book.getId(), query, 1000, lastCursor);
 
     if (transactionList.items == null) {
       transactionList.items = [];
     }
 
-    this.transactions = Utilities.wrapObjects(new Transaction(), transactionList.items);
+    this.transactions = wrapObjects(new Transaction(), transactionList.items);
     book.configureTransactions_(this.transactions);
     this.cursor = transactionList.cursor;
     if (transactionList.account) {

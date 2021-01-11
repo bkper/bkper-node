@@ -1,7 +1,7 @@
-import Book from "./Book";
-import * as BookService_ from './BookService_';
-import { HttpApiRequest } from './HttpApiRequest';
-import OAuthTokenProvider from "./OAuthTokenProvider";
+import Book from "./model/Book";
+import * as BookService from './service/book-service';
+import { HttpApiRequest } from './service/api/HttpApiRequest';
+import OAuthTokenProvider from './service/api/OAuthTokenProvider';
 
 export default class Bkper {
 
@@ -22,7 +22,7 @@ export default class Bkper {
    * @public
    */
   public static async getBook(id: string): Promise<Book> {
-    let book = await BookService_.loadBookWrapped(id);
+    let book = await BookService.loadBookWrapped(id);
     return new Book(book);
   }
 

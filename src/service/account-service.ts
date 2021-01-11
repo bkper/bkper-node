@@ -1,4 +1,4 @@
-import {HttpBooksApiV3Request} from './HttpApiRequest';
+import {HttpBooksApiV3Request} from './api/HttpApiRequest';
 
 export async function createAccount(bookId: string, account: bkper.Account): Promise<bkper.Account> {
   var payload = JSON.stringify(account);

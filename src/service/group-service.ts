@@ -1,4 +1,4 @@
-import { HttpBooksApiV3Request } from "./HttpApiRequest";
+import { HttpBooksApiV3Request } from "./api/HttpApiRequest";
 
 export async function createGroup(bookId: string, group: bkper.Group): Promise<bkper.Group> {
   var payload = JSON.stringify(group);

@@ -1,4 +1,4 @@
-import { HttpBooksApiV3Request } from "./HttpApiRequest";
+import { HttpBooksApiV3Request } from "./api/HttpApiRequest";
 
 export async function createFile(bookId: string, file: bkper.File): Promise<bkper.File> {
   var payload = JSON.stringify(file);
