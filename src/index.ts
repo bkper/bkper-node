@@ -1,7 +1,7 @@
 import Book from "./model/Book";
 import * as BookService from './service/book-service';
-import { HttpApiRequest } from './service/api/HttpApiRequest';
-import OAuthTokenProvider from './service/api/OAuthTokenProvider';
+import { HttpApiRequest } from './service/HttpApiRequest';
+import OAuthTokenProvider from './auth/OAuthTokenProvider';
 
 export default class Bkper {
 
@@ -39,7 +39,7 @@ export default class Bkper {
    * @public
    */
   public static setApiKey(key: string): void {
-    HttpApiRequest.API_KEY_ = key;
+    HttpApiRequest.API_KEY = key;
   }
 
 
@@ -53,7 +53,7 @@ export default class Bkper {
    * @public
    */
   public static setOAuthTokenProvider(tokenProvider: OAuthTokenProvider) {
-    HttpApiRequest.OAUTH_TOKEN_PROVIDER_ = tokenProvider;
+    HttpApiRequest.OAUTH_TOKEN_PROVIDER = tokenProvider;
   }
 
 }

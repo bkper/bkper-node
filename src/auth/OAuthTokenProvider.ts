@@ -8,5 +8,5 @@ export default interface OAuthTokenProvider {
   /**
    * A valid OAuth2 access token with **email** scope authorized.
    */
-  (): string;
+  getOAuthToken(): string;
 }

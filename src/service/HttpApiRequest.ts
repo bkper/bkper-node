@@ -1,6 +1,6 @@
 
 import {GaxiosError, request, GaxiosResponse} from 'gaxios';
-import OAuthTokenProvider from './OAuthTokenProvider';
+import OAuthTokenProvider from '../auth/OAuthTokenProvider';
 
 type HttpMethod = "GET"|"POST"|"PUT"|"PATCH"|"DELETE";
 
@@ -12,8 +12,8 @@ export class HttpApiRequest  {
   private method: HttpMethod = 'GET';
   private payload: any = null;
 
-  public static API_KEY_: string;
-  public static OAUTH_TOKEN_PROVIDER_: OAuthTokenProvider;
+  public static API_KEY: string;
+  public static OAUTH_TOKEN_PROVIDER: OAuthTokenProvider;
   
   constructor(path: string) {
     this.url = `https://app.bkper.com/_ah/api/bkper/${path}`;
@@ -71,8 +71,8 @@ export class HttpApiRequest  {
 
   async fetch(): Promise<GaxiosResponse> {
 
-    this.headers['Authorization'] = `Bearer ${HttpApiRequest.OAUTH_TOKEN_PROVIDER_()}`;
-    this.addParam('key', HttpApiRequest.API_KEY_);
+    this.headers['Authorization'] = `Bearer ${HttpApiRequest.OAUTH_TOKEN_PROVIDER.getOAuthToken()}`;
+    this.addParam('key', HttpApiRequest.API_KEY);
 
     return request({
       url: this.getUrl(),

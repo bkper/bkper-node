@@ -1,4 +1,4 @@
-import { HttpBooksApiV3Request } from "./api/HttpApiRequest";
+import { HttpBooksApiV3Request } from "./HttpApiRequest";
 
 export async function createTransaction(bookId: string, transaction: bkper.Transaction): Promise<bkper.TransactionOperation> {
   var payload = JSON.stringify(transaction);

@@ -1,4 +1,4 @@
-import { HttpBooksApiV3Request } from "./api/HttpApiRequest";
+import { HttpBooksApiV3Request } from "./HttpApiRequest";
 
 export async function loadBookWrapped(bookId: string): Promise<bkper.Book> {
 

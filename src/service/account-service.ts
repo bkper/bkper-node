@@ -1,4 +1,4 @@
-import {HttpBooksApiV3Request} from './api/HttpApiRequest';
+import {HttpBooksApiV3Request} from './HttpApiRequest';
 
 export async function createAccount(bookId: string, account: bkper.Account): Promise<bkper.Account> {
   var payload = JSON.stringify(account);
@@ -23,7 +23,7 @@ export async function createAccounts(bookId: string, accounts: bkper.Account[]):
   };
   var accountSaveBatchJSON = JSON.stringify(accountList);
   var response = await new HttpBooksApiV3Request(`${bookId}/accounts/batch`).setMethod('POST').setPayload(accountSaveBatchJSON).fetch();
-  var accountsPlain = await response.data;
+  var accountsPlain = response.data;
   if (accountsPlain.items == null) {
     return [];
   }

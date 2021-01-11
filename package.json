@@ -21,6 +21,7 @@
   "dependencies": {
     "@bkper/bkper-api-types": "^3.7.1",
     "gaxios": "^4.1.0",
+    "google-auth-library": "^6.1.4",
     "moment-timezone": "^0.5.32",
     "request": "^2.88.2"
   },
