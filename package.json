@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Node.js client for Bkper REST API",
   "main": "lib/index.js",
+  "bin": {
+    "bkper": "./lib/cli.js"
+  },
   "types": "lib",
   "files": [
     "lib/**/*"
@@ -20,12 +23,16 @@
   },
   "dependencies": {
     "@bkper/bkper-api-types": "^3.7.1",
+    "@google-cloud/local-auth": "^1.0.0",
+    "commander": "^6.2.1",
     "gaxios": "^4.1.0",
     "google-auth-library": "^6.1.4",
     "moment-timezone": "^0.5.32",
+    "open": "^7.3.1",
     "request": "^2.88.2"
   },
   "devDependencies": {
+    "@types/commander": "^2.12.2",
     "@types/moment-timezone": "^0.5.30",
     "@types/node": "^14.14.20",
     "gts": "^3.0.3",

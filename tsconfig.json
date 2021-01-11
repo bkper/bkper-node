@@ -6,9 +6,11 @@
     "typeRoots" : ["node_modules/@bkper", "node_modules/@types" ],
     "strict": false,
     "esModuleInterop": true,
-    "target": "es2015"
+    "target": "es2015",
+    "resolveJsonModule": true
   },
   "include": [
+    "src/**/*.json",
     "src/**/*.ts",
     "test/**/*.ts"
   ]

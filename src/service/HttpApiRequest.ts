@@ -1,5 +1,6 @@
 
 import {GaxiosError, request, GaxiosResponse} from 'gaxios';
+import { getAccessToken, isLoggedIn } from '../auth/LocalAuth';
 import OAuthTokenProvider from '../auth/OAuthTokenProvider';
 
 type HttpMethod = "GET"|"POST"|"PUT"|"PATCH"|"DELETE";
@@ -71,7 +72,7 @@ export class HttpApiRequest  {
 
   async fetch(): Promise<GaxiosResponse> {
 
-    this.headers['Authorization'] = `Bearer ${HttpApiRequest.OAUTH_TOKEN_PROVIDER.getOAuthToken()}`;
+    this.headers['Authorization'] = `Bearer ${await getOAuthToken()}`;
     this.addParam('key', HttpApiRequest.API_KEY);
 
     return request({
@@ -87,6 +88,18 @@ export class HttpApiRequest  {
     })
 
   }
+}
+
+async function getOAuthToken() {
+  let token: string = null;
+  if (HttpApiRequest.OAUTH_TOKEN_PROVIDER) {
+    token = await HttpApiRequest.OAUTH_TOKEN_PROVIDER.getOAuthToken();
+  }
+
+  if (token == null && isLoggedIn()) {
+    token = await getAccessToken();
+  }
+  return token;
 }
 
 export class HttpBooksApiV2Request extends HttpApiRequest {
