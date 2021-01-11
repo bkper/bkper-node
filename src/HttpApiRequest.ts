@@ -1,7 +1,6 @@
 
 import fetch, { Response } from 'node-fetch'
 import Utilities from './Utilities';
-import Logger from './Logger';
 import OAuthTokenProvider from './OAuthTokenProvider';
 
 type HttpMethod = "get"|"post"|"put"|"patch"|"delete";
@@ -95,8 +94,6 @@ export class HttpApiRequest  {
       try {
         let body = this.payload;
 
-        console.log(`BODY: ${body}`)
-
         response = await fetch(this.getUrl(), {
           method: this.method,
           body: body,
@@ -107,7 +104,7 @@ export class HttpApiRequest  {
         if (retries > 4) {
             throw addressUnavailable;
         } else {
-          Logger.log("Retrying in " + (sleepTime / 1000) + " secs...");
+          console.log("Retrying in " + (sleepTime / 1000) + " secs...");
           await Utilities.sleep(sleepTime);
           sleepTime = sleepTime * 2;
           retries++;
@@ -137,7 +134,7 @@ export class HttpApiRequest  {
               throw error.message;
             }
           } else {
-            Logger.log("Retrying in " + (sleepTime / 1000) + " secs...");
+            console.log("Retrying in " + (sleepTime / 1000) + " secs...");
             await Utilities.sleep(sleepTime);
             sleepTime = sleepTime * 2;
             retries++;
