@@ -1,19 +1,22 @@
 import { convertInMatrix } from '../utils';
-import Account from './Account'
+import { Account } from './Account'
 import { AccountType } from './Enums';
-import Group from './Group';
+import { Group } from './Group';
 
 /**
  * A AccountsDataTableBuilder is used to setup and build two-dimensional arrays containing transactions.
  * 
  * @public
  */
-export default class AccountsDataTableBuilder {
+export class AccountsDataTableBuilder {
 
+  /** @internal */
   private accounts: Account[];
 
+  /** @internal */
   private shouldIncludeArchived: boolean;
 
+  /** @internal */
   constructor(accounts: Account[]) {
     this.accounts = accounts;
     this.shouldIncludeArchived = false;
@@ -29,6 +32,7 @@ export default class AccountsDataTableBuilder {
     return this;
   }
 
+  /** @internal */
   private getTypeIndex(type: AccountType): number {
     if (type == AccountType.ASSET) {
       return 0;

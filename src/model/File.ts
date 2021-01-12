@@ -1,4 +1,4 @@
-import Book from "./Book";
+import { Book } from "./Book";
 import * as FileService from '../service/file-service';
 
 /**
@@ -9,7 +9,7 @@ import * as FileService from '../service/file-service';
  * 
  * @public
  */
-export default class File {
+export class File {
 
   /** @internal */
   wrapped: bkper.File;

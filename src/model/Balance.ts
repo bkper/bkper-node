@@ -1,15 +1,17 @@
 import { createDate } from "../utils";
-import BalancesContainer from "./BalancesContainer";
+import { BalancesContainer } from "./BalancesContainer";
 
 /**
  * Class that represents an [[Account]], [[Group]] or #hashtag balance on a window of time (Day / Month / Year). 
  * 
  * @public
  */
-export default class Balance {
+export class Balance {
 
+  /** @internal */
   private wrapped: bkper.Balance;
 
+  /** @internal */
   private container: BalancesContainer;
 
   /** @internal */

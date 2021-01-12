@@ -3,7 +3,7 @@
  * 
  * @public
  */
-export default interface OAuthTokenProvider {
+export interface OAuthTokenProvider {
 
   /**
    * A valid OAuth2 access token with **https://www.googleapis.com/auth/userinfo.email** scope authorized.

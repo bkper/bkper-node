@@ -1,7 +1,7 @@
 import * as AccountService  from '../service/account-service'
-import Book from './Book';
+import { Book } from './Book';
 import { AccountType } from './Enums';
-import Group from './Group';
+import { Group } from './Group';
 import { getRepresentativeValue, normalizeText, round } from '../utils';
 
 /**
@@ -14,7 +14,7 @@ import { getRepresentativeValue, normalizeText, round } from '../utils';
  * 
  * @public
  */
-export default class Account {
+export class Account {
 
   /** @internal */
   wrapped: bkper.Account;
@@ -353,6 +353,7 @@ export default class Account {
     return this.isInGroupObject_(foundGroup);
   }
 
+  /** @internal */
   private isInGroupObject_(group: Group): boolean {
     if (this.wrapped.groups == null) {
       return false;

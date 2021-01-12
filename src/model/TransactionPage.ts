@@ -1,11 +1,11 @@
-import Book from "./Book"
-import Transaction from "./Transaction"
-import Account from "./Account"
+import { Book } from "./Book"
+import { Transaction } from "./Transaction"
+import { Account } from "./Account"
 import * as TransactionService from '../service/transaction-service';
 import { wrapObjects } from "../utils";
 
 
-export default class TransactionPage {
+export class TransactionPage {
 
   private account: Account
   private transactions: Transaction[]

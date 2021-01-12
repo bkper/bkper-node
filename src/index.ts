@@ -1,49 +1,32 @@
-import Book from "./model/Book";
-import * as BookService from './service/book-service';
-import { HttpApiRequest } from './service/HttpApiRequest';
-import OAuthTokenProvider from './auth/OAuthTokenProvider';
-
-
-
 /**
- * Gets the [[Book]] with the specified bookId from url param.
- *
- *
- * @param id - The universal book id - The same bookId param of URL you access at app.bkper.com
+ * Bkper REST API Node client.
  * 
- * @public
+ * Learn more at https://bkper.com/docs
+ * 
+ * @packageDocumentation
  */
-export async function getBook(id: string): Promise<Book> {
-  let book = await BookService.loadBook(id);
-  return new Book(book);
-}
 
+export { Bkper } from './Bkper'
+export { OAuthTokenProvider } from './auth/OAuthTokenProvider'
+export { Account } from './model/Account'
+export { AccountsDataTableBuilder } from './model/AccountsDataTableBuilder'
+export { Balance } from './model/Balance'
+export { BalancesContainer } from './model/BalancesContainer'
+export { BalancesDataTableBuilder } from './model/BalancesDataTableBuilder'
+export { BalancesReport } from './model/BalancesReport'
+export { Book }  from './model/Book'
+export { Collection } from './model/Collection'
+export { File } from './model/File'
+export { Group } from './model/Group'
+export { Transaction } from './model/Transaction'
+export { TransactionIterator } from './model/TransactionIterator'
+export { TransactionsDataTableBuilder } from './model/TransactionsDataTableBuilder'
+export { 
+  Periodicity, 
+  AccountType,
+  BalanceCheckedType,
+  BalanceType,
+  DecimalSeparator,
+  Permission
+} from './model/Enums'
 
-/**
- * Sets the API key to identify the agent.
- * 
- * API keys are intended for agent identification only, not for authentication. [Learn more](https://cloud.google.com/endpoints/docs/frameworks/java/when-why-api-key)
- * 
- * See how to create your api key [here](https://cloud.google.com/docs/authentication/api-keys).
- *
- * @param key - The key from GCP API & Services Credentials console.
- * 
- * @public
- */
-export function setApiKey(key: string): void {
-  HttpApiRequest.API_KEY = key;
-}
-
-
-/**
- * Sets the [[OAuthTokenProvider]].
- * 
- * OAuthTokenProvider issue a valid OAuth token upon calling the Bkper Rest API. 
- * 
- * @param oauthTokenProvider - The [[OAuthTokenProvider]] implementation.
- * 
- * @public
- */
-export async function setOAuthTokenProvider(oauthTokenProvider: OAuthTokenProvider) {
-  HttpApiRequest.OAUTH_TOKEN_PROVIDER = oauthTokenProvider;
-}

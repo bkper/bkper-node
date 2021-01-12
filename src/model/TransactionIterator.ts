@@ -1,7 +1,7 @@
-import Book from "./Book"
-import Transaction from "./Transaction"
-import Account from "./Account"
-import TransactionPage from "./TransactionPage"
+import { Book } from "./Book"
+import { Transaction } from "./Transaction"
+import { Account } from "./Account"
+import { TransactionPage } from "./TransactionPage"
 
 /**
  *
@@ -22,14 +22,24 @@ import TransactionPage from "./TransactionPage"
  *
  * @public
  */
-export default class TransactionIterator {
+export class TransactionIterator {
 
+  /** @internal */
   private book: Book
-  private query: string
-  private currentPage: TransactionPage
-  private nextPage: TransactionPage
-  private lastCursor: string
 
+  /** @internal */
+  private query: string
+
+  /** @internal */
+  private currentPage: TransactionPage
+
+  /** @internal */
+  private nextPage: TransactionPage
+
+  /** @internal */
+  private lastCursor: string
+  
+  /** @internal */
   constructor(book: Book, query?: string) {
     this.book = book
     this.query = query

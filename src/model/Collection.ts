@@ -1,13 +1,13 @@
-import Book from "./Book";
+import { Book } from "./Book";
 
 /**
  * This class defines a Collection of [[Books]].
  * 
  * @public
  */
-export default class Collection {
+export class Collection {
 
-  
+  /** @internal */
   private wrapped: bkper.Collection
   
   /** @internal */

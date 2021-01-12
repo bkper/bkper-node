@@ -5,18 +5,18 @@ import * as BookService from '../service/book-service';
 import * as SavedQueryService from '../service/query-service';
 import * as FileService from '../service/file-service';
 import * as GroupService from '../service/group-service';
-import Account from './Account';
-import Collection from './Collection';
-import AccountsDataTableBuilder from './AccountsDataTableBuilder';
-import BalancesDataTableBuilder from './BalancesDataTableBuilder';
-import BalancesReport from './BalancesReport';
-import File from './File';
+import { Account } from './Account';
+import { Collection } from './Collection';
+import { AccountsDataTableBuilder } from './AccountsDataTableBuilder';
+import { BalancesDataTableBuilder } from './BalancesDataTableBuilder';
+import { BalancesReport } from './BalancesReport';
+import { File } from './File';
 import { normalizeName } from '../utils';
 import { DecimalSeparator, Permission } from './Enums';
-import Group from './Group';
-import Transaction from './Transaction';
-import TransactionIterator from './TransactionIterator';
-import TransactionsDataTableBuilder from './TransactionsDataTableBuilder';
+import { Group } from './Group';
+import { Transaction } from './Transaction';
+import { TransactionIterator } from './TransactionIterator';
+import { TransactionsDataTableBuilder } from './TransactionsDataTableBuilder';
 import * as Utils from '../utils';
 
 /**
@@ -27,16 +27,33 @@ import * as Utils from '../utils';
  * 
  * @public
  */
-export default class Book {
+export class Book {
 
+  /** @internal */
   private wrapped: bkper.Book;
+  
+  /** @internal */
   private accounts: Account[];
+
+  /** @internal */
   private groups: Group[];
+  
+  /** @internal */
   private collection: Collection;
+
+  /** @internal */
   private idAccountMap: any;
+  
+  /** @internal */
   private nameAccountMap: any;
+
+  /** @internal */
   private idGroupMap: any;
+
+  /** @internal */
   private nameGroupMap: any;
+
+  /** @internal */
   private savedQueries: bkper.Query[];
 
 
@@ -95,7 +112,7 @@ export default class Book {
     return this.wrapped.ownerName;
   }
 
-
+  /** @internal */
   private checkAccountsLoaded_(): void {
     if (this.idAccountMap == null || this.idAccountMap == null) {
       this.configureGroups_(this.wrapped.groups);
@@ -341,7 +358,7 @@ export default class Book {
     return transactions;
   }
 
-
+  /** @internal */
   private configureTransaction_(transaction: Transaction) {
     transaction.book = this;
     return transaction;
@@ -472,7 +489,7 @@ export default class Book {
   }
 
 
-
+  /** @internal */
   private configureAccounts_(accounts: bkper.Account[]): void {
     this.accounts = Utils.wrapObjects(new Account(), accounts);
     this.idAccountMap = new Object();
@@ -519,6 +536,7 @@ export default class Book {
     this.idGroupMap = null;
   }
 
+  /** @internal */
   private clearBookCache_() {
     this.wrapped = null;
   }
@@ -548,6 +566,7 @@ export default class Book {
     return group;
   }
 
+  /** @internal */
   private configureGroups_(groups: bkper.Group[]): void {
     this.groups = Utils.wrapObjects(new Group(), groups);
     this.idGroupMap = new Object();

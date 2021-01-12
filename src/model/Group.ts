@@ -1,5 +1,5 @@
-import Book from "./Book";
-import Account from "./Account";
+import { Book } from "./Book";
+import { Account } from "./Account";
 import { normalizeText } from "../utils";
 import * as GroupService from  '../service/group-service';
 
@@ -12,7 +12,7 @@ import * as GroupService from  '../service/group-service';
  * 
  * @public
  */
-export default class Group {
+export class Group {
 
   /** @internal */
   wrapped: bkper.Group

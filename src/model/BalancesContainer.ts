@@ -1,7 +1,7 @@
 import { getRepresentativeValue, round } from "../utils";
-import Balance from "./Balance";
-import BalancesDataTableBuilder from "./BalancesDataTableBuilder";
-import BalancesReport from "./BalancesReport";
+import { Balance } from "./Balance";
+import { BalancesDataTableBuilder } from "./BalancesDataTableBuilder";
+import { BalancesReport } from "./BalancesReport";
 import { BalanceCheckedType, Periodicity } from "./Enums";
 
 /**
@@ -11,7 +11,7 @@ import { BalanceCheckedType, Periodicity } from "./Enums";
  * 
  * @public
  */
-export default interface BalancesContainer {
+export interface BalancesContainer {
 
   /**
    * The parent BalancesReport of the container

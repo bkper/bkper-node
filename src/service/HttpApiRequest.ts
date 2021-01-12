@@ -1,7 +1,7 @@
 
-import {GaxiosError, request, GaxiosResponse} from 'gaxios';
+import { GaxiosError, request, GaxiosResponse } from 'gaxios';
 import { getOAuthToken } from '../auth/auth-service';
-import OAuthTokenProvider from '../auth/OAuthTokenProvider';
+import { OAuthTokenProvider } from '../auth/OAuthTokenProvider';
 
 type HttpMethod = "GET"|"POST"|"PUT"|"PATCH"|"DELETE";
 

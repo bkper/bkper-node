@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Node.js client for Bkper REST API",
   "main": "lib/index.js",
-  "types": "lib",
+  "types": "lib/index.d.ts",
   "files": [
     "lib/**/*"
   ],
@@ -19,7 +19,9 @@
     "build:test": "yarn test",
     "build:compile": "tsc",
     "build:api": "api-extractor run --local",
-    "build:cleanup": "rimraf 'lib/!(*.js)'",
+    "build:cleanup": "rimraf lib/**/*.map lib/*.map lib/**/*.d.ts lib/*.d.ts",
+    "build:dts": "cp dist/bkper-public.d.ts lib/index.d.ts",
+    "build:clean-dist": "rimraf dist",
     "watch": "tsc -w"
   },
   "dependencies": {

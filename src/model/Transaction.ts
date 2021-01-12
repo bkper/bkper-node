@@ -1,6 +1,6 @@
-import File from "./File";
-import Book from "./Book";
-import Account from "./Account";
+import { File } from "./File";
+import { Book } from "./Book";
+import { Account } from "./Account";
 import * as TransactionService from '../service/transaction-service';
 import * as Utils from '../utils';
 
@@ -13,7 +13,7 @@ import * as Utils from '../utils';
  * 
  * @public
  */
-export default class Transaction {
+export class Transaction {
 
   /** @internal */
   wrapped: bkper.Transaction
@@ -447,6 +447,7 @@ export default class Transaction {
     }
   }
 
+  /** @internal */
   private getAccount_(account: Account | string): Account {
     if (account == null || account instanceof Account) {
       return account as Account;
@@ -454,10 +455,12 @@ export default class Transaction {
     return this.book.getAccount(account);
   }
 
+  /** @internal */
   private isCreditOnTransaction_(account: Account) {
     return this.getCreditAccount() != null && account != null && this.getCreditAccount().getId() == account.getId();
   }
 
+  /** @internal */
   private isDebitOnTransaction_(account: Account) {
     return this.getDebitAccount() != null && account != null && this.getDebitAccount().getId() == account.getId();
   }
@@ -552,10 +555,12 @@ export default class Transaction {
 
 
   //EVOLVED BALANCES
+  /** @internal */
   private getCaEvolvedBalance_(): number {
     return this.wrapped.creditAccount != null && this.wrapped.creditAccount.balance != null ? +this.wrapped.creditAccount.balance : null;
   }
 
+  /** @internal */
   private getDaEvolvedBalance_(): number {
     return this.wrapped.debitAccount != null && this.wrapped.debitAccount.balance != null ? +this.wrapped.debitAccount.balance : null;
   }

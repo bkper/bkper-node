@@ -1,7 +1,7 @@
-import BalancesContainer, { GroupBalancesContainer } from "./BalancesContainer";
+import { BalancesContainer, GroupBalancesContainer } from "./BalancesContainer";
 import { BalanceType, BalanceCheckedType, Periodicity } from "./Enums";
 
-import Book from "./Book";
+import { Book } from "./Book";
 import { formatDate, formatValue, getDateFormatterPattern, getRepresentativeValue, round } from "../utils";
 
 
@@ -10,20 +10,42 @@ import { formatDate, formatValue, getDateFormatterPattern, getRepresentativeValu
  * 
  * @public
  */
-export default class BalancesDataTableBuilder implements BalancesDataTableBuilder {
+export class BalancesDataTableBuilder implements BalancesDataTableBuilder {
 
+  /** @internal */
   private balanceType: BalanceType;
+  
+  /** @internal */
   private balancesContainers: BalancesContainer[];
+  
+  /** @internal */
   private periodicity: Periodicity;
-  private balanceCheckedType: BalanceCheckedType;
-  private shouldFormatDate: boolean;
-  private shouldHideDates: boolean;
-  private shouldHideNames: boolean;
-  private shouldFormatValue: boolean;
-  private book: Book;
-  private shouldExpand: boolean;
-  private shouldTranspose: boolean
 
+  /** @internal */
+  private balanceCheckedType: BalanceCheckedType;
+
+  /** @internal */
+  private shouldFormatDate: boolean;
+
+  /** @internal */
+  private shouldHideDates: boolean;
+
+  /** @internal */
+  private shouldHideNames: boolean;
+
+  /** @internal */
+  private shouldFormatValue: boolean;
+
+  /** @internal */
+  private book: Book;
+
+  /** @internal */
+  private shouldExpand: boolean;
+
+  /** @internal */
+  private shouldTranspose: boolean
+  
+  /** @internal */
   constructor(book: Book, balancesContainers: BalancesContainer[], periodicity: Periodicity, balanceCheckedType: BalanceCheckedType) {
     this.book = book;
     this.balancesContainers = balancesContainers;
@@ -181,7 +203,7 @@ export default class BalancesDataTableBuilder implements BalancesDataTableBuilde
 
   ////////////////////////
 
-
+  /** @internal */
   private buildTotalDataTable_() {
     var table = new Array();
 
@@ -268,6 +290,7 @@ export default class BalancesDataTableBuilder implements BalancesDataTableBuilde
     return table;
   }
 
+  /** @internal */
   private buildTimeDataTable_() {
     var table = new Array<Array<any>>();
     var dataIndexMap: any = new Object();

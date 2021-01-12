@@ -1,20 +1,28 @@
 import { convertInMatrix, formatValue } from "../utils";
-import Account from "./Account";
-import Transaction from "./Transaction";
-import TransactionIterator from "./TransactionIterator";
+import { Account } from "./Account";
+import { Transaction } from "./Transaction";
+import { TransactionIterator } from "./TransactionIterator";
 
 /**
  * A TransactionsDataTableBuilder is used to setup and build two-dimensional arrays containing transactions.
  * 
  * @public
  */
-export default class TransactionsDataTableBuilder {
+export class TransactionsDataTableBuilder {
 
+  /** @internal */
   private transactionIterator: TransactionIterator;
-  private shouldFormatDates: boolean;
-  private shouldFormatValues: boolean;
-  private shouldAddUrls: boolean;
 
+  /** @internal */
+  private shouldFormatDates: boolean;
+
+  /** @internal */
+  private shouldFormatValues: boolean;
+
+  /** @internal */
+  private shouldAddUrls: boolean;
+  
+  /** @internal */
   constructor(transactionIterator: TransactionIterator) {
     this.transactionIterator = transactionIterator;
     this.shouldFormatDates = false;
@@ -111,6 +119,7 @@ export default class TransactionsDataTableBuilder {
     }
   }
 
+  /** @internal */
   private async get2DArray_(iterator: TransactionIterator) {
     var transactions = new Array();
 
@@ -175,6 +184,7 @@ export default class TransactionsDataTableBuilder {
     return transactions;
   }
 
+  /** @internal */
   private async getExtract2DArray_(iterator: TransactionIterator, account: Account): Promise<any[][]> {
     var transactions = new Array<Array<any>>();
 
@@ -258,6 +268,7 @@ export default class TransactionsDataTableBuilder {
     return transactions;
   }
 
+  /** @internal */
   private isCreditOnTransaction_(transaction: Transaction, account: Account) {
     if (transaction.getCreditAccount() == null) {
       return false;

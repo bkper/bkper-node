@@ -1,6 +1,6 @@
-import BalancesContainer, { AccountBalancesContainer, GroupBalancesContainer } from "./BalancesContainer";
-import BalancesDataTableBuilder from "./BalancesDataTableBuilder";
-import Book from "./Book";
+import { BalancesContainer, AccountBalancesContainer, GroupBalancesContainer } from "./BalancesContainer";
+import { BalancesDataTableBuilder } from "./BalancesDataTableBuilder";
+import { Book } from "./Book";
 import { BalanceCheckedType, Periodicity } from "./Enums";
 
 /**
@@ -8,12 +8,18 @@ import { BalanceCheckedType, Periodicity } from "./Enums";
  * 
  * @public
  */
-export default class BalancesReport {
+export class BalancesReport {
 
+  /** @internal */
   private wrapped: bkper.Balances;
-
+  
+  /** @internal */
   private book: Book;
+
+  /** @internal */
   private groupBalancesContainers: GroupBalancesContainer[];
+
+  /** @internal */
   private accountBalancesContainers: AccountBalancesContainer[];
 
   /** @internal */
@@ -74,6 +80,7 @@ export default class BalancesReport {
     return this.getGroupBalancesContainers() != null && this.getGroupBalancesContainers().length == 1;
   }
 
+  /** @internal */
   private getAccountBalancesContainers(): AccountBalancesContainer[] {
     if (this.accountBalancesContainers == null && this.wrapped.accountBalances != null) {
       this.accountBalancesContainers = [];
@@ -86,7 +93,7 @@ export default class BalancesReport {
     return this.accountBalancesContainers;
   }
 
-
+  /** @internal */
   private getGroupBalancesContainers(): GroupBalancesContainer[] {
     if (this.groupBalancesContainers == null && this.wrapped.groupBalances != null) {
       this.groupBalancesContainers = [];
