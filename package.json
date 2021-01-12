@@ -1,6 +1,6 @@
 {
   "name": "bkper",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Node.js client for Bkper REST API",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -28,8 +28,7 @@
     "minor": "yarn version --minor",
     "major": "yarn version --major",
     "preversion": "yarn build",
-    "postversion": "git push --tags && yarn publish --new-version $npm_package_version && git push && echo \"Successfully released version $npm_package_version!\""    
-    
+    "postversion": "git push --tags && yarn publish --new-version $npm_package_version && git push && echo \"Successfully released version $npm_package_version!\""
   },
   "dependencies": {
     "@bkper/bkper-api-types": "^3.7.1",
