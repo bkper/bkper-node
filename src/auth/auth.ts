@@ -27,25 +27,14 @@ export function isLoggedIn() {
   return storedCredentials != null;
 }
 
-export async function getAccessToken(): Promise<string> {
-  try {
-    return await new LocalOAuthTokenProvider().getOAuthToken();
-  } catch(e) {
-    console.log(e)
-    return null;
-  }
-}
-
 export async function login() {
   if (storedCredentials) {
     console.log('Bkper already logged in.');
   }
-  await getAccessToken();
+  await getOAuthToken();
 }
 
-export default class LocalOAuthTokenProvider {
-
-  async getOAuthToken(): Promise<string> {
+export async function getOAuthToken(): Promise<string> {
 
     let localAuth: OAuth2Client
 
@@ -61,14 +50,14 @@ export default class LocalOAuthTokenProvider {
         scopes: ['https://www.googleapis.com/auth/userinfo.email'],
         keyfilePath: `${__dirname}/keys.json`,
       });
-      this.storeCredentials(localAuth.credentials);
+      storeCredentials(localAuth.credentials);
     }
 
     localAuth.on('tokens', (tokens) => {
       if (tokens.refresh_token) {
         // store the refresh_token in my database!
         console.log(tokens.refresh_token);
-        this.storeCredentials(tokens)
+        storeCredentials(tokens)
       }
     });
     
@@ -78,8 +67,7 @@ export default class LocalOAuthTokenProvider {
     
   }
 
-  private storeCredentials(credentials: Credentials) {
+  function storeCredentials(credentials: Credentials) {
     storedCredentials = credentials;
     fs.writeFileSync(storedCredentialsPath, JSON.stringify(credentials, null, 4), 'utf8');
   }
-}

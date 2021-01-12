@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "description": "Node.js client for Bkper REST API",
   "main": "lib/index.js",
-  "bin": {
-    "bkper": "./lib/cli.js"
-  },
   "types": "lib",
   "files": [
     "lib/**/*"

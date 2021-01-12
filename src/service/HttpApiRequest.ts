@@ -1,6 +1,6 @@
 
 import {GaxiosError, request, GaxiosResponse} from 'gaxios';
-import { getAccessToken, isLoggedIn } from '../auth/LocalAuth';
+import { getOAuthToken, isLoggedIn } from '../auth/auth';
 import OAuthTokenProvider from '../auth/OAuthTokenProvider';
 
 type HttpMethod = "GET"|"POST"|"PUT"|"PATCH"|"DELETE";
@@ -72,7 +72,7 @@ export class HttpApiRequest  {
 
   async fetch(): Promise<GaxiosResponse> {
 
-    this.headers['Authorization'] = `Bearer ${await getOAuthToken()}`;
+    this.headers['Authorization'] = `Bearer ${await getAccessToken()}`;
     this.addParam('key', HttpApiRequest.API_KEY);
 
     return request({
@@ -90,15 +90,16 @@ export class HttpApiRequest  {
   }
 }
 
-async function getOAuthToken() {
+async function getAccessToken() {
   let token: string = null;
   if (HttpApiRequest.OAUTH_TOKEN_PROVIDER) {
     token = await HttpApiRequest.OAUTH_TOKEN_PROVIDER.getOAuthToken();
   }
 
-  if (token == null && isLoggedIn()) {
-    token = await getAccessToken();
+  if (token == null) {
+    token = await getOAuthToken();
   }
+
   return token;
 }
 
