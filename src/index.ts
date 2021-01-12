@@ -10,13 +10,6 @@ export default class Bkper {
    *
    * This is the main Entry Point to start interacting with Bkper.
    *
-   * Example:
-   *
-   * ```js
-   * var book = bkper.getBook("agtzfmJrcGVyLWhyZHITCxIGTGVkZ2VyGICAgIDggqALDA");
-   * book.record("#fuel for my Land Rover 126.50 28/01/2013");
-   * ```
-   *
    * @param id The universal book id - The same bookId param of URL you access at app.bkper.com
    * 
    * @public
@@ -48,12 +41,12 @@ export default class Bkper {
    * 
    * OAuthTokenProvider issue a valid OAuth token upon calling the Bkper Rest API. 
    * 
-   * @param tokenProvider The [[OAuthTokenProvider]] implementation.
+   * @param oauthTokenProvider The [[OAuthTokenProvider]] implementation.
    * 
    * @public
    */
-  public static setOAuthTokenProvider(tokenProvider: OAuthTokenProvider) {
-    HttpApiRequest.OAUTH_TOKEN_PROVIDER = tokenProvider;
+  public static setOAuthTokenProvider(oauthTokenProvider: OAuthTokenProvider) {
+    HttpApiRequest.OAUTH_TOKEN_PROVIDER = oauthTokenProvider;
   }
 
 }

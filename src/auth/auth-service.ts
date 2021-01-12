@@ -1,4 +1,3 @@
-import OAuthTokenProvider from "./OAuthTokenProvider";
 import  {authenticate} from '@google-cloud/local-auth';
 import fs from 'fs';
 import { Credentials, OAuth2Client } from "google-auth-library";
@@ -12,26 +11,8 @@ const storedCredentialsPath = `${os.homedir}/.bkper-credentials.json`;
 try {
   let credentialsJson = fs.readFileSync(storedCredentialsPath, 'utf8');
   storedCredentials = JSON.parse(credentialsJson);
-} catch {
+} catch (err) {
   console.log('Credentials not yet obtained.');
-}
-
-export function logout() {
-  if (fs.existsSync(storedCredentialsPath)) {
-    fs.unlinkSync(storedCredentialsPath);
-  }
-  console.log('Bkper logged out.');
-}
-
-export function isLoggedIn() {
-  return storedCredentials != null;
-}
-
-export async function login() {
-  if (storedCredentials) {
-    console.log('Bkper already logged in.');
-  }
-  await getOAuthToken();
 }
 
 export async function getOAuthToken(): Promise<string> {

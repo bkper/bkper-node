@@ -1,6 +1,6 @@
 
 import {GaxiosError, request, GaxiosResponse} from 'gaxios';
-import { getOAuthToken, isLoggedIn } from '../auth/auth';
+import { getOAuthToken } from '../auth/auth-service';
 import OAuthTokenProvider from '../auth/OAuthTokenProvider';
 
 type HttpMethod = "GET"|"POST"|"PUT"|"PATCH"|"DELETE";
@@ -93,7 +93,7 @@ export class HttpApiRequest  {
 async function getAccessToken() {
   let token: string = null;
   if (HttpApiRequest.OAUTH_TOKEN_PROVIDER) {
-    token = await HttpApiRequest.OAUTH_TOKEN_PROVIDER.getOAuthToken();
+    token = await HttpApiRequest.OAUTH_TOKEN_PROVIDER();
   }
 
   if (token == null) {
