@@ -8,6 +8,7 @@
     "lib/**/*"
   ],
   "repository": "https://github.com/bkper/bkper-node.git",
+  "homepage": "https://bkper.com/docs",
   "author": "mael <mael@bkper.com>",
   "license": "Apache-2.0",
   "private": false,
@@ -31,8 +32,7 @@
     "gaxios": "^4.1.0",
     "google-auth-library": "^6.1.4",
     "moment-timezone": "^0.5.32",
-    "open": "^7.3.1",
-    "request": "^2.88.2"
+    "open": "^7.3.1"
   },
   "devDependencies": {
     "@microsoft/api-extractor": "^7.12.1",
