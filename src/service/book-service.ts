@@ -1,6 +1,6 @@
 import { HttpBooksApiV3Request } from "./HttpApiRequest";
 
-export async function loadBookWrapped(bookId: string): Promise<bkper.Book> {
+export async function loadBook(bookId: string): Promise<bkper.Book> {
 
   if (bookId == null) {
     throw new Error("Book id null!");

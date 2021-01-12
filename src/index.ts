@@ -15,7 +15,7 @@ export default class Bkper {
    * @public
    */
   public static async getBook(id: string): Promise<Book> {
-    let book = await BookService.loadBookWrapped(id);
+    let book = await BookService.loadBook(id);
     return new Book(book);
   }
 
