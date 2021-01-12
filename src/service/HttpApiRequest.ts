@@ -80,11 +80,11 @@ export class HttpApiRequest  {
       method: this.method,
       headers: this.headers,
       data: this.payload,
-      retryConfig: {
-        retry: 5,
-        onRetryAttempt: (err: GaxiosError) => {console.log(`${err.message} - Retrying... `)},
-        retryDelay: 500
-      }
+      // retryConfig: {
+      //   retry: 5,
+      //   onRetryAttempt: (err: GaxiosError) => {console.log(`${err.message} - Retrying... `)},
+      //   retryDelay: 500
+      // }
     })
 
   }
