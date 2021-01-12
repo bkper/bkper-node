@@ -40,6 +40,7 @@ export default class Book {
   private savedQueries: bkper.Query[];
 
 
+  /** @internal */
   constructor(wrapped: bkper.Book) {
     this.wrapped = wrapped;
   }
@@ -52,7 +53,7 @@ export default class Book {
   }
 
   /**
-   * @return The name of this Book
+   * @returns The name of this Book
    */
   public getName(): string {
     return this.wrapped.name;
@@ -70,7 +71,7 @@ export default class Book {
   }
   
   /**
-   * @return The number of fraction digits (decimal places) supported by this Book
+   * @returns The number of fraction digits (decimal places) supported by this Book
    */
   public getFractionDigits(): number {
     return this.wrapped.fractionDigits;
@@ -88,7 +89,7 @@ export default class Book {
   }
 
   /**
-   * @return The name of the owner of the Book
+   * @returns The name of the owner of the Book
    */
   public getOwnerName(): string {
     return this.wrapped.ownerName;
@@ -103,14 +104,14 @@ export default class Book {
   }
 
   /**
-   * @return The permission for the current user
+   * @returns The permission for the current user
    */
   public getPermission(): Permission {
     return this.wrapped.permission as Permission;
   }
 
   /** 
-   * @return The collection of this book
+   * @returns The collection of this book
    */
   public getCollection(): Collection {
     this.checkAccountsLoaded_();
@@ -122,7 +123,7 @@ export default class Book {
 
 
   /**
-   * @return The date pattern of the Book. Current: dd/MM/yyyy | MM/dd/yyyy | yyyy/MM/dd
+   * @returns The date pattern of the Book. Current: dd/MM/yyyy | MM/dd/yyyy | yyyy/MM/dd
    */
   public getDatePattern(): string {
     return this.wrapped.datePattern;
@@ -143,7 +144,7 @@ export default class Book {
  
 
   /**
-   * @return The decimal separator of the Book
+   * @returns The decimal separator of the Book
    */
   public getDecimalSeparator(): DecimalSeparator {
     return this.wrapped.decimalSeparator as DecimalSeparator;
@@ -162,7 +163,7 @@ export default class Book {
 
 
   /**
-   * @return The time zone of the Book
+   * @returns The time zone of the Book
    */
   public getTimeZone(): string {
     return this.wrapped.timeZone;
@@ -180,14 +181,14 @@ export default class Book {
   }
 
   /**
-   * @return The time zone offset of the book, in minutes
+   * @returns The time zone offset of the book, in minutes
    */
   public getTimeZoneOffset(): number {
     return this.wrapped.timeZoneOffset;
   }
 
   /**
-   * @return The last update date of the book, in in milliseconds
+   * @returns The last update date of the book, in in milliseconds
    */
   public getLastUpdateMs(): number {
     return +this.wrapped.lastUpdateMs;
@@ -204,7 +205,7 @@ export default class Book {
   /**
    * Gets the property value for given keys. First property found will be retrieved
    * 
-   * @param keys The property key
+   * @param keys - The property key
    */
   public getProperty(...keys: string[]): string {
 
@@ -222,7 +223,7 @@ export default class Book {
   /**
    * Sets the custom properties of the Book
    * 
-   * @param properties Object with key/value pair properties
+   * @param properties - Object with key/value pair properties
    * 
    * @returns This Book, for chainning. 
    */
@@ -234,8 +235,8 @@ export default class Book {
   /**
    * Sets a custom property in the Book.
    * 
-   * @param key The property key
-   * @param value The property value
+   * @param key - The property key
+   * @param value - The property value
    * 
    * @returns This Book, for chainning. 
    */
@@ -254,10 +255,10 @@ export default class Book {
   /**
    * Formats a date according to date pattern of the Book.
    * 
-   * @param  date The date to format as string.
-   * @param  timeZone The output timezone of the result. Default to script's timeZone
+   * @param date - The date to format as string.
+   * @param timeZone - The output timezone of the result. Default to script's timeZone
    * 
-   * @return The date formated
+   * @returns The date formated
    */
   public formatDate(date: Date, timeZone?: string): string {
     if (timeZone == null || timeZone.trim() == "") {
@@ -270,9 +271,9 @@ export default class Book {
   /**
    * Formats a value according to [[DecimalSeparator]] and fraction digits of the Book.
    * 
-   * @param value The value to be formatted.
+   * @param value - The value to be formatted.
    * 
-   * @return The value formated
+   * @returns The value formated
    */
   public formatValue(value: number): string {
     return Utils.formatValue(value, this.getDecimalSeparator(), this.getFractionDigits());
@@ -289,7 +290,7 @@ export default class Book {
   /**
    * Rounds a value according to the number of fraction digits of the Book
    * 
-   * @param value The value to be rounded
+   * @param value - The value to be rounded
    * 
    * @returns The value rounded
    */
@@ -322,9 +323,9 @@ export default class Book {
   /**
    * Resumes a transaction iteration using a continuation token from a previous iterator.
    * 
-   * @param continuationToken continuation token from a previous transaction iterator
+   * @param continuationToken - continuation token from a previous transaction iterator
    * 
-   * @return a collection of transactions that remained in a previous iterator when the continuation token was generated
+   * @returns a collection of transactions that remained in a previous iterator when the continuation token was generated
    */
   public continueTransactionIterator(query: string, continuationToken: string): TransactionIterator {
     var transactionIterator = new TransactionIterator(this, query);
@@ -425,7 +426,7 @@ export default class Book {
   /**
    * Gets an [[Account]] object
    * 
-   * @param idOrName The id or name of the Account
+   * @param idOrName - The id or name of the Account
    * 
    * @returns The matching Account object
    */
@@ -525,7 +526,7 @@ export default class Book {
   /**
    * Gets a [[Group]] object
    * 
-   * @param idOrName The id or name of the Group
+   * @param idOrName - The id or name of the Group
    * 
    * @returns The matching Group object
    */
@@ -574,7 +575,7 @@ export default class Book {
    * 
    * Create a [[BalancesReport]] based on query
    * 
-   * @param query The balances report query
+   * @param query - The balances report query
    */
   public async getBalancesReport(query: string): Promise<BalancesReport> {
     var balances = await BalancesService.getBalances(this.getId(), query);
@@ -586,9 +587,9 @@ export default class Book {
    * 
    * See [Query Guide](https://help.bkper.com/en/articles/2569178-search-query-guide) to learn more
    * 
-   * @param query The balances report query
+   * @param query - The balances report query
    * 
-   * @return The balances data table builder
+   * @returns The balances data table builder
    * 
    * Example:
    * 
@@ -606,7 +607,7 @@ export default class Book {
   /**
    * Create a [[AccountsDataTableBuilder]], to build two dimensional Array representations of [[Accounts]] dataset.
    * 
-   * @return Accounts data table builder.
+   * @returns Accounts data table builder.
    * 
    */
   public async createAccountsDataTable(): Promise<AccountsDataTableBuilder> {
@@ -620,9 +621,9 @@ export default class Book {
    * 
    * See [Query Guide](https://help.bkper.com/en/articles/2569178-search-query-guide) to learn more
    * 
-   * @param query The flter query.
+   * @param query - The flter query.
    * 
-   * @return Transactions data table builder.
+   * @returns Transactions data table builder.
    * 
    * Example: 
    * 
@@ -642,9 +643,9 @@ export default class Book {
    * 
    * See [Query Guide](https://help.bkper.com/en/articles/2569178-search-query-guide) to learn more
    *  
-   * @param query The query string.
+   * @param query - The query string.
    * 
-   * @return The Transactions result as an iterator.
+   * @returns The Transactions result as an iterator.
    * 
    * Example:
    * 

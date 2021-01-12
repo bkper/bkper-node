@@ -7,8 +7,10 @@ import Book from "./Book";
  */
 export default class Collection {
 
-  wrapped: bkper.Collection
-
+  
+  private wrapped: bkper.Collection
+  
+  /** @internal */
   constructor(wrapped: bkper.Collection) {
     this.wrapped = wrapped;
   }

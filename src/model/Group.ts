@@ -14,8 +14,10 @@ import * as GroupService from  '../service/group-service';
  */
 export default class Group {
 
+  /** @internal */
   wrapped: bkper.Group
 
+    /** @internal */
   book: Book
 
   /**
@@ -89,7 +91,7 @@ export default class Group {
   /**
    * Sets the custom properties of the Group
    * 
-   * @param properties Object with key/value pair properties
+   * @param properties - Object with key/value pair properties
    * 
    * @returns This Group, for chainning. 
    */
@@ -101,7 +103,7 @@ export default class Group {
   /**
    * Gets the property value for given keys. First property found will be retrieved
    * 
-   * @param keys The property key
+   * @param keys - The property key
    */
   public getProperty(...keys: string[]): string {
     for (let index = 0; index < keys.length; index++) {
@@ -117,8 +119,8 @@ export default class Group {
   /**
    * Sets a custom property in the Group.
    * 
-   * @param key The property key
-   * @param value The property value
+   * @param key - The property key
+   * @param value - The property value
    */
   public setProperty(key: string, value: string): Group {
     if (key == null || key.trim() == '') {
@@ -134,7 +136,7 @@ export default class Group {
   /**
    * Delete a custom property
    * 
-   * @param key The property key
+   * @param key - The property key
    * 
    * @returns This Group, for chainning. 
    */

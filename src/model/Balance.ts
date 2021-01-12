@@ -12,6 +12,7 @@ export default class Balance {
 
   private container: BalancesContainer;
 
+  /** @internal */
   constructor(container: BalancesContainer, balancePlain: bkper.Balance) {
     this.container = container;
     this.wrapped = balancePlain;

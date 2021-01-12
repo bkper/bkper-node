@@ -51,7 +51,7 @@ export default class AccountsDataTableBuilder {
     let accounts = this.accounts;
 
     if (!this.shouldIncludeArchived) {
-      accounts = this.accounts.filter(a => a.isActive());
+      accounts = this.accounts.filter(a => !a.isArchived());
     }
 
     let headers = [];

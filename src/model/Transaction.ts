@@ -15,8 +15,10 @@ import * as Utils from '../utils';
  */
 export default class Transaction {
 
+  /** @internal */
   wrapped: bkper.Transaction
-
+  
+  /** @internal */
   book: Book;
 
   /**
@@ -45,7 +47,7 @@ export default class Transaction {
   /**
    * Add a remote id to the Transaction.
    * 
-   * @param remoteId The remote id to add.
+   * @param remoteId - The remote id to add.
    * 
    * @returns This Transaction, for chainning.
    */
@@ -98,7 +100,7 @@ export default class Transaction {
   /**
    * Sets the Transaction urls. Url starts with https://
    * 
-   * @param urls The urls array.
+   * @param urls - The urls array.
    * 
    * @returns This Transaction, for chainning.
    */
@@ -115,7 +117,7 @@ export default class Transaction {
   /**
    * Add a url to the Transaction. Url starts with https://
    * 
-   * @param url The url to add.
+   * @param url - The url to add.
    * 
    * @returns This Transaction, for chainning.
    */
@@ -152,7 +154,7 @@ export default class Transaction {
    * 
    * Files not previously created in the Book will be automatically created. 
    * 
-   * @param file The file to add
+   * @param file - The file to add
    * 
    * @returns This Transaction, for chainning.
    */
@@ -198,7 +200,7 @@ export default class Transaction {
   /**
    * Sets the custom properties of the Transaction
    * 
-   * @param properties Object with key/value pair properties
+   * @param properties - Object with key/value pair properties
    * 
    * @returns This Transaction, for chainning. 
    */
@@ -210,7 +212,7 @@ export default class Transaction {
   /**
    * Gets the property value for given keys. First property found will be retrieved
    * 
-   * @param keys The property key
+   * @param keys - The property key
    */
   public getProperty(...keys: string[]): string {
     for (let index = 0; index < keys.length; index++) {
@@ -226,8 +228,8 @@ export default class Transaction {
   /**
    * Sets a custom property in the Transaction.
    * 
-   * @param key The property key
-   * @param value The property value
+   * @param key - The property key
+   * @param value - The property value
    * 
    * @returns This Transaction, for chainning. 
    */
@@ -245,7 +247,7 @@ export default class Transaction {
   /**
    * Delete a custom property
    * 
-   * @param key The property key
+   * @param key - The property key
    * 
    * @returns This Transaction, for chainning. 
    */
@@ -278,7 +280,7 @@ export default class Transaction {
    * 
    * Sets the credit/origin Account of the Transaction. Same as from().
    * 
-   * @param account Account id, name or object.
+   * @param account - Account id, name or object.
    * 
    * @returns This Transaction, for chainning.
    */
@@ -296,7 +298,7 @@ export default class Transaction {
    * 
    * Sets the credit/origin Account of the Transaction. Same as setCreditAccount().
    * 
-   * @param account Account id, name or object.
+   * @param account - Account id, name or object.
    * 
    * @returns This Transaction, for chainning.
    */
@@ -329,7 +331,7 @@ export default class Transaction {
    * 
    * Sets the debit/origin Account of the Transaction. Same as to().
    * 
-   * @param account Account id, name or object.
+   * @param account - Account id, name or object.
    * 
    * @returns This Transaction, for chainning.
    */
@@ -347,7 +349,7 @@ export default class Transaction {
    * 
    * Sets the debit/origin Account of the Transaction. Same as setDebitAccount().
    * 
-   * @param account Account id, name or object.
+   * @param account - Account id, name or object.
    * 
    * @returns This Transaction, for chainning.
    */
@@ -391,7 +393,7 @@ export default class Transaction {
   /**
    * Get the absolute amount of this transaction if the given account is at the credit side, else null.
    * 
-   * @param account The account object, id or name.
+   * @param account - The account object, id or name.
    */
   public getCreditAmount(account: Account | string): number {
     let accountObject = this.getAccount_(account);
@@ -404,7 +406,7 @@ export default class Transaction {
   /**
    * Gets the absolute amount of this transaction if the given account is at the debit side, else null.
    * 
-   * @param account The account object, id or name.
+   * @param account - The account object, id or name.
    */
   public getDebitAmount(account: Account | string): number {
     let accountObject = this.getAccount_(account);
@@ -417,7 +419,7 @@ export default class Transaction {
   /**
    * Gets the [[Account]] at the other side of the transaction given the one in one side.
    * 
-   * @param account The account object, id or name.
+   * @param account - The account object, id or name.
    */
   public getOtherAccount(account: Account | string): Account {
     let accountObject = this.getAccount_(account);
@@ -434,7 +436,7 @@ export default class Transaction {
    * 
    * The account name at the other side of the transaction given the one in one side.
    * 
-   * @param account The account object, id or name.
+   * @param account - The account object, id or name.
    */
   public getOtherAccountName(account: string | Account): string {
     var otherAccount = this.getOtherAccount(account);
@@ -565,7 +567,7 @@ export default class Transaction {
    * 
    * Only comes with the last posted transaction of the day.
    * 
-   * @param raw True to get the raw balance, no matter the credit nature of the [[Account]].
+   * @param raw - True to get the raw balance, no matter the credit nature of the [[Account]].
    */
   public getAccountBalance(raw?: boolean): number {
     var accountBalance = this.getCaEvolvedBalance_();

@@ -16,7 +16,7 @@ export default class BalancesReport {
   private groupBalancesContainers: GroupBalancesContainer[];
   private accountBalancesContainers: AccountBalancesContainer[];
 
-
+  /** @internal */
   constructor(book: Book, balancesReportPlain: bkper.Balances) {
     this.book = book;
     this.wrapped = balancesReportPlain;
@@ -102,7 +102,7 @@ export default class BalancesReport {
   /**
    * Gets a specific [[BalancesContainers]].
    * 
-   * @param name The [[Account]] name, [[Group]] name or #hashtag.
+   * @param name - The [[Account]] name, [[Group]] name or #hashtag.
    */
   public getBalancesContainer(groupName: string): BalancesContainer {
     var groupBalances = this.getBalancesContainers();

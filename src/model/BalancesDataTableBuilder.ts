@@ -72,7 +72,7 @@ export default class BalancesDataTableBuilder implements BalancesDataTableBuilde
   /**
    * Fluent method to set the [[BalanceType]] for the builder.
    * 
-   * @param type The type of balance for this data table
+   * @param type - The type of balance for this data table
    * 
    * For **TOTAL** [[BalanceType]], the table format looks like:
    * 
@@ -426,45 +426,5 @@ export default class BalancesDataTableBuilder implements BalancesDataTableBuilde
   }
 
 
-
-
-
-
-/******************* DEPRECATED METHODS *******************/
-
-  /**
-   * @deprecated
-   */
-  formatDate(): BalancesDataTableBuilder {
-    return this.formatDates(true);
-  }  
-
-  /**
-   * @deprecated
-   */
-  formatValue(): BalancesDataTableBuilder {
-    return this.formatValues(true);
-  }  
-
-  /**
-   * @deprecated
-   */
-  expandGroups(): BalancesDataTableBuilder {
-    return this.expanded(true);
-  }  
-
-  /**
-   * @deprecated
-   */
-  setBalanceType(balanceType: BalanceType): BalancesDataTableBuilder {
-    return this.type(balanceType);
-  }
-
-  /**
-   * @deprecated
-   */
-  transpose(): BalancesDataTableBuilder {
-    return this.transposed(true);
-  }  
 
 }

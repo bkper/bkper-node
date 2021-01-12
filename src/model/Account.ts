@@ -16,8 +16,10 @@ import { getRepresentativeValue, normalizeText, round } from '../utils';
  */
 export default class Account {
 
+  /** @internal */
   wrapped: bkper.Account;
-
+  
+  /** @internal */
   book: Book;
 
   /**
@@ -58,7 +60,7 @@ export default class Account {
   }
 
   /**
-   * @return The type for of this account.
+   * @returns The type for of this account.
    */
   public getType(): AccountType {
     return this.wrapped.type as AccountType;
@@ -85,7 +87,7 @@ export default class Account {
   /**
    * Sets the custom properties of the Account
    * 
-   * @param properties Object with key/value pair properties
+   * @param properties - Object with key/value pair properties
    * 
    * @returns This Account, for chainning. 
    */
@@ -97,7 +99,7 @@ export default class Account {
   /**
    * Gets the property value for given keys. First property found will be retrieved
    * 
-   * @param keys The property key
+   * @param keys - The property key
    */
   public getProperty(...keys: string[]): string {
     for (let index = 0; index < keys.length; index++) {
@@ -114,8 +116,8 @@ export default class Account {
   /**
    * Sets a custom property in the Account.
    * 
-   * @param key The property key
-   * @param value The property value
+   * @param key - The property key
+   * @param value - The property value
    * 
    * @returns This Account, for chainning. 
    */
@@ -133,7 +135,7 @@ export default class Account {
   /**
    * Delete a custom property
    * 
-   * @param key The property key
+   * @param key - The property key
    * 
    * @returns This Account, for chainning. 
    */
@@ -145,7 +147,7 @@ export default class Account {
   /**
    * Gets the balance based on credit nature of this Account.
    *  
-   * @param raw True to get the raw balance, no matter the credit nature of this Account.
+   * @param raw - True to get the raw balance, no matter the credit nature of this Account.
    * 
    * @returns The balance of this account.
    */
@@ -165,7 +167,7 @@ export default class Account {
   /**
    * Gets the checked balance based on credit nature of this Account.
    * 
-   * @param raw True to get the raw balance, no matter the credit nature of this Account.
+   * @param raw - True to get the raw balance, no matter the credit nature of this Account.
    * 
    * @returns The checked balance of this Account
    */
@@ -331,7 +333,7 @@ export default class Account {
   /**
    * Tell if this account is in the [[Group]]
    * 
-   * @param  group The Group name, id or object
+   * @param  group - The Group name, id or object
    */
   public isInGroup(group: string | Group): boolean {
     if (group == null) {
@@ -391,27 +393,5 @@ export default class Account {
     this.book.clearAccountsCache();
     return this;
   }   
-
-
-  //DEPRECATED
-
-  /**
-   * Gets the account description
-   * 
-   * @deprecated Use properties instead
-   * 
-   */
-  public getDescription(): string {
-    return this.getProperty('description');
-  }
-
-  /**
-   * Tell if this account is Active or otherwise Archived.
-   * 
-   *  @deprecated Use isArchived instead
-   */
-  public isActive(): boolean {
-    return !this.wrapped.archived;
-  };
 
 }

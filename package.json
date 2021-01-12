@@ -14,9 +14,13 @@
   "scripts": {
     "test": "env TS_NODE_COMPILER_OPTIONS='{\"rootDir\": \".\" }' mocha -r ts-node/register 'test/**/*.ts'",
     "clean": "gts clean",
-    "build": "yarn clean && yarn test && tsc",
-    "watch": "tsc -w",
-    "prepare": "yarn build"
+    "build": "run-s build:*",
+    "build:clean": "yarn clean",
+    "build:test": "yarn test",
+    "build:compile": "tsc",
+    "build:api": "api-extractor run --local",
+    "build:cleanup": "rimraf 'lib/!(*.js)'",
+    "watch": "tsc -w"
   },
   "dependencies": {
     "@bkper/bkper-api-types": "^3.7.1",
@@ -29,6 +33,7 @@
     "request": "^2.88.2"
   },
   "devDependencies": {
+    "@microsoft/api-extractor": "^7.12.1",
     "@types/chai": "^4.2.14",
     "@types/commander": "^2.12.2",
     "@types/mocha": "^8.2.0",
@@ -37,6 +42,8 @@
     "chai": "^4.2.0",
     "gts": "^3.0.3",
     "mocha": "^8.2.1",
+    "npm-run-all": "^4.1.5",
+    "rimraf": "^3.0.2",
     "ts-node": "^9.1.1",
     "typescript": "^4.1.3"
   }

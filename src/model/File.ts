@@ -11,8 +11,10 @@ import * as FileService from '../service/file-service';
  */
 export default class File {
 
+  /** @internal */
   wrapped: bkper.File;
-
+  
+  /** @internal */
   book: Book;
 
   /**

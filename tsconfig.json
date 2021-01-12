@@ -7,7 +7,10 @@
     "strict": false,
     "esModuleInterop": true,
     "target": "es2015",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "declaration": true,
+    "sourceMap": true,
+    "declarationMap": true
   },
   "include": [
     "src/**/*.json",
