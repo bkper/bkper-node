@@ -6,7 +6,8 @@
  * @packageDocumentation
  */
 
-export { Bkper } from './Bkper'
+export { App } from './model/App'
+export { Bkper } from './model/Bkper'
 export { OAuthTokenProvider } from './auth/OAuthTokenProvider'
 export { Account } from './model/Account'
 export { AccountsDataTableBuilder } from './model/AccountsDataTableBuilder'

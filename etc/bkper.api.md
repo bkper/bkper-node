@@ -62,6 +62,14 @@ export enum AccountType {
 }
 
 // @public
+export class App {
+    // @internal
+    constructor();
+    setWebhookUrlDev(webhookUrlDev: string): App;
+    update(): Promise<App>;
+    }
+
+// @public
 export class Balance {
     // @internal
     constructor(container: BalancesContainer, balancePlain: bkper.Balance);
@@ -145,7 +153,7 @@ export enum BalanceType {
 // @public
 export class Bkper {
     static getBook(id: string): Promise<Book>;
-    static setApiKey(key: string): void;
+    static setApiKey(key: string): App;
     static setOAuthTokenProvider(oauthTokenProvider: OAuthTokenProvider): Promise<void>;
 }
 

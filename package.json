@@ -27,6 +27,7 @@
     "build:dts": "cp dist/bkper-public.d.ts lib/index.d.ts",
     "build:clean-dist": "rimraf dist",
     "watch": "tsc -w",
+    "upgrade:api": "yarn upgrade @bkper/bkper-api-types --latest",
     "patch": "yarn version --patch",
     "minor": "yarn version --minor",
     "major": "yarn version --major",
@@ -34,7 +35,7 @@
     "postversion": "git push --tags && yarn publish --new-version $npm_package_version && git push && echo \"Successfully released version $npm_package_version!\""
   },
   "dependencies": {
-    "@bkper/bkper-api-types": "^3.7.1",
+    "@bkper/bkper-api-types": "^3.7.2",
     "@google-cloud/local-auth": "^1.0.0",
     "commander": "^6.2.1",
     "gaxios": "^4.1.0",

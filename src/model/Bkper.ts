@@ -1,7 +1,8 @@
-import { Book } from "./model/Book";
-import * as BookService from './service/book-service';
-import { HttpApiRequest } from './service/HttpApiRequest';
-import { OAuthTokenProvider } from './auth/OAuthTokenProvider';
+import { Book } from "./Book";
+import { App } from "./App";
+import * as BookService from '../service/book-service';
+import { HttpApiRequest } from '../service/HttpApiRequest';
+import { OAuthTokenProvider } from '../auth/OAuthTokenProvider';
 
 /**
  * This is the main Entry Point to start interacting with Bkper.
@@ -31,8 +32,9 @@ export class Bkper {
    * @param key - The key from GCP API & Services Credentials console.
    * 
    */
-  public static setApiKey(key: string): void {
+  public static setApiKey(key: string): App {
     HttpApiRequest.API_KEY = key;
+    return new App();
   }
 
 
