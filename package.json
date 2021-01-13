@@ -7,6 +7,9 @@
   "files": [
     "lib/**/*"
   ],
+  "bin": {
+    "bkper": "./lib/cli.js"
+  },
   "repository": "https://github.com/bkper/bkper-node.git",
   "homepage": "https://bkper.com/docs",
   "author": "mael <mael@bkper.com>",

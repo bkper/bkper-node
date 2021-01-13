@@ -15,6 +15,24 @@ try {
   console.log('Credentials not yet obtained.');
 }
 
+export async function login() {
+  if (storedCredentials) {
+    console.log('Bkper already logged in.');
+  }
+  await getOAuthToken();
+}
+
+export function logout() {
+  if (fs.existsSync(storedCredentialsPath)) {
+    fs.unlinkSync(storedCredentialsPath);
+  }
+  console.log('Bkper logged out.');
+}
+
+export function isLoggedIn() {
+  return storedCredentials != null;
+}
+
 export async function getOAuthToken(): Promise<string> {
 
     let localAuth: OAuth2Client
