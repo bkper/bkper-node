@@ -138,8 +138,7 @@ export class Book {
   /** 
    * @returns The collection of this book
    */
-  public async getCollection(): Promise<Collection> {
-    await this.checkAccountsLoaded_();
+  public getCollection(): Collection {
     if (this.wrapped.collection != null && this.collection == null) {
       this.collection = new Collection(this.wrapped.collection);
     }

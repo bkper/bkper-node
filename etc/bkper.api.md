@@ -179,7 +179,7 @@ export class Book {
     getAccounts(): Promise<Account[]>;
     getBalancesReport(query: string): Promise<BalancesReport>;
     // (undocumented)
-    getCollection(): Promise<Collection>;
+    getCollection(): Collection;
     // (undocumented)
     getDatePattern(): string;
     // (undocumented)
