@@ -60,6 +60,8 @@ export class Book {
   /** @internal */
   constructor(wrapped: bkper.Book) {
     this.wrapped = wrapped;
+    this.configureGroups_(this.wrapped.groups);
+    this.configureAccounts_(this.wrapped.accounts);
   }
 
   /**
@@ -112,14 +114,6 @@ export class Book {
     return this.wrapped.ownerName;
   }
 
-  /** @internal */
-  private checkAccountsLoaded_(): void {
-    if (this.idAccountMap == null || this.idAccountMap == null) {
-      this.configureGroups_(this.wrapped.groups);
-      this.configureAccounts_(this.wrapped.accounts);
-    }
-  }
-
   /**
    * @returns The permission for the current user
    */
@@ -131,7 +125,6 @@ export class Book {
    * @returns The collection of this book
    */
   public getCollection(): Collection {
-    this.checkAccountsLoaded_();
     if (this.wrapped.collection != null && this.collection == null) {
       this.collection = new Collection(this.wrapped.collection);
     }
@@ -435,7 +428,6 @@ export class Book {
    * Gets all [[Accounts]] of this Book
    */
   public getAccounts(): Account[] {
-    this.checkAccountsLoaded_();
     return this.accounts;
   }
 
@@ -454,8 +446,6 @@ export class Book {
     }
 
     idOrName = idOrName + '';
-
-    this.checkAccountsLoaded_();
 
     var account = this.idAccountMap[idOrName];
     if (account == null) {
@@ -507,7 +497,6 @@ export class Book {
    * Gets all [[Groups]] of this Book
    */
   public getGroups(): Group[] {
-    this.checkAccountsLoaded_();
     return this.groups;
   }
 
@@ -555,8 +544,6 @@ export class Book {
     }
 
     idOrName = idOrName + '';
-
-    this.checkAccountsLoaded_();
 
     var group = this.idGroupMap[idOrName];
     if (group == null) {
@@ -629,7 +616,7 @@ export class Book {
    * @returns Accounts data table builder.
    * 
    */
-  public async createAccountsDataTable(): Promise<AccountsDataTableBuilder> {
+  public createAccountsDataTable(): AccountsDataTableBuilder {
     let accounts = this.getAccounts();
     return new AccountsDataTableBuilder(accounts);
   }
@@ -686,8 +673,8 @@ export class Book {
   /**
    * Retrieve a transaction by id
    */
-  public getTransaction(id: string): Transaction {
-    let wrapped = TransactionService.getTransaction(this.getId(), id);
+  public async getTransaction(id: string): Promise<Transaction> {
+    let wrapped = await TransactionService.getTransaction(this.getId(), id);
     let transaction = Utils.wrapObject(new Transaction(), wrapped);
     this.configureTransaction_(transaction);
     return transaction;

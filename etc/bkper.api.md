@@ -170,7 +170,7 @@ export class Book {
     // (undocumented)
     configureTransactions_(transactions: Transaction[]): Transaction[];
     continueTransactionIterator(query: string, continuationToken: string): TransactionIterator;
-    createAccountsDataTable(): Promise<AccountsDataTableBuilder>;
+    createAccountsDataTable(): AccountsDataTableBuilder;
     createBalancesDataTable(query: string): Promise<BalancesDataTableBuilder>;
     createTransactionsDataTable(query?: string): TransactionsDataTableBuilder;
     formatDate(date: Date, timeZone?: string): string;
@@ -211,7 +211,7 @@ export class Book {
     getTimeZone(): string;
     // (undocumented)
     getTimeZoneOffset(): number;
-    getTransaction(id: string): Transaction;
+    getTransaction(id: string): Promise<Transaction>;
     getTransactions(query?: string): TransactionIterator;
     newAccount(): Account;
     newFile(): File;
