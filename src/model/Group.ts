@@ -60,17 +60,17 @@ export class Group {
   /**
    * @returns True if this group has any account in it
    */
-  public hasAccounts(): boolean {
-    return this.getAccounts().length > 0;
+  public async hasAccounts(): Promise<boolean> {
+    return (await this.getAccounts()).length > 0;
   }
 
 
   /**
    * @returns All Accounts of this group.
    */
-  public getAccounts(): Account[] {
+  public async getAccounts(): Promise<Account[]> {
     var accounts = [];
-    var accs = this.book.getAccounts();
+    var accs = await this.book.getAccounts();
     for (var i = 0; i < accs.length; i++) {
       if (accs[i].isInGroup(this)) {
         accounts.push(accs[i]);

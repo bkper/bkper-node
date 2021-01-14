@@ -49,7 +49,7 @@ export class AccountsDataTableBuilder {
   /**
    * @returns A two-dimensional array containing all [[Accounts]].
    */
-  public build(): any[][] {
+  public async build(): Promise<any[][]> {
     var table = new Array<Array<any>>();
 
     let accounts = this.accounts;
@@ -76,7 +76,7 @@ export class AccountsDataTableBuilder {
       line.push(account.getName())
       line.push(account.getType())
 
-      let groups = account.getGroups();
+      let groups = await account.getGroups();
 
       groups.sort((g1: Group, g2: Group) => {
         return g1.getNormalizedName().localeCompare(g2.getNormalizedName())

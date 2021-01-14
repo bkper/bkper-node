@@ -25,7 +25,7 @@ export class TransactionPage {
     book.configureTransactions_(this.transactions);
     this.cursor = transactionList.cursor;
     if (transactionList.account) {
-      this.account = book.getAccount(transactionList.account)
+      this.account = await book.getAccount(transactionList.account)
     }
     this.index = 0;
     if (this.transactions == null || this.transactions.length == 0 || this.cursor == null || this.cursor == "") {

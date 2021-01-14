@@ -200,10 +200,10 @@ export class TransactionsDataTableBuilder {
 
       if (transaction.getCreditAccount() != null && transaction.getDebitAccount() != null) {
 
-        if (this.isCreditOnTransaction_(transaction, account)) {
-          line.push(transaction.getDebitAccount().getName());
+        if (await this.isCreditOnTransaction_(transaction, account)) {
+          line.push((await transaction.getDebitAccount()).getName());
         } else {
-          line.push(transaction.getCreditAccount().getName());
+          line.push((await transaction.getCreditAccount()).getName());
         }
 
       } else {
@@ -224,7 +224,7 @@ export class TransactionsDataTableBuilder {
           amount = formatValue(transaction.getAmount(), iterator.getBook().getDecimalSeparator(), iterator.getBook().getFractionDigits());
         };
 
-        if (this.isCreditOnTransaction_(transaction, account)) {
+        if (await this.isCreditOnTransaction_(transaction, account)) {
           line.push("");
           line.push(amount);
         } else {
@@ -238,7 +238,7 @@ export class TransactionsDataTableBuilder {
 
       if (account.isPermanent()) {
         if (transaction.getAccountBalance() != null) {
-          var balance: string | number = transaction.getAccountBalance();
+          var balance: string | number = await transaction.getAccountBalance();
           if (this.shouldFormatValues) {
             balance = formatValue(balance, iterator.getBook().getDecimalSeparator(), iterator.getBook().getFractionDigits());
           };
@@ -269,11 +269,11 @@ export class TransactionsDataTableBuilder {
   }
 
   /** @internal */
-  private isCreditOnTransaction_(transaction: Transaction, account: Account) {
+  private async isCreditOnTransaction_(transaction: Transaction, account: Account) {
     if (transaction.getCreditAccount() == null) {
       return false;
     }
-    return transaction.getCreditAccount().getId() == account.getId();
+    return (await transaction.getCreditAccount()).getId() == account.getId();
   }
 
 }

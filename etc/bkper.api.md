@@ -6,14 +6,14 @@
 
 // @public
 export class Account {
-    addGroup(group: string | Group): Account;
+    addGroup(group: string | Group): Promise<Account>;
     // @internal (undocumented)
     book: Book;
     create(): Promise<Account>;
     deleteProperty(key: string): Account;
     getBalance(raw?: boolean): number;
     getCheckedBalance(raw?: boolean): number;
-    getGroups(): Group[];
+    getGroups(): Promise<Group[]>;
     getId(): string;
     getName(): string;
     // (undocumented)
@@ -27,10 +27,10 @@ export class Account {
     hasTransactionPosted(): boolean;
     isArchived(): boolean;
     isCredit(): boolean;
-    isInGroup(group: string | Group): boolean;
+    isInGroup(group: string | Group): Promise<boolean>;
     isPermanent(): boolean;
     remove(): Promise<Account>;
-    removeGroup(group: string | Group): Account;
+    removeGroup(group: string | Group): Promise<Account>;
     setArchived(archived: boolean): Account;
     setGroups(groups: string[] | Group[]): Account;
     setName(name: string): Account;
@@ -49,7 +49,7 @@ export class AccountsDataTableBuilder {
     // @internal
     constructor(accounts: Account[]);
     // (undocumented)
-    build(): any[][];
+    build(): Promise<any[][]>;
     includeArchived(include: boolean): AccountsDataTableBuilder;
     }
 
@@ -170,16 +170,16 @@ export class Book {
     // (undocumented)
     configureTransactions_(transactions: Transaction[]): Transaction[];
     continueTransactionIterator(query: string, continuationToken: string): TransactionIterator;
-    createAccountsDataTable(): AccountsDataTableBuilder;
+    createAccountsDataTable(): Promise<AccountsDataTableBuilder>;
     createBalancesDataTable(query: string): Promise<BalancesDataTableBuilder>;
     createTransactionsDataTable(query?: string): TransactionsDataTableBuilder;
     formatDate(date: Date, timeZone?: string): string;
     formatValue(value: number): string;
-    getAccount(idOrName: string): Account;
-    getAccounts(): Account[];
+    getAccount(idOrName: string): Promise<Account>;
+    getAccounts(): Promise<Account[]>;
     getBalancesReport(query: string): Promise<BalancesReport>;
     // (undocumented)
-    getCollection(): Collection;
+    getCollection(): Promise<Collection>;
     // (undocumented)
     getDatePattern(): string;
     // (undocumented)
@@ -187,8 +187,8 @@ export class Book {
     getFile(id: string): Promise<File>;
     // (undocumented)
     getFractionDigits(): number;
-    getGroup(idOrName: string): Group;
-    getGroups(): Group[];
+    getGroup(idOrName: string): Promise<Group>;
+    getGroups(): Promise<Group[]>;
     getId(): string;
     // (undocumented)
     getLastUpdateMs(): number;
@@ -276,7 +276,7 @@ export class Group {
     create(): Promise<Group>;
     deleteProperty(key: string): Group;
     // (undocumented)
-    getAccounts(): Account[];
+    getAccounts(): Promise<Account[]>;
     // (undocumented)
     getId(): string;
     // (undocumented)
@@ -288,7 +288,7 @@ export class Group {
     };
     getProperty(...keys: string[]): string;
     // (undocumented)
-    hasAccounts(): boolean;
+    hasAccounts(): Promise<boolean>;
     isHidden(): boolean;
     remove(): Promise<Group>;
     setHidden(hidden: boolean): Group;
@@ -334,8 +334,8 @@ export class Transaction {
     check(): Promise<Transaction>;
     create(): Promise<Transaction>;
     deleteProperty(key: string): Transaction;
-    from(account: string | Account): Transaction;
-    getAccountBalance(raw?: boolean): number;
+    from(account: string | Account): Promise<Transaction>;
+    getAccountBalance(raw?: boolean): Promise<number>;
     // (undocumented)
     getAgentId(): string;
     // (undocumented)
@@ -345,10 +345,10 @@ export class Transaction {
     // (undocumented)
     getCreatedAtFormatted(): string;
     // (undocumented)
-    getCreditAccount(): Account;
+    getCreditAccount(): Promise<Account>;
     // (undocumented)
-    getCreditAccountName(): string;
-    getCreditAmount(account: Account | string): number;
+    getCreditAccountName(): Promise<string>;
+    getCreditAmount(account: Account | string): Promise<number>;
     // (undocumented)
     getDate(): string;
     // (undocumented)
@@ -358,18 +358,18 @@ export class Transaction {
     // (undocumented)
     getDateValue(): number;
     // (undocumented)
-    getDebitAccount(): Account;
+    getDebitAccount(): Promise<Account>;
     // (undocumented)
-    getDebitAccountName(): string;
-    getDebitAmount(account: Account | string): number;
+    getDebitAccountName(): Promise<string>;
+    getDebitAmount(account: Account | string): Promise<number>;
     // (undocumented)
     getDescription(): string;
     // (undocumented)
     getFiles(): File[];
     // (undocumented)
     getId(): string;
-    getOtherAccount(account: Account | string): Account;
-    getOtherAccountName(account: string | Account): string;
+    getOtherAccount(account: Account | string): Promise<Account>;
+    getOtherAccountName(account: string | Account): Promise<string>;
     getProperties(): {
         [key: string]: string;
     };
@@ -390,16 +390,16 @@ export class Transaction {
     remove(): Promise<Transaction>;
     restore(): Promise<Transaction>;
     setAmount(amount: number | string): Transaction;
-    setCreditAccount(account: string | Account): Transaction;
+    setCreditAccount(account: string | Account): Promise<Transaction>;
     setDate(date: string | Date): Transaction;
-    setDebitAccount(account: string | Account): Transaction;
+    setDebitAccount(account: string | Account): Promise<Transaction>;
     setDescription(description: string): Transaction;
     setProperties(properties: {
         [key: string]: string;
     }): Transaction;
     setProperty(key: string, value: string): Transaction;
     setUrls(urls: string[]): Transaction;
-    to(account: string | Account): Transaction;
+    to(account: string | Account): Promise<Transaction>;
     uncheck(): Promise<Transaction>;
     update(): Promise<Transaction>;
     // @internal (undocumented)

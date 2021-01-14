@@ -255,12 +255,12 @@ export class Account {
   /**
    * Get the [[Groups]] of this account.
    */  
-  public getGroups(): Group[] {
+  public async getGroups(): Promise<Group[]> {
     let groups = new Array<Group>();
     if (this.wrapped.groups != null) {
       for (var i = 0; i < this.wrapped.groups.length; i++) {
         let groupId = this.wrapped.groups[i];
-        let group = this.book.getGroup(groupId);
+        let group = await this.book.getGroup(groupId);
         groups.push(group);
       }
     }
@@ -285,7 +285,7 @@ export class Account {
    * 
    * @returns This Account, for chainning.
    */
-  public addGroup(group: string | Group): Account {
+  public async addGroup(group: string | Group): Promise<Account> {
     if (this.wrapped.groups == null) {
       this.wrapped.groups = [];
     }
@@ -294,7 +294,7 @@ export class Account {
     if (group instanceof Group) {
       groupObject = group;
     } else if (typeof group == "string") {
-      groupObject = this.book.getGroup(group);
+      groupObject = await this.book.getGroup(group);
     }
 
     if (groupObject) {
@@ -307,14 +307,14 @@ export class Account {
   /**
    * Remove a group from the Account.
    */
-  public removeGroup(group: string | Group): Account {
+  public async removeGroup(group: string | Group): Promise<Account> {
 
     if (this.wrapped.groups != null) {
       let groupObject: Group = null;
       if (group instanceof Group) {
         groupObject = group;
       } else if (typeof group == "string") {
-        groupObject = this.book.getGroup(group);
+        groupObject = await this.book.getGroup(group);
       }
       if (groupObject) {
         for (let i = 0; i < this.wrapped.groups.length; i++) {
@@ -335,7 +335,7 @@ export class Account {
    * 
    * @param  group - The Group name, id or object
    */
-  public isInGroup(group: string | Group): boolean {
+  public async isInGroup(group: string | Group): Promise<boolean> {
     if (group == null) {
       return false;
     }
@@ -346,7 +346,7 @@ export class Account {
     }
 
     //id or name
-    var foundGroup = this.book.getGroup(group);
+    var foundGroup = await this.book.getGroup(group);
     if (foundGroup == null) {
       return false;
     }

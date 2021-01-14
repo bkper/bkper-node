@@ -114,6 +114,20 @@ export class Book {
     return this.wrapped.ownerName;
   }
 
+  /** @internal */
+  private async checkAccountsLoaded_(): Promise<void> {
+    if (this.wrapped == null || this.idAccountMap == null || this.idAccountMap == null) {
+      await this.loadBook_();
+    }
+  }
+
+  /** @internal */
+  private async loadBook_(): Promise<void> {
+    this.wrapped = await BookService.loadBook(this.getId());
+    this.configureGroups_(this.wrapped.groups);
+    this.configureAccounts_(this.wrapped.accounts);
+  }
+
   /**
    * @returns The permission for the current user
    */
@@ -124,7 +138,8 @@ export class Book {
   /** 
    * @returns The collection of this book
    */
-  public getCollection(): Collection {
+  public async getCollection(): Promise<Collection> {
+    await this.checkAccountsLoaded_();
     if (this.wrapped.collection != null && this.collection == null) {
       this.collection = new Collection(this.wrapped.collection);
     }
@@ -427,7 +442,8 @@ export class Book {
   /**
    * Gets all [[Accounts]] of this Book
    */
-  public getAccounts(): Account[] {
+  public async getAccounts(): Promise<Account[]> {
+    await this.checkAccountsLoaded_();
     return this.accounts;
   }
 
@@ -439,13 +455,15 @@ export class Book {
    * 
    * @returns The matching Account object
    */
-  public getAccount(idOrName: string): Account {
+  public async getAccount(idOrName: string): Promise<Account> {
 
     if (idOrName == null) {
       return null;
     }
 
     idOrName = idOrName + '';
+
+    await this.checkAccountsLoaded_();
 
     var account = this.idAccountMap[idOrName];
     if (account == null) {
@@ -496,7 +514,8 @@ export class Book {
   /**
    * Gets all [[Groups]] of this Book
    */
-  public getGroups(): Group[] {
+  public async getGroups(): Promise<Group[]> {
+    await this.checkAccountsLoaded_();
     return this.groups;
   }
 
@@ -537,13 +556,15 @@ export class Book {
    * 
    * @returns The matching Group object
    */
-  public getGroup(idOrName: string): Group {
+  public async getGroup(idOrName: string): Promise<Group> {
 
     if (idOrName == null) {
       return null;
     }
 
     idOrName = idOrName + '';
+
+    await this.checkAccountsLoaded_();
 
     var group = this.idGroupMap[idOrName];
     if (group == null) {
@@ -616,8 +637,8 @@ export class Book {
    * @returns Accounts data table builder.
    * 
    */
-  public createAccountsDataTable(): AccountsDataTableBuilder {
-    let accounts = this.getAccounts();
+  public async createAccountsDataTable(): Promise<AccountsDataTableBuilder> {
+    let accounts = await this.getAccounts();
     return new AccountsDataTableBuilder(accounts);
   }
 

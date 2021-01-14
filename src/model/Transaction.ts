@@ -261,16 +261,16 @@ export class Transaction {
   /**
    * @returns The credit account. The same as origin account.
    */
-  public getCreditAccount(): Account {
-    return this.wrapped.creditAccount != null ? this.book.getAccount(this.wrapped.creditAccount.id) : null;;
+  public async getCreditAccount(): Promise<Account> {
+    return this.wrapped.creditAccount != null ? await this.book.getAccount(this.wrapped.creditAccount.id) : null;;
   }
 
   /**
    * @returns The credit account name.
    */
-  public getCreditAccountName(): string {
+  public async getCreditAccountName(): Promise<string> {
     if (this.getCreditAccount() != null) {
-      return this.getCreditAccount().getName();
+      return (await this.getCreditAccount()).getName();
     } else {
       return "";
     }
@@ -284,9 +284,9 @@ export class Transaction {
    * 
    * @returns This Transaction, for chainning.
    */
-  public setCreditAccount(account: string | Account): Transaction {
+  public async setCreditAccount(account: string | Account): Promise<Transaction> {
     if (typeof account == "string") {
-      account = this.book.getAccount(account)
+      account = await this.book.getAccount(account)
     }
     if (account != null && account.getId() != null) {
       this.wrapped.creditAccount = account.wrapped
@@ -302,8 +302,8 @@ export class Transaction {
    * 
    * @returns This Transaction, for chainning.
    */
-  public from(account: string | Account): Transaction {
-    return this.setCreditAccount(account);
+  public async from(account: string | Account): Promise<Transaction> {
+    return await this.setCreditAccount(account);
   }
 
 
@@ -312,16 +312,16 @@ export class Transaction {
    * @returns The debit account. The same as destination account.
    * 
    */
-  public getDebitAccount(): Account {
-    return this.wrapped.debitAccount != null ? this.book.getAccount(this.wrapped.debitAccount.id) : null;
+  public async getDebitAccount(): Promise<Account> {
+    return this.wrapped.debitAccount != null ? await this.book.getAccount(this.wrapped.debitAccount.id) : null;
   }
 
   /**
    * @returns The debit account name.
    */
-  public getDebitAccountName(): string {
+  public async getDebitAccountName(): Promise<string> {
     if (this.getDebitAccount() != null) {
-      return this.getDebitAccount().getName();
+      return (await this.getDebitAccount()).getName();
     } else {
       return "";
     }
@@ -335,9 +335,9 @@ export class Transaction {
    * 
    * @returns This Transaction, for chainning.
    */
-  public setDebitAccount(account: string | Account): Transaction {
+  public async setDebitAccount(account: string | Account): Promise<Transaction> {
     if (typeof account == "string") {
-      account = this.book.getAccount(account)
+      account = await this.book.getAccount(account)
     }
     if (account != null && account.getId() != null) {
       this.wrapped.debitAccount = account.wrapped
@@ -353,8 +353,8 @@ export class Transaction {
    * 
    * @returns This Transaction, for chainning.
    */
-  public to(account: string | Account): Transaction {
-    return this.setDebitAccount(account);
+  public async to(account: string | Account): Promise<Transaction> {
+    return await this.setDebitAccount(account);
   }
 
 
@@ -395,8 +395,8 @@ export class Transaction {
    * 
    * @param account - The account object, id or name.
    */
-  public getCreditAmount(account: Account | string): number {
-    let accountObject = this.getAccount_(account);
+  public async getCreditAmount(account: Account | string): Promise<number> {
+    let accountObject = await this.getAccount_(account);
     if (this.isCreditOnTransaction_(accountObject)) {
       return this.getAmount();
     }
@@ -408,8 +408,8 @@ export class Transaction {
    * 
    * @param account - The account object, id or name.
    */
-  public getDebitAmount(account: Account | string): number {
-    let accountObject = this.getAccount_(account);
+  public async getDebitAmount(account: Account | string): Promise<number> {
+    let accountObject = await this.getAccount_(account);
     if (this.isDebitOnTransaction_(accountObject)) {
       return this.getAmount();
     }
@@ -421,13 +421,13 @@ export class Transaction {
    * 
    * @param account - The account object, id or name.
    */
-  public getOtherAccount(account: Account | string): Account {
-    let accountObject = this.getAccount_(account);
+  public async getOtherAccount(account: Account | string): Promise<Account> {
+    let accountObject = await this.getAccount_(account);
     if (this.isCreditOnTransaction_(accountObject)) {
-      return this.getDebitAccount();
+      return await this.getDebitAccount();
     }
     if (this.isDebitOnTransaction_(accountObject)) {
-      return this.getCreditAccount();
+      return await this.getCreditAccount();
     }
     return null;
   }
@@ -438,8 +438,8 @@ export class Transaction {
    * 
    * @param account - The account object, id or name.
    */
-  public getOtherAccountName(account: string | Account): string {
-    var otherAccount = this.getOtherAccount(account);
+  public async getOtherAccountName(account: string | Account): Promise<string> {
+    var otherAccount = await this.getOtherAccount(account);
     if (otherAccount != null) {
       return otherAccount.getName();
     } else {
@@ -448,21 +448,21 @@ export class Transaction {
   }
 
   /** @internal */
-  private getAccount_(account: Account | string): Account {
+  private async getAccount_(account: Account | string): Promise<Account> {
     if (account == null || account instanceof Account) {
       return account as Account;
     }
-    return this.book.getAccount(account);
+    return await this.book.getAccount(account);
   }
 
   /** @internal */
-  private isCreditOnTransaction_(account: Account) {
-    return this.getCreditAccount() != null && account != null && this.getCreditAccount().getId() == account.getId();
+  private async isCreditOnTransaction_(account: Account) {
+    return this.getCreditAccount() != null && account != null && (await this.getCreditAccount()).getId() == account.getId();
   }
 
   /** @internal */
-  private isDebitOnTransaction_(account: Account) {
-    return this.getDebitAccount() != null && account != null && this.getDebitAccount().getId() == account.getId();
+  private async isDebitOnTransaction_(account: Account) {
+    return this.getDebitAccount() != null && account != null && (await this.getDebitAccount()).getId() == account.getId();
   }
 
 
@@ -574,7 +574,7 @@ export class Transaction {
    * 
    * @param raw - True to get the raw balance, no matter the credit nature of the [[Account]].
    */
-  public getAccountBalance(raw?: boolean): number {
+  public async getAccountBalance(raw?: boolean): Promise<number> {
     var accountBalance = this.getCaEvolvedBalance_();
     var isCa = true;
     if (accountBalance == null) {
@@ -583,7 +583,7 @@ export class Transaction {
     }
     if (accountBalance != null) {
       if (!raw) {
-        var account = isCa ? this.getCreditAccount() : this.getDebitAccount();
+        var account = isCa ? await this.getCreditAccount() : await this.getDebitAccount();
         accountBalance = Utils.getRepresentativeValue(accountBalance, account.isCredit());
       }
       return Utils.round(accountBalance, this.book.getFractionDigits());
