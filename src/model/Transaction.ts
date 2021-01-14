@@ -284,10 +284,7 @@ export class Transaction {
    * 
    * @returns This Transaction, for chainning.
    */
-  public async setCreditAccount(account: string | Account): Promise<Transaction> {
-    if (typeof account == "string") {
-      account = await this.book.getAccount(account)
-    }
+  public setCreditAccount(account: Account): Transaction {
     if (account != null && account.getId() != null) {
       this.wrapped.creditAccount = account.wrapped
     }
@@ -302,8 +299,8 @@ export class Transaction {
    * 
    * @returns This Transaction, for chainning.
    */
-  public async from(account: string | Account): Promise<Transaction> {
-    return await this.setCreditAccount(account);
+  public from(account: Account): Transaction {
+    return this.setCreditAccount(account);
   }
 
 
@@ -335,10 +332,7 @@ export class Transaction {
    * 
    * @returns This Transaction, for chainning.
    */
-  public async setDebitAccount(account: string | Account): Promise<Transaction> {
-    if (typeof account == "string") {
-      account = await this.book.getAccount(account)
-    }
+  public setDebitAccount(account: Account): Transaction {
     if (account != null && account.getId() != null) {
       this.wrapped.debitAccount = account.wrapped
     }
@@ -353,8 +347,8 @@ export class Transaction {
    * 
    * @returns This Transaction, for chainning.
    */
-  public async to(account: string | Account): Promise<Transaction> {
-    return await this.setDebitAccount(account);
+  public to(account: Account): Transaction {
+    return this.setDebitAccount(account);
   }
 
 
