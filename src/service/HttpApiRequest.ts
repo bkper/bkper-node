@@ -2,6 +2,7 @@
 import { GaxiosError, request, GaxiosResponse } from 'gaxios';
 import { getOAuthToken, isLoggedIn } from '../auth/local-auth-service';
 import { OAuthTokenProvider } from '../auth/OAuthTokenProvider';
+import https from 'https';
 
 type HttpMethod = "GET"|"POST"|"PUT"|"PATCH"|"DELETE";
 
@@ -80,6 +81,7 @@ export class HttpApiRequest  {
       method: this.method,
       headers: this.headers,
       data: this.payload,
+      agent: new https.Agent({keepAlive: true}),
       retryConfig: {
         retry: 5,
         onRetryAttempt: (err: GaxiosError) => {console.log(`${err.message} - Retrying... `)},
