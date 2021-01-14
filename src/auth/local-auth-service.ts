@@ -8,11 +8,12 @@ const keys = require(`${__dirname}/keys.json`);
 let storedCredentials: Credentials;
 
 const storedCredentialsPath = `${os.homedir}/.bkper-credentials.json`;
+
 try {
   let credentialsJson = fs.readFileSync(storedCredentialsPath, 'utf8');
   storedCredentials = JSON.parse(credentialsJson);
 } catch (err) {
-  console.log('Credentials not yet obtained.');
+  console.log('No local credentials found.');
 }
 
 export async function login() {
