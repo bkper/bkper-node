@@ -9,8 +9,14 @@ let storedCredentials: Credentials;
 
 const storedCredentialsPath = `${os.homedir}/.bkper-credentials.json`;
 
+try {
+  let credentialsJson = fs.readFileSync(storedCredentialsPath, 'utf8');
+  storedCredentials = JSON.parse(credentialsJson);
+} catch (err) {
+  console.log('No local credentials found.');
+}
+
 export async function login() {
-  tryReadStoredCredentials();
   if (storedCredentials) {
     console.log('Bkper already logged in.');
   }
@@ -21,18 +27,14 @@ export function logout() {
   if (fs.existsSync(storedCredentialsPath)) {
     fs.unlinkSync(storedCredentialsPath);
   }
-  storedCredentials = null;
   console.log('Bkper logged out.');
 }
 
 export function isLoggedIn() {
-  tryReadStoredCredentials();
   return storedCredentials != null;
 }
 
 export async function getOAuthToken(): Promise<string> {
-
-  tryReadStoredCredentials();
 
     let localAuth: OAuth2Client
 
@@ -63,18 +65,6 @@ export async function getOAuthToken(): Promise<string> {
 
     return token.token;
     
-  }
-
-  function tryReadStoredCredentials() {
-    if (storedCredentials) {
-      return;
-    }
-    try {
-      let credentialsJson = fs.readFileSync(storedCredentialsPath, 'utf8');
-      storedCredentials = JSON.parse(credentialsJson);
-    } catch (err) {
-      console.log('No local credentials found.');
-    }
   }
 
   function storeCredentials(credentials: Credentials) {
