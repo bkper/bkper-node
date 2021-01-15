@@ -269,7 +269,7 @@ export class Transaction {
    * @returns The credit account name.
    */
   public async getCreditAccountName(): Promise<string> {
-    if (this.getCreditAccount() != null) {
+    if (await this.getCreditAccount() != null) {
       return (await this.getCreditAccount()).getName();
     } else {
       return "";
@@ -317,7 +317,7 @@ export class Transaction {
    * @returns The debit account name.
    */
   public async getDebitAccountName(): Promise<string> {
-    if (this.getDebitAccount() != null) {
+    if (await this.getDebitAccount() != null) {
       return (await this.getDebitAccount()).getName();
     } else {
       return "";
@@ -451,12 +451,12 @@ export class Transaction {
 
   /** @internal */
   private async isCreditOnTransaction_(account: Account) {
-    return this.getCreditAccount() != null && account != null && (await this.getCreditAccount()).getId() == account.getId();
+    return await this.getCreditAccount() != null && account != null && (await this.getCreditAccount()).getId() == account.getId();
   }
 
   /** @internal */
   private async isDebitOnTransaction_(account: Account) {
-    return this.getDebitAccount() != null && account != null && (await this.getDebitAccount()).getId() == account.getId();
+    return await this.getDebitAccount() != null && account != null && (await this.getDebitAccount()).getId() == account.getId();
   }
 
 
