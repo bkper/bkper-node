@@ -310,7 +310,6 @@ export class Transaction {
    * 
    */
   public async getDebitAccount(): Promise<Account> {
-    console.log('BBBBB')
     return this.wrapped.debitAccount != null ? await this.book.getAccount(this.wrapped.debitAccount.id) : null;
   }
 
