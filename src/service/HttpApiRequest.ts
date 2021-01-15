@@ -1,10 +1,13 @@
 
-import { GaxiosError, request, GaxiosResponse } from 'gaxios';
 import { getOAuthToken, isLoggedIn } from '../auth/local-auth-service';
 import { OAuthTokenProvider } from '../auth/OAuthTokenProvider';
+import fetch, { Response } from 'node-fetch';
 import https from 'https';
+import { sleep } from '../utils';
 
 type HttpMethod = "GET"|"POST"|"PUT"|"PATCH"|"DELETE";
+const httpsAgent = new https.Agent({keepAlive: true});
+
 
 export class HttpApiRequest  {
 
@@ -71,24 +74,70 @@ export class HttpApiRequest  {
   }
 
 
-  async fetch(): Promise<GaxiosResponse> {
+  async fetch(): Promise<Response> {
 
     this.headers['Authorization'] = `Bearer ${await getAccessToken()}`;
     this.addParam('key', HttpApiRequest.API_KEY);
+    // this.httpRequest.setMuteHttpExceptions(true);
 
-    return request({
-      url: this.getUrl(),
-      method: this.method,
-      headers: this.headers,
-      data: this.payload,
-      agent: new https.Agent({keepAlive: true}),
-      retryConfig: {
-        retry: 5,
-        onRetryAttempt: (err: GaxiosError) => {console.log(`${err.message} - Retrying... `)},
-        retryDelay: 500
+    var retries = 0;
+    var sleepTime = 1000;
+    while (true) {
+      let response: Response;
+      try {
+        let body = this.payload;
+
+        response = await fetch(this.getUrl(), {
+          method: this.method,
+          body: body,
+          headers: this.headers,
+          agent: httpsAgent
+        })
+      } catch (addressUnavailable) {
+        //Error on fetch service
+        if (retries > 4) {
+            throw addressUnavailable;
+        } else {
+          console.log("Retrying in " + (sleepTime / 1000) + " secs...");
+          await sleep(sleepTime);
+          sleepTime = sleepTime * 2;
+          retries++;
+          continue;
+        }
       }
-    })
 
+      if (response.status >= 200 && response.status < 300) {
+        //OK
+        return response;      
+      } else {
+        //ERROR
+        let responseText = await response.text();
+        let error: any;
+        let unknowError = false;
+        try {
+           error = JSON.parse(responseText).error;
+        } catch (e) {
+          unknowError = true;
+        }
+        if (unknowError || response.status == 429 || response.status >= 500) {
+          //Retry in case of server error
+          if (retries > 4) {
+            if (unknowError) {
+              throw responseText;
+            } else {
+              throw error.message;
+            }
+          } else {
+            console.log("Retrying in " + (sleepTime / 1000) + " secs...");
+            await sleep(sleepTime);
+            sleepTime = sleepTime * 2;
+            retries++;
+          }
+        } else {
+          throw error.message;
+        }
+      }
+    }
   }
 }
 

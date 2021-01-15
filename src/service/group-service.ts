@@ -3,18 +3,18 @@ import { HttpBooksApiV3Request } from "./HttpApiRequest";
 export async function createGroup(bookId: string, group: bkper.Group): Promise<bkper.Group> {
   var payload = JSON.stringify(group);
   var response = await new HttpBooksApiV3Request(`${bookId}/groups`).setMethod('POST').setPayload(payload).fetch();
-  return response.data;
+  return response.json();
 }
 
 export async function updateGroup(bookId: string, group: bkper.Group): Promise<bkper.Group> {
   var payload = JSON.stringify(group);
   var response = await new HttpBooksApiV3Request(`${bookId}/groups`).setMethod('PUT').setPayload(payload).fetch();
-  return response.data;
+  return response.json();
 }
 
 export async function deleteGroup(bookId: string, group: bkper.Group): Promise<bkper.Group> {
   var response = await new HttpBooksApiV3Request(`${bookId}/groups/${group.id}`).setMethod('DELETE').fetch();
-  return response.data;
+  return response.json();
 }
 
 
@@ -32,7 +32,7 @@ export async function createGroups(bookId: string, groups: bkper.Group[]): Promi
     return [];
   }
 
-  var groupsPlain = await response.data;
+  var groupsPlain = await response.json();
   if (groupsPlain.items == null) {
     return [];
   }

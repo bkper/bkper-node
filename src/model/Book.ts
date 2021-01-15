@@ -60,8 +60,12 @@ export class Book {
   /** @internal */
   constructor(wrapped: bkper.Book) {
     this.wrapped = wrapped;
-    this.configureGroups_(this.wrapped.groups);
-    this.configureAccounts_(this.wrapped.accounts);
+    if (this.wrapped.groups) {
+      this.configureGroups_(this.wrapped.groups);
+    }
+    if (this.wrapped.accounts) {
+      this.configureAccounts_(this.wrapped.accounts);
+    }
   }
 
   /**

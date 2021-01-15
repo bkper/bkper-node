@@ -37,10 +37,11 @@
   "dependencies": {
     "@bkper/bkper-api-types": "^3.7.2",
     "@google-cloud/local-auth": "^1.0.0",
+    "@types/node-fetch": "^2.5.8",
     "commander": "^6.2.1",
-    "gaxios": "^4.1.0",
     "google-auth-library": "^6.1.4",
     "moment-timezone": "^0.5.32",
+    "node-fetch": "^2.6.1",
     "open": "^7.3.1"
   },
   "devDependencies": {
