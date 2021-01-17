@@ -1,6 +1,6 @@
 import Utils from 'moment-timezone';
+import { Big } from "big.js";
 import { DecimalSeparator, Periodicity } from './model/Enums';
-import { Decimal } from "decimal.js-light";
 
 export function sleep(ms: number) {
   return new Promise((resolve) => {
@@ -17,18 +17,18 @@ export function base64Decode(data: string): Buffer {
 
 var diacriticsMap_: any = null;
 
-export function round(number: Decimal | string | number, fractionDigits: number): Decimal {
+export function round(number: Big | string | number, fractionDigits: number): Big {
   if (number == null) {
-    number = new Decimal('0');
+    number = new Big('0');
   }
   if (fractionDigits != null) {
-    return new Decimal(number).toDecimalPlaces(fractionDigits);
+    return new Big(number).round(fractionDigits);
   } else {
-    return new Decimal(number).toDecimalPlaces(2);
+    return new Big(number).round(2);
   }
 }
 
-export function formatValue(value: Decimal | string | number, decimalSeparator: DecimalSeparator, fractionDigits: number): string {
+export function formatValue(value: Big | string | number, decimalSeparator: DecimalSeparator, fractionDigits: number): string {
 
   if (value == null) {
     return "";
@@ -38,7 +38,7 @@ export function formatValue(value: Decimal | string | number, decimalSeparator: 
     if (value.trim() == '') {
       return "";
     }
-    value = new Decimal(value);
+    value = new Big(value);
   }
 
   if (value == null) {
@@ -57,13 +57,13 @@ export function formatValue(value: Decimal | string | number, decimalSeparator: 
   }
 }
 
-export function parseValue(value: string, decimalSeparator: DecimalSeparator): Decimal {
+export function parseValue(value: string, decimalSeparator: DecimalSeparator): Big {
   if (value == null) {
     return null;
   }
 
   if (!isNaN(+value) && isFinite(+value)) {
-    return new Decimal(value);
+    return new Big(value);
   }
 
   if (decimalSeparator == DecimalSeparator.DOT) {
@@ -71,7 +71,7 @@ export function parseValue(value: string, decimalSeparator: DecimalSeparator): D
   } else {
     value = value.replace(/\./g, '').replace(/\,/g, '.');
   }
-  return new Decimal(value);
+  return new Big(value);
 }
 
 export function convertValueToDate(dateValue: number, offsetInMinutes: number): Date {
@@ -180,10 +180,10 @@ export function getDateFormatterPattern(datePattern: string, periodicity: Period
   return pattern;
 }
 
-export function getRepresentativeValue(value: Decimal, credit: boolean): Decimal {
+export function getRepresentativeValue(value: Big, credit: boolean): Big {
 
   if (value == null) {
-    return new Decimal(0);
+    return new Big(0);
   }
 
   if (credit != null && !credit) {

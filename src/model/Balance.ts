@@ -1,6 +1,6 @@
 import { createDate } from "../utils";
 import { BalancesContainer } from "./BalancesContainer";
-import { Decimal } from "decimal.js-light";
+import { Big } from "big.js";
 
 /**
  * Class that represents an [[Account]], [[Group]] or #hashtag balance on a window of time (Day / Month / Year). 
@@ -88,43 +88,43 @@ export class Balance {
   /**
    * The cumulative balance to the date, since the first transaction posted.
    */
-  public getCumulativeBalance(): Decimal {
-    return new Decimal(this.wrapped.cumulativeBalance);
+  public getCumulativeBalance(): Big {
+    return new Big(this.wrapped.cumulativeBalance);
   }
 
   /**
    * The cumulative checked balance to the date, since the first transaction posted.
    */
-  public getCheckedCumulativeBalance(): Decimal {
-    return new Decimal(this.wrapped.checkedCumulativeBalance);
+  public getCheckedCumulativeBalance(): Big {
+    return new Big(this.wrapped.checkedCumulativeBalance);
   }
 
   /**
    * The balance on the date period.
    */
-  public getPeriodBalance(): Decimal {
-    return new Decimal(this.wrapped.periodBalance);
+  public getPeriodBalance(): Big {
+    return new Big(this.wrapped.periodBalance);
   }
 
   /**
    * The checked balance on the date period.
    */
-  public getCheckedPeriodBalance(): Decimal {
-    return new Decimal(this.wrapped.checkedPeriodBalance);
+  public getCheckedPeriodBalance(): Big {
+    return new Big(this.wrapped.checkedPeriodBalance);
   }
 
   /**
    * The unchecked cumulative balance to the date, since the first transaction posted.
    */
-  public getUncheckedCumulativeBalance(): Decimal {
-    return new Decimal(this.wrapped.uncheckedCumulativeBalance);
+  public getUncheckedCumulativeBalance(): Big {
+    return new Big(this.wrapped.uncheckedCumulativeBalance);
   }
 
   /**
     * The unchecked balance on the date period.
     */
-  public getUncheckedPeriodBalance(): Decimal {
-    return new Decimal(this.wrapped.uncheckedPeriodBalance);
+  public getUncheckedPeriodBalance(): Big {
+    return new Big(this.wrapped.uncheckedPeriodBalance);
   }
 
 

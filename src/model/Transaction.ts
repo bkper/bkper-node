@@ -3,7 +3,7 @@ import { Book } from "./Book";
 import { Account } from "./Account";
 import * as TransactionService from '../service/transaction-service';
 import * as Utils from '../utils';
-import { Decimal } from "decimal.js-light";
+import { Big } from "big.js";
 
 
 /**
@@ -357,8 +357,8 @@ export class Transaction {
   /**
    * @returns The amount of the transaction.
    */
-  public getAmount(): Decimal {
-    return this.wrapped.amount != null && this.wrapped.amount.trim() != '' ? new Decimal(this.wrapped.amount) : null;
+  public getAmount(): Big {
+    return this.wrapped.amount != null && this.wrapped.amount.trim() != '' ? new Big(this.wrapped.amount) : null;
   }
 
   /**
@@ -367,7 +367,7 @@ export class Transaction {
    * 
    * @returns This Transaction, for chainning.
    */
-  public setAmount(amount: Decimal | number | string): Transaction {
+  public setAmount(amount: Big | number | string): Transaction {
     
     if (typeof amount == "string") {
       amount = Utils.parseValue(amount, this.book.getDecimalSeparator())+'';
@@ -381,7 +381,7 @@ export class Transaction {
       }
     }
 
-    this.wrapped.amount = new Decimal(amount).abs().toString();
+    this.wrapped.amount = new Big(amount).abs().toString();
 
     return this;
   }
@@ -391,7 +391,7 @@ export class Transaction {
    * 
    * @param account - The account object, id or name.
    */
-  public async getCreditAmount(account: Account | string): Promise<Decimal> {
+  public async getCreditAmount(account: Account | string): Promise<Big> {
     let accountObject = await this.getAccount_(account);
     if (this.isCreditOnTransaction_(accountObject)) {
       return this.getAmount();
@@ -404,7 +404,7 @@ export class Transaction {
    * 
    * @param account - The account object, id or name.
    */
-  public async getDebitAmount(account: Account | string): Promise<Decimal> {
+  public async getDebitAmount(account: Account | string): Promise<Big> {
     let accountObject = await this.getAccount_(account);
     if (this.isDebitOnTransaction_(accountObject)) {
       return this.getAmount();
@@ -552,13 +552,13 @@ export class Transaction {
 
   //EVOLVED BALANCES
   /** @internal */
-  private getCaEvolvedBalance_(): Decimal {
-    return this.wrapped.creditAccount != null && this.wrapped.creditAccount.balance != null ? new Decimal(this.wrapped.creditAccount.balance) : null;
+  private getCaEvolvedBalance_(): Big {
+    return this.wrapped.creditAccount != null && this.wrapped.creditAccount.balance != null ? new Big(this.wrapped.creditAccount.balance) : null;
   }
 
   /** @internal */
-  private getDaEvolvedBalance_(): Decimal {
-    return this.wrapped.debitAccount != null && this.wrapped.debitAccount.balance != null ? new Decimal(this.wrapped.debitAccount.balance) : null;
+  private getDaEvolvedBalance_(): Big {
+    return this.wrapped.debitAccount != null && this.wrapped.debitAccount.balance != null ? new Big(this.wrapped.debitAccount.balance) : null;
   }
 
   /**
@@ -570,7 +570,7 @@ export class Transaction {
    * 
    * @param raw - True to get the raw balance, no matter the credit nature of the [[Account]].
    */
-  public async getAccountBalance(raw?: boolean): Promise<Decimal> {
+  public async getAccountBalance(raw?: boolean): Promise<Big> {
     var accountBalance = this.getCaEvolvedBalance_();
     var isCa = true;
     if (accountBalance == null) {

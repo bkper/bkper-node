@@ -18,7 +18,7 @@ import { Transaction } from './Transaction';
 import { TransactionIterator } from './TransactionIterator';
 import { TransactionsDataTableBuilder } from './TransactionsDataTableBuilder';
 import * as Utils from '../utils';
-import { Decimal } from "decimal.js-light";
+import { Big } from "big.js";
 
 /**
  *
@@ -311,14 +311,14 @@ export class Book {
    * 
    * @returns The value formated
    */
-  public formatValue(value: Decimal | number): string {
+  public formatValue(value: Big | number): string {
     return Utils.formatValue(value, this.getDecimalSeparator(), this.getFractionDigits());
   }
 
   /**
    * Parse a value string according to [[DecimalSeparator]] and fraction digits of the Book.
    */
-  public parseValue(value: string): Decimal {
+  public parseValue(value: string): Big {
     return Utils.parseValue(value, this.getDecimalSeparator());
   }
 
@@ -330,7 +330,7 @@ export class Book {
    * 
    * @returns The value rounded
    */
-  public round(value: Decimal | number): Decimal {
+  public round(value: Big | number): Big {
     return Utils.round(value, this.getFractionDigits());
   }
 
