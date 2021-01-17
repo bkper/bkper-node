@@ -3,7 +3,7 @@ import { Book } from './Book';
 import { AccountType } from './Enums';
 import { Group } from './Group';
 import { getRepresentativeValue, normalizeText, round } from '../utils';
-import { Big } from 'big.js';
+import { Amount } from './Amount';
 
 /**
  * 
@@ -152,8 +152,8 @@ export class Account {
    * 
    * @returns The balance of this account.
    */
-  public getBalance(raw?: boolean): Big {
-    var balance = new Big('0');
+  public getBalance(raw?: boolean): Amount {
+    var balance = new Amount('0');
     if (this.wrapped.balance != null) {
       balance = round(this.wrapped.balance, this.book.getFractionDigits());
     }
@@ -172,8 +172,8 @@ export class Account {
    * 
    * @returns The checked balance of this Account
    */
-  public getCheckedBalance(raw?: boolean): Big {
-    var balance = new Big('0');
+  public getCheckedBalance(raw?: boolean): Amount {
+    var balance = new Amount('0');
     if (this.wrapped.balance != null) {
       balance = round(this.wrapped.checkedBalance, this.book.getFractionDigits());
     }

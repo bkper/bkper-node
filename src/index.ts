@@ -7,7 +7,7 @@
  */
 
 export { App } from './model/App'
-export { Big } from "big.js";
+export { Amount } from "./model/Amount";
 export { Bkper } from './model/Bkper'
 export { OAuthTokenProvider } from './auth/OAuthTokenProvider'
 export { Account } from './model/Account'

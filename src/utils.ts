@@ -1,5 +1,5 @@
 import moment from 'moment-timezone';
-import { Big } from "big.js";
+import { Amount } from './model/Amount';
 import { DecimalSeparator, Periodicity } from './model/Enums';
 
 export function sleep(ms: number) {
@@ -17,18 +17,18 @@ export function base64Decode(data: string): Buffer {
 
 var diacriticsMap_: any = null;
 
-export function round(number: Big | string | number, fractionDigits: number): Big {
+export function round(number: Amount | string | number, fractionDigits: number): Amount {
   if (number == null) {
-    number = new Big('0');
+    number = new Amount('0');
   }
   if (fractionDigits != null) {
-    return new Big(number).round(fractionDigits);
+    return new Amount(number).round(fractionDigits);
   } else {
-    return new Big(number).round(2);
+    return new Amount(number).round(2);
   }
 }
 
-export function formatValue(value: Big | string | number, decimalSeparator: DecimalSeparator, fractionDigits: number): string {
+export function formatValue(value: Amount | string | number, decimalSeparator: DecimalSeparator, fractionDigits: number): string {
 
   if (value == null) {
     return "";
@@ -38,7 +38,7 @@ export function formatValue(value: Big | string | number, decimalSeparator: Deci
     if (value.trim() == '') {
       return "";
     }
-    value = new Big(value);
+    value = new Amount(value);
   }
 
   if (value == null) {
@@ -57,13 +57,13 @@ export function formatValue(value: Big | string | number, decimalSeparator: Deci
   }
 }
 
-export function parseValue(value: string, decimalSeparator: DecimalSeparator): Big {
+export function parseValue(value: string, decimalSeparator: DecimalSeparator): Amount {
   if (value == null) {
     return null;
   }
 
   if (!isNaN(+value) && isFinite(+value)) {
-    return new Big(value);
+    return new Amount(value);
   }
 
   if (decimalSeparator == DecimalSeparator.DOT) {
@@ -71,7 +71,7 @@ export function parseValue(value: string, decimalSeparator: DecimalSeparator): B
   } else {
     value = value.replace(/\./g, '').replace(/\,/g, '.');
   }
-  return new Big(value);
+  return new Amount(value);
 }
 
 export function convertValueToDate(dateValue: number, offsetInMinutes: number): Date {
@@ -180,14 +180,14 @@ export function getDateFormatterPattern(datePattern: string, periodicity: Period
   return pattern;
 }
 
-export function getRepresentativeValue(value: Big, credit: boolean): Big {
+export function getRepresentativeValue(value: Amount, credit: boolean): Amount {
 
   if (value == null) {
-    return new Big(0);
+    return new Amount(0);
   }
 
   if (credit != null && !credit) {
-    return value.mul(-1);
+    return value.times(-1);
   }
   return value;
 }

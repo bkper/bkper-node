@@ -1,6 +1,6 @@
 import { convertInMatrix, formatValue } from "../utils";
 import { Account } from "./Account";
-import { Big } from "big.js";
+import { Amount } from './Amount';
 import { Transaction } from "./Transaction";
 import { TransactionIterator } from "./TransactionIterator";
 
@@ -219,7 +219,7 @@ export class TransactionsDataTableBuilder {
 
       if (transaction.getAmount() != null) {
 
-        var amount: string | Big = transaction.getAmount();
+        var amount: string | Amount = transaction.getAmount();
 
         if (this.shouldFormatValues) {
           amount = formatValue(transaction.getAmount(), iterator.getBook().getDecimalSeparator(), iterator.getBook().getFractionDigits());
@@ -239,7 +239,7 @@ export class TransactionsDataTableBuilder {
 
       if (account.isPermanent()) {
         if (transaction.getAccountBalance() != null) {
-          var balance: string | Big = await transaction.getAccountBalance();
+          var balance: string | Amount = await transaction.getAccountBalance();
           if (this.shouldFormatValues) {
             balance = formatValue(balance, iterator.getBook().getDecimalSeparator(), iterator.getBook().getFractionDigits());
           };

@@ -4,7 +4,7 @@
 
 ```ts
 
-import { Big } from 'big.js';
+import Big from 'big.js';
 
 // @public
 export class Account {
@@ -13,8 +13,8 @@ export class Account {
     book: Book;
     create(): Promise<Account>;
     deleteProperty(key: string): Account;
-    getBalance(raw?: boolean): Big;
-    getCheckedBalance(raw?: boolean): Big;
+    getBalance(raw?: boolean): Amount;
+    getCheckedBalance(raw?: boolean): Amount;
     getGroups(): Promise<Group[]>;
     getId(): string;
     getName(): string;
@@ -64,6 +64,29 @@ export enum AccountType {
 }
 
 // @public
+export class Amount {
+    constructor(amount: number | string | Amount);
+    abs(): Amount;
+    cmp(n: number | string | Amount): -1 | 0 | 1;
+    div(n: number | string | Amount): Amount;
+    eq(n: number | string | Amount): boolean;
+    gt(n: number | string | Amount): boolean;
+    gte(n: number | string | Amount): boolean;
+    lt(n: number | string | Amount): boolean;
+    lte(n: number | string | Amount): boolean;
+    minus(n: number | string | Amount): Amount;
+    mod(n: number | string | Amount): Amount;
+    plus(n: number | string | Amount): Amount;
+    round(dp?: number): Amount;
+    times(n: number | string | Amount): Amount;
+    toFixed(dp?: number): string;
+    toNumber(): number;
+    toString(): string;
+    // (undocumented)
+    wrapped: Big;
+}
+
+// @public
 export class App {
     // @internal
     constructor();
@@ -75,16 +98,16 @@ export class App {
 export class Balance {
     // @internal
     constructor(container: BalancesContainer, balancePlain: bkper.Balance);
-    getCheckedCumulativeBalance(): Big;
-    getCheckedPeriodBalance(): Big;
-    getCumulativeBalance(): Big;
+    getCheckedCumulativeBalance(): Amount;
+    getCheckedPeriodBalance(): Amount;
+    getCumulativeBalance(): Amount;
     getDate(): Date;
     getDay(): number;
     getFuzzyDate(): number;
     getMonth(): number;
-    getPeriodBalance(): Big;
-    getUncheckedCumulativeBalance(): Big;
-    getUncheckedPeriodBalance(): Big;
+    getPeriodBalance(): Amount;
+    getUncheckedCumulativeBalance(): Amount;
+    getUncheckedPeriodBalance(): Amount;
     getYear(): number;
     }
 
@@ -102,18 +125,18 @@ export interface BalancesContainer {
     getBalancesContainer(name: string): BalancesContainer;
     getBalancesContainers(): BalancesContainer[];
     getBalancesReport(): BalancesReport;
-    getCheckedCumulativeBalance(): Big;
+    getCheckedCumulativeBalance(): Amount;
     getCheckedCumulativeBalanceText(): string;
-    getCheckedPeriodBalance(): Big;
+    getCheckedPeriodBalance(): Amount;
     getCheckedPeriodBalanceText(): string;
-    getCumulativeBalance(): Big;
+    getCumulativeBalance(): Amount;
     getCumulativeBalanceText(): string;
     getName(): string;
-    getPeriodBalance(): Big;
+    getPeriodBalance(): Amount;
     getPeriodBalanceText(): string;
-    getUncheckedCumulativeBalance(): Big;
+    getUncheckedCumulativeBalance(): Amount;
     getUncheckedCumulativeBalanceText(): string;
-    getUncheckedPeriodBalance(): Big;
+    getUncheckedPeriodBalance(): Amount;
     getUncheckedPeriodBalanceText(): string;
     isCredit(): boolean;
 }
@@ -152,8 +175,6 @@ export enum BalanceType {
     TOTAL = "TOTAL"
 }
 
-export { Big }
-
 // @public
 export class Bkper {
     static getBook(id: string): Promise<Book>;
@@ -178,7 +199,7 @@ export class Book {
     createBalancesDataTable(query: string): Promise<BalancesDataTableBuilder>;
     createTransactionsDataTable(query?: string): TransactionsDataTableBuilder;
     formatDate(date: Date, timeZone?: string): string;
-    formatValue(value: Big | number): string;
+    formatValue(value: Amount | number): string;
     getAccount(idOrName: string): Promise<Account>;
     getAccounts(): Promise<Account[]>;
     getBalancesReport(query: string): Promise<BalancesReport>;
@@ -223,8 +244,8 @@ export class Book {
     newFile(): File;
     newGroup(): Group;
     newTransaction(): Transaction;
-    parseValue(value: string): Big;
-    round(value: Big | number): Big;
+    parseValue(value: string): Amount;
+    round(value: Amount | number): Amount;
     setDatePattern(datePattern: string): Book;
     setDecimalSeparator(decimalSeparator: DecimalSeparator): Book;
     setFractionDigits(fractionDigits: number): Book;
@@ -341,11 +362,11 @@ export class Transaction {
     create(): Promise<Transaction>;
     deleteProperty(key: string): Transaction;
     from(account: Account): Transaction;
-    getAccountBalance(raw?: boolean): Promise<Big>;
+    getAccountBalance(raw?: boolean): Promise<Amount>;
     // (undocumented)
     getAgentId(): string;
     // (undocumented)
-    getAmount(): Big;
+    getAmount(): Amount;
     // (undocumented)
     getCreatedAt(): Date;
     // (undocumented)
@@ -354,7 +375,7 @@ export class Transaction {
     getCreditAccount(): Promise<Account>;
     // (undocumented)
     getCreditAccountName(): Promise<string>;
-    getCreditAmount(account: Account | string): Promise<Big>;
+    getCreditAmount(account: Account | string): Promise<Amount>;
     // (undocumented)
     getDate(): string;
     // (undocumented)
@@ -367,7 +388,7 @@ export class Transaction {
     getDebitAccount(): Promise<Account>;
     // (undocumented)
     getDebitAccountName(): Promise<string>;
-    getDebitAmount(account: Account | string): Promise<Big>;
+    getDebitAmount(account: Account | string): Promise<Amount>;
     // (undocumented)
     getDescription(): string;
     // (undocumented)
@@ -395,7 +416,7 @@ export class Transaction {
     post(): Promise<Transaction>;
     remove(): Promise<Transaction>;
     restore(): Promise<Transaction>;
-    setAmount(amount: Big | number | string): Transaction;
+    setAmount(amount: Amount | number | string): Transaction;
     setCreditAccount(account: Account): Transaction;
     setDate(date: string | Date): Transaction;
     setDebitAccount(account: Account): Transaction;
