@@ -1,8 +1,6 @@
 import Utils from 'moment-timezone';
 import { DecimalSeparator, Periodicity } from './model/Enums';
-
-var diacriticsMap_: any = null;
-
+import { Decimal } from "decimal.js-light";
 
 export function sleep(ms: number) {
   return new Promise((resolve) => {
@@ -14,44 +12,43 @@ export function base64Decode(data: string): Buffer {
   return Buffer.from(data, 'base64');
 }
 
-export function round(number: number | string, fractionDigits: number): number {
-  let num = +number;
-  if (num == null) {
-    num = 0;
+
+//SAME AS bkper-app
+
+var diacriticsMap_: any = null;
+
+export function round(number: Decimal | string | number, fractionDigits: number): Decimal {
+  if (number == null) {
+    number = new Decimal('0');
   }
   if (fractionDigits != null) {
-    var rounded = Number(Math.round(new Number(num + 'e' + fractionDigits).valueOf()) + 'e-' + fractionDigits)
-    if (isNaN(rounded)) {
-      rounded = 0;
-    }
-    return rounded;
+    return new Decimal(number).toDecimalPlaces(fractionDigits);
   } else {
-    var rounded =  Math.round(num*100)/100;
-    return rounded;
+    return new Decimal(number).toDecimalPlaces(2);
   }
 }
 
-export function formatValue(value: number | string, decimalSeparator: DecimalSeparator, fractionDigits:number): string {
-  
-  if (value == null){
-      return "";
-  } 
-  
+export function formatValue(value: Decimal | string | number, decimalSeparator: DecimalSeparator, fractionDigits: number): string {
+
+  if (value == null) {
+    return "";
+  }
+
   if (typeof value == "string") {
     if (value.trim() == '') {
       return "";
     }
-    value = parseFloat(value);
+    value = new Decimal(value);
   }
-  
-  if (value == null){
-      return "";
-  }     
 
-  if(fractionDigits == null) {
+  if (value == null) {
+    return "";
+  }
+
+  if (fractionDigits == null) {
     fractionDigits = 2;
   }
-  
+
   var formattedValue = (value.toFixed(fractionDigits)) + "";
   if (decimalSeparator == DecimalSeparator.DOT) {
     return formattedValue.replace(/\,/g, '.');
@@ -60,13 +57,13 @@ export function formatValue(value: number | string, decimalSeparator: DecimalSep
   }
 }
 
-export function parseValue(value: string, decimalSeparator: DecimalSeparator): number {
-  if (value == null){
-      return null;
-  } 
-  
+export function parseValue(value: string, decimalSeparator: DecimalSeparator): Decimal {
+  if (value == null) {
+    return null;
+  }
+
   if (!isNaN(+value) && isFinite(+value)) {
-    return +value;
+    return new Decimal(value);
   }
 
   if (decimalSeparator == DecimalSeparator.DOT) {
@@ -74,15 +71,15 @@ export function parseValue(value: string, decimalSeparator: DecimalSeparator): n
   } else {
     value = value.replace(/\./g, '').replace(/\,/g, '.');
   }
-  return +value;
-}  
+  return new Decimal(value);
+}
 
 export function convertValueToDate(dateValue: number, offsetInMinutes: number): Date {
   if (dateValue == null) {
     return new Date();
   }
-  var year =  dateValue/10000;
-  var month =  (dateValue / 100) % 100;
+  var year = dateValue / 10000;
+  var month = (dateValue / 100) % 100;
   var day = dateValue % 100;
   var date = this.createDate(year, month, day, offsetInMinutes);
   return date;
@@ -99,22 +96,22 @@ export function isString(obj: object): boolean {
   }
 }
 
-export function createDate(year: number, month: number, day:number, offsetInMinutes: number): Date {
+export function createDate(year: number, month: number, day: number, offsetInMinutes: number): Date {
   var date = new Date(year, month - 1, day);
-  date.setTime(date.getTime() + offsetInMinutes*60*1000 );    
+  date.setTime(date.getTime() + offsetInMinutes * 60 * 1000);
   return date;
-} 
+}
 
 
 export function formatDate(date: Date, pattern: string, timeZone: string): string {
   if (date == null || !(Object.prototype.toString.call(date) === '[object Date]')) {
     return '';
   }
-  
+
   if (timeZone == null || timeZone == "") {
     timeZone = "UTC";
-  }    
-  
+  }
+
   var formatedDate = Utils.tz(date, timeZone).format(pattern);
   return formatedDate;
 }
@@ -123,11 +120,11 @@ export function formatDateISO(date: Date, timeZone: string): string {
   if (date == null || !(Object.prototype.toString.call(date) === '[object Date]')) {
     return '';
   }
-  
+
   if (timeZone == null || timeZone == "") {
     timeZone = "UTC";
-  }    
-  
+  }
+
   var formatedDate = formatDate(date, timeZone, 'yyyy-MM-dd');
   return formatedDate;
 }
@@ -148,7 +145,7 @@ export function parseDate(date: string, pattern: string, offsetInMinutes: number
       let month = +split[0];
       let day = +split[1];
       return this.createDate(year, month, day, offsetInMinutes);
-    }      
+    }
   } else if (pattern == 'yyyy/MM/dd') {
     let split = date.split('/');
     if (split.length == 3) {
@@ -156,7 +153,7 @@ export function parseDate(date: string, pattern: string, offsetInMinutes: number
       let month = +split[1];
       let day = +split[2];
       return this.createDate(year, month, day, offsetInMinutes);
-    }   
+    }
   } else if (pattern == 'yyyy-MM-dd') {
     let split = date.split('-');
     if (split.length == 3) {
@@ -164,10 +161,10 @@ export function parseDate(date: string, pattern: string, offsetInMinutes: number
       let month = +split[1];
       let day = +split[2];
       return this.createDate(year, month, day, offsetInMinutes);
-    }   
+    }
   }
   let now = new Date()
-  return this.createDate(now.getFullYear(), now.getMonth()+1, now.getDate(), offsetInMinutes);
+  return this.createDate(now.getFullYear(), now.getMonth() + 1, now.getDate(), offsetInMinutes);
 
 }
 
@@ -183,14 +180,14 @@ export function getDateFormatterPattern(datePattern: string, periodicity: Period
   return pattern;
 }
 
-export function getRepresentativeValue(value: number, credit:boolean): number {
-  
+export function getRepresentativeValue(value: Decimal, credit: boolean): Decimal {
+
   if (value == null) {
-    return 0;
+    return new Decimal(0);
   }
-  
+
   if (credit != null && !credit) {
-    return value *-1;
+    return value.mul(-1);
   }
   return value;
 }
@@ -206,7 +203,7 @@ export function wrapObjects<E extends Object>(wrapper: E, wrappeds: Array<Object
   return newObjects;
 }
 
-export function wrapObject<E extends Object>(wrapper:E, wrapped: Object): E {
+export function wrapObject<E extends Object>(wrapper: E, wrapped: Object): E {
   if (wrapped == null) {
     wrapped = new Object();
   }
@@ -247,7 +244,7 @@ export function convertInMatrix(array: any[]): any[][] {
     }
   }
   return array;
-}  
+}
 
 
 export function normalizeName(name: string): string {

@@ -1,3 +1,4 @@
+import Decimal from "decimal.js-light";
 import { getRepresentativeValue, round } from "../utils";
 import { Balance } from "./Balance";
 import { BalancesDataTableBuilder } from "./BalancesDataTableBuilder";
@@ -43,7 +44,7 @@ export interface BalancesContainer {
   /**
    * The cumulative balance to the date, since the first transaction posted.
    */
-  getCumulativeBalance(): number;
+  getCumulativeBalance(): Decimal;
   /**
    * The cumulative balance formatted according to [[Book]] decimal format and fraction digits.
    */
@@ -53,7 +54,7 @@ export interface BalancesContainer {
   /**
    * The cumulative checked balance to the date, since the first transaction posted.
    */
-  getCheckedCumulativeBalance(): number;
+  getCheckedCumulativeBalance(): Decimal;
   /**
    * The cumulative checked balance formatted according to [[Book]] decimal format and fraction digits.
    */
@@ -63,7 +64,7 @@ export interface BalancesContainer {
   /**
    * The cumulative unchecked balance to the date, since the first transaction posted.
    */
-  getUncheckedCumulativeBalance(): number;
+  getUncheckedCumulativeBalance(): Decimal;
   /**
    * The cumulative unchecked balance formatted according to [[Book]] decimal format and fraction digits.
    */
@@ -73,7 +74,7 @@ export interface BalancesContainer {
   /**
    * The balance on the date period.
    */
-  getPeriodBalance(): number;
+  getPeriodBalance(): Decimal;
   /**
    * The balance on the date period formatted according to [[Book]] decimal format and fraction digits
    */
@@ -83,7 +84,7 @@ export interface BalancesContainer {
   /**
    * The checked balance on the date period.
    */
-  getCheckedPeriodBalance(): number;
+  getCheckedPeriodBalance(): Decimal;
   /**
    * The checked balance on the date period formatted according to [[Book]] decimal format and fraction digits
    */
@@ -93,7 +94,7 @@ export interface BalancesContainer {
   /**
    * The unchecked balance on the date period.
    */
-  getUncheckedPeriodBalance(): number;
+  getUncheckedPeriodBalance(): Decimal;
   /**
    * The unchecked balance on the date period formatted according to [[Book]] decimal format and fraction digits
    */
@@ -144,7 +145,7 @@ export class AccountBalancesContainer implements BalancesContainer {
     return this.wrapped.credit;
   }
 
-  public getCumulativeBalance(): number {
+  public getCumulativeBalance(): Decimal {
     var balance = round(this.wrapped.cumulativeBalance, this.balancesReport.getBook().getFractionDigits());
     balance = getRepresentativeValue(balance, this.isCredit());
     return balance;
@@ -153,7 +154,7 @@ export class AccountBalancesContainer implements BalancesContainer {
     return this.balancesReport.getBook().formatValue(this.getCumulativeBalance());
   }
 
-  public getCheckedCumulativeBalance(): number {
+  public getCheckedCumulativeBalance(): Decimal {
     var balance = round(this.wrapped.checkedCumulativeBalance, this.balancesReport.getBook().getFractionDigits());
     balance = getRepresentativeValue(balance, this.isCredit());
     return balance;
@@ -162,7 +163,7 @@ export class AccountBalancesContainer implements BalancesContainer {
     return this.balancesReport.getBook().formatValue(this.getCheckedCumulativeBalance());
   }
 
-  public getUncheckedCumulativeBalance(): number {
+  public getUncheckedCumulativeBalance(): Decimal {
     var balance = round(this.wrapped.uncheckedCumulativeBalance, this.balancesReport.getBook().getFractionDigits());
     balance = getRepresentativeValue(balance, this.isCredit());
     return balance;
@@ -171,7 +172,7 @@ export class AccountBalancesContainer implements BalancesContainer {
     return this.balancesReport.getBook().formatValue(this.getUncheckedCumulativeBalance());
   }
 
-  public getPeriodBalance(): number {
+  public getPeriodBalance(): Decimal {
     var balance = round(this.wrapped.periodBalance, this.balancesReport.getBook().getFractionDigits());
     return getRepresentativeValue(balance, this.isCredit());
   }
@@ -179,7 +180,7 @@ export class AccountBalancesContainer implements BalancesContainer {
     return this.balancesReport.getBook().formatValue(this.getPeriodBalance());
   }
 
-  public getCheckedPeriodBalance(): number {
+  public getCheckedPeriodBalance(): Decimal {
     var balance = round(this.wrapped.checkedPeriodBalance, this.balancesReport.getBook().getFractionDigits());
     return getRepresentativeValue(balance, this.isCredit());
   }
@@ -187,7 +188,7 @@ export class AccountBalancesContainer implements BalancesContainer {
     return this.balancesReport.getBook().formatValue(this.getCheckedPeriodBalance());
   }
 
-  public getUncheckedPeriodBalance(): number {
+  public getUncheckedPeriodBalance(): Decimal {
     var balance = round(this.wrapped.uncheckedPeriodBalance, this.balancesReport.getBook().getFractionDigits());
     return getRepresentativeValue(balance, this.isCredit());
   }
@@ -248,7 +249,7 @@ export class GroupBalancesContainer implements BalancesContainer {
   }
 
 
-  public getCumulativeBalance(): number {
+  public getCumulativeBalance(): Decimal {
     var balance = round(this.wrapped.cumulativeBalance, this.balancesReport.getBook().getFractionDigits());
     return getRepresentativeValue(balance, this.isCredit());
   }
@@ -257,7 +258,7 @@ export class GroupBalancesContainer implements BalancesContainer {
   }
 
 
-  public getCheckedCumulativeBalance(): number {
+  public getCheckedCumulativeBalance(): Decimal {
     var balance = round(this.wrapped.checkedCumulativeBalance, this.balancesReport.getBook().getFractionDigits());
     return getRepresentativeValue(balance, this.isCredit());
   }
@@ -266,7 +267,7 @@ export class GroupBalancesContainer implements BalancesContainer {
   }
 
 
-  public getUncheckedCumulativeBalance(): number {
+  public getUncheckedCumulativeBalance(): Decimal {
     var balance = round(this.wrapped.uncheckedCumulativeBalance, this.balancesReport.getBook().getFractionDigits());
     return getRepresentativeValue(balance, this.isCredit());
   }
@@ -275,7 +276,7 @@ export class GroupBalancesContainer implements BalancesContainer {
   }
 
 
-  public getPeriodBalance(): number {
+  public getPeriodBalance(): Decimal {
     var balance = round(this.wrapped.periodBalance, this.balancesReport.getBook().getFractionDigits());
     return getRepresentativeValue(balance, this.isCredit());
   }
@@ -284,7 +285,7 @@ export class GroupBalancesContainer implements BalancesContainer {
   }  
 
 
-  public getCheckedPeriodBalance(): number {
+  public getCheckedPeriodBalance(): Decimal {
     var balance = round(this.wrapped.checkedPeriodBalance, this.balancesReport.getBook().getFractionDigits());
     return getRepresentativeValue(balance, this.isCredit());
   }
@@ -292,7 +293,7 @@ export class GroupBalancesContainer implements BalancesContainer {
     return this.balancesReport.getBook().formatValue(this.getCheckedPeriodBalance());
   }    
 
-  public getUncheckedPeriodBalance(): number {
+  public getUncheckedPeriodBalance(): Decimal {
     var balance = round(this.wrapped.uncheckedPeriodBalance, this.balancesReport.getBook().getFractionDigits());
     return getRepresentativeValue(balance, this.isCredit());
   }

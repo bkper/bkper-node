@@ -2,6 +2,7 @@ import { convertInMatrix, formatValue } from "../utils";
 import { Account } from "./Account";
 import { Transaction } from "./Transaction";
 import { TransactionIterator } from "./TransactionIterator";
+import { Decimal } from "decimal.js-light";
 
 /**
  * A TransactionsDataTableBuilder is used to setup and build two-dimensional arrays containing transactions.
@@ -218,7 +219,7 @@ export class TransactionsDataTableBuilder {
 
       if (transaction.getAmount() != null) {
 
-        var amount: string | number = transaction.getAmount();
+        var amount: string | Decimal = transaction.getAmount();
 
         if (this.shouldFormatValues) {
           amount = formatValue(transaction.getAmount(), iterator.getBook().getDecimalSeparator(), iterator.getBook().getFractionDigits());
@@ -238,7 +239,7 @@ export class TransactionsDataTableBuilder {
 
       if (account.isPermanent()) {
         if (transaction.getAccountBalance() != null) {
-          var balance: string | number = await transaction.getAccountBalance();
+          var balance: string | Decimal = await transaction.getAccountBalance();
           if (this.shouldFormatValues) {
             balance = formatValue(balance, iterator.getBook().getDecimalSeparator(), iterator.getBook().getFractionDigits());
           };

@@ -18,6 +18,7 @@ import { Transaction } from './Transaction';
 import { TransactionIterator } from './TransactionIterator';
 import { TransactionsDataTableBuilder } from './TransactionsDataTableBuilder';
 import * as Utils from '../utils';
+import { Decimal } from "decimal.js-light";
 
 /**
  *
@@ -94,10 +95,17 @@ export class Book {
   }
   
   /**
-   * @returns The number of fraction digits (decimal places) supported by this Book
+   * @returns The number of fraction digits supported by this Book. Same as getDecimalPlaces
    */
   public getFractionDigits(): number {
     return this.wrapped.fractionDigits;
+  }
+
+  /**
+   * @returns The number of decimal places supported by this Book. Same as getFractionDigits
+   */
+  public getDecimalPlaces(): number {
+    return this.getFractionDigits();
   }
 
   /**
@@ -303,14 +311,14 @@ export class Book {
    * 
    * @returns The value formated
    */
-  public formatValue(value: number): string {
+  public formatValue(value: Decimal | number): string {
     return Utils.formatValue(value, this.getDecimalSeparator(), this.getFractionDigits());
   }
 
   /**
    * Parse a value string according to [[DecimalSeparator]] and fraction digits of the Book.
    */
-  public parseValue(value: string): number {
+  public parseValue(value: string): Decimal {
     return Utils.parseValue(value, this.getDecimalSeparator());
   }
 
@@ -322,7 +330,7 @@ export class Book {
    * 
    * @returns The value rounded
    */
-  public round(value: number): number {
+  public round(value: Decimal | number): Decimal {
     return Utils.round(value, this.getFractionDigits());
   }
 

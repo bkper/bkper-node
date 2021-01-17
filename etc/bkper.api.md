@@ -4,6 +4,8 @@
 
 ```ts
 
+import { Decimal } from 'decimal.js-light';
+
 // @public
 export class Account {
     addGroup(group: string | Group): Promise<Account>;
@@ -11,8 +13,8 @@ export class Account {
     book: Book;
     create(): Promise<Account>;
     deleteProperty(key: string): Account;
-    getBalance(raw?: boolean): number;
-    getCheckedBalance(raw?: boolean): number;
+    getBalance(raw?: boolean): Decimal;
+    getCheckedBalance(raw?: boolean): Decimal;
     getGroups(): Promise<Group[]>;
     getId(): string;
     getName(): string;
@@ -73,16 +75,16 @@ export class App {
 export class Balance {
     // @internal
     constructor(container: BalancesContainer, balancePlain: bkper.Balance);
-    getCheckedCumulativeBalance(): number;
-    getCheckedPeriodBalance(): number;
-    getCumulativeBalance(): number;
+    getCheckedCumulativeBalance(): Decimal;
+    getCheckedPeriodBalance(): Decimal;
+    getCumulativeBalance(): Decimal;
     getDate(): Date;
     getDay(): number;
     getFuzzyDate(): number;
     getMonth(): number;
-    getPeriodBalance(): number;
-    getUncheckedCumulativeBalance(): number;
-    getUncheckedPeriodBalance(): number;
+    getPeriodBalance(): Decimal;
+    getUncheckedCumulativeBalance(): Decimal;
+    getUncheckedPeriodBalance(): Decimal;
     getYear(): number;
     }
 
@@ -100,18 +102,18 @@ export interface BalancesContainer {
     getBalancesContainer(name: string): BalancesContainer;
     getBalancesContainers(): BalancesContainer[];
     getBalancesReport(): BalancesReport;
-    getCheckedCumulativeBalance(): number;
+    getCheckedCumulativeBalance(): Decimal;
     getCheckedCumulativeBalanceText(): string;
-    getCheckedPeriodBalance(): number;
+    getCheckedPeriodBalance(): Decimal;
     getCheckedPeriodBalanceText(): string;
-    getCumulativeBalance(): number;
+    getCumulativeBalance(): Decimal;
     getCumulativeBalanceText(): string;
     getName(): string;
-    getPeriodBalance(): number;
+    getPeriodBalance(): Decimal;
     getPeriodBalanceText(): string;
-    getUncheckedCumulativeBalance(): number;
+    getUncheckedCumulativeBalance(): Decimal;
     getUncheckedCumulativeBalanceText(): string;
-    getUncheckedPeriodBalance(): number;
+    getUncheckedPeriodBalance(): Decimal;
     getUncheckedPeriodBalanceText(): string;
     isCredit(): boolean;
 }
@@ -174,7 +176,7 @@ export class Book {
     createBalancesDataTable(query: string): Promise<BalancesDataTableBuilder>;
     createTransactionsDataTable(query?: string): TransactionsDataTableBuilder;
     formatDate(date: Date, timeZone?: string): string;
-    formatValue(value: number): string;
+    formatValue(value: Decimal | number): string;
     getAccount(idOrName: string): Promise<Account>;
     getAccounts(): Promise<Account[]>;
     getBalancesReport(query: string): Promise<BalancesReport>;
@@ -217,8 +219,8 @@ export class Book {
     newFile(): File;
     newGroup(): Group;
     newTransaction(): Transaction;
-    parseValue(value: string): number;
-    round(value: number): number;
+    parseValue(value: string): Decimal;
+    round(value: Decimal | number): Decimal;
     setDatePattern(datePattern: string): Book;
     setDecimalSeparator(decimalSeparator: DecimalSeparator): Book;
     setFractionDigits(fractionDigits: number): Book;
@@ -242,6 +244,8 @@ export class Collection {
     // (undocumented)
     getName(): string;
     }
+
+export { Decimal }
 
 // @public
 export enum DecimalSeparator {
@@ -335,11 +339,11 @@ export class Transaction {
     create(): Promise<Transaction>;
     deleteProperty(key: string): Transaction;
     from(account: Account): Transaction;
-    getAccountBalance(raw?: boolean): Promise<number>;
+    getAccountBalance(raw?: boolean): Promise<Decimal>;
     // (undocumented)
     getAgentId(): string;
     // (undocumented)
-    getAmount(): number;
+    getAmount(): Decimal;
     // (undocumented)
     getCreatedAt(): Date;
     // (undocumented)
@@ -348,7 +352,7 @@ export class Transaction {
     getCreditAccount(): Promise<Account>;
     // (undocumented)
     getCreditAccountName(): Promise<string>;
-    getCreditAmount(account: Account | string): Promise<number>;
+    getCreditAmount(account: Account | string): Promise<Decimal>;
     // (undocumented)
     getDate(): string;
     // (undocumented)
@@ -361,7 +365,7 @@ export class Transaction {
     getDebitAccount(): Promise<Account>;
     // (undocumented)
     getDebitAccountName(): Promise<string>;
-    getDebitAmount(account: Account | string): Promise<number>;
+    getDebitAmount(account: Account | string): Promise<Decimal>;
     // (undocumented)
     getDescription(): string;
     // (undocumented)
@@ -389,7 +393,7 @@ export class Transaction {
     post(): Promise<Transaction>;
     remove(): Promise<Transaction>;
     restore(): Promise<Transaction>;
-    setAmount(amount: number | string): Transaction;
+    setAmount(amount: Decimal | number | string): Transaction;
     setCreditAccount(account: Account): Transaction;
     setDate(date: string | Date): Transaction;
     setDebitAccount(account: Account): Transaction;

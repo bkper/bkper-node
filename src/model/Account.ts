@@ -1,6 +1,7 @@
 import * as AccountService  from '../service/account-service'
 import { Book } from './Book';
 import { AccountType } from './Enums';
+import { Decimal } from "decimal.js-light";
 import { Group } from './Group';
 import { getRepresentativeValue, normalizeText, round } from '../utils';
 
@@ -151,8 +152,8 @@ export class Account {
    * 
    * @returns The balance of this account.
    */
-  public getBalance(raw?: boolean): number {
-    var balance = 0;
+  public getBalance(raw?: boolean): Decimal {
+    var balance = new Decimal('0');
     if (this.wrapped.balance != null) {
       balance = round(this.wrapped.balance, this.book.getFractionDigits());
     }
@@ -171,8 +172,8 @@ export class Account {
    * 
    * @returns The checked balance of this Account
    */
-  public getCheckedBalance(raw?: boolean): number {
-    var balance = 0;
+  public getCheckedBalance(raw?: boolean): Decimal {
+    var balance = new Decimal('0');
     if (this.wrapped.balance != null) {
       balance = round(this.wrapped.checkedBalance, this.book.getFractionDigits());
     }

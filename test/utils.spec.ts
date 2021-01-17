@@ -40,17 +40,17 @@ describe('utils', () => {
   describe('#parseValue()', () => {
     it('should parse DOT separator', () => {
       let value = utils.parseValue('23.4', DecimalSeparator.DOT);
-      expect(value).to.equal(23.4);
+      expect(value.toNumber()).to.equal(23.4);
       value = utils.parseValue('233,345.4667', DecimalSeparator.DOT);
-      expect(value).to.equal(233345.4667);
+      expect(value.toNumber()).to.equal(233345.4667);
     });
     it('should parse COMMA separator', () => {
       let value = utils.parseValue('23,4', DecimalSeparator.COMMA);
-      expect(value).to.equal(23.4);
+      expect(value.toNumber()).to.equal(23.4);
       value = utils.parseValue('23.4', DecimalSeparator.COMMA);
-      expect(value).to.equal(23.4);
+      expect(value.toNumber()).to.equal(23.4);
       value = utils.parseValue('233.345,4667', DecimalSeparator.COMMA);
-      expect(value).to.equal(233345.4667);
+      expect(value.toNumber()).to.equal(233345.4667);
     });
   });
 

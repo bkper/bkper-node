@@ -214,11 +214,11 @@ export class BalancesDataTableBuilder implements BalancesDataTableBuilder {
     this.balancesContainers.sort((a, b) => {
       if (a != null && b != null) {
         if (this.balanceCheckedType == BalanceCheckedType.CHECKED_BALANCE) {
-          return b.getCheckedCumulativeBalance() - a.getCheckedCumulativeBalance();
+          return b.getCheckedCumulativeBalance().minus(a.getCheckedCumulativeBalance()).toNumber();
         } else if (this.balanceCheckedType == BalanceCheckedType.UNCHECKED_BALANCE) {
-          return b.getUncheckedCumulativeBalance() - a.getUncheckedCumulativeBalance();
+          return b.getUncheckedCumulativeBalance().minus(a.getUncheckedCumulativeBalance()).toNumber();
         } else {
-          return b.getCumulativeBalance() - a.getCumulativeBalance();
+          return b.getCumulativeBalance().minus(a.getCumulativeBalance()).toNumber();
         }
       }
       return -1;
@@ -232,11 +232,11 @@ export class BalancesDataTableBuilder implements BalancesDataTableBuilder {
           subContainers.sort((a, b) => {
             if (a != null && b != null) {
               if (this.balanceCheckedType == BalanceCheckedType.CHECKED_BALANCE) {
-                return b.getCheckedCumulativeBalance() - a.getCheckedCumulativeBalance();
+                return b.getCheckedCumulativeBalance().minus(a.getCheckedCumulativeBalance()).toNumber();
               } else if (this.balanceCheckedType == BalanceCheckedType.UNCHECKED_BALANCE) {
-                return b.getUncheckedCumulativeBalance() - a.getUncheckedCumulativeBalance();
+                return b.getUncheckedCumulativeBalance().minus(a.getUncheckedCumulativeBalance()).toNumber();
               } else {
-                return b.getCumulativeBalance() - a.getCumulativeBalance();
+                return b.getCumulativeBalance().minus(a.getCumulativeBalance()).toNumber();
               }              
             }
             return -1;

@@ -6,6 +6,7 @@
  * @packageDocumentation
  */
 
+export { Decimal } from "decimal.js-light";
 export { App } from './model/App'
 export { Bkper } from './model/Bkper'
 export { OAuthTokenProvider } from './auth/OAuthTokenProvider'
