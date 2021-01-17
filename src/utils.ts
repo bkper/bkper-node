@@ -1,4 +1,4 @@
-import Utils from 'moment-timezone';
+import moment from 'moment-timezone';
 import { Big } from "big.js";
 import { DecimalSeparator, Periodicity } from './model/Enums';
 
@@ -112,7 +112,7 @@ export function formatDate(date: Date, pattern: string, timeZone: string): strin
     timeZone = "UTC";
   }
 
-  var formatedDate = Utils.tz(date, timeZone).format(pattern);
+  var formatedDate = moment.tz(date, timeZone).format(pattern);
   return formatedDate;
 }
 
