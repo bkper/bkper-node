@@ -4,8 +4,6 @@
 
 ```ts
 
-import Big from 'big.js';
-
 // @public
 export class Account {
     addGroup(group: string | Group): Promise<Account>;
@@ -84,9 +82,7 @@ export class Amount {
     toFixed(dp?: number): string;
     toNumber(): number;
     toString(): string;
-    // @internal (undocumented)
-    wrapped: Big;
-}
+    }
 
 // @public
 export class App {

@@ -8,7 +8,7 @@ import Big from "big.js";
 export class Amount {
 
   /** @internal */
-  wrapped: Big
+  private wrapped: Big
 
   /**
    * The Amount constructor.
