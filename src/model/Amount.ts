@@ -37,7 +37,7 @@ export class Amount {
   /**
    * Compare
    */
-  cmp(n: number | string | Amount): -1 | 0 | 1 {
+  public cmp(n: number | string | Amount): -1 | 0 | 1 {
     this.checkNumberNotNull(n);
     if (typeof n == "string") {
       return this.wrapped.cmp(n);
@@ -53,7 +53,7 @@ export class Amount {
   /**
    * Divide by
    */
-  div(n: number | string | Amount): Amount {
+  public div(n: number | string | Amount): Amount {
     this.checkNumberNotNull(n);
     let big: Big;
     if (typeof n == "string") {
@@ -71,7 +71,7 @@ export class Amount {
   /**
    * Equals to
    */
-  eq(n: number | string | Amount): boolean {
+  public eq(n: number | string | Amount): boolean {
     this.checkNumberNotNull(n);
     if (typeof n == "string") {
       return this.wrapped.eq(n);
@@ -87,7 +87,7 @@ export class Amount {
   /**
    * Greater than
    */
-  gt(n: number | string | Amount): boolean {
+  public gt(n: number | string | Amount): boolean {
     this.checkNumberNotNull(n);
     if (typeof n == "string") {
       return this.wrapped.gt(n);
@@ -103,7 +103,7 @@ export class Amount {
   /**
    * Greater than or equal
    */
-  gte(n: number | string | Amount): boolean {
+  public gte(n: number | string | Amount): boolean {
     this.checkNumberNotNull(n);
     if (typeof n == "string") {
       return this.wrapped.gte(n);
@@ -121,7 +121,7 @@ export class Amount {
   /**
    * Less than
    */
-  lt(n: number | string | Amount): boolean {
+  public lt(n: number | string | Amount): boolean {
     this.checkNumberNotNull(n);
     if (typeof n == "string") {
       return this.wrapped.lt(n);
@@ -138,7 +138,7 @@ export class Amount {
   /**
    * Less than or equal to
    */
-  lte(n: number | string | Amount): boolean {
+  public lte(n: number | string | Amount): boolean {
     this.checkNumberNotNull(n);
     if (typeof n == "string") {
       return this.wrapped.lte(n);
@@ -154,7 +154,7 @@ export class Amount {
   /**
    * Sum
    */
-  plus(n: number | string | Amount): Amount {
+  public plus(n: number | string | Amount): Amount {
     this.checkNumberNotNull(n);
     let big: Big;
     if (typeof n == "string") {
@@ -173,7 +173,7 @@ export class Amount {
   /**
    * Minus
    */
-  minus(n: number | string | Amount): Amount {
+  public minus(n: number | string | Amount): Amount {
     this.checkNumberNotNull(n);
     let big: Big;
     if (typeof n == "string") {
@@ -194,7 +194,7 @@ export class Amount {
    * Similar to % operator
    *
    */
-  mod(n: number | string | Amount): Amount {
+  public mod(n: number | string | Amount): Amount {
     this.checkNumberNotNull(n);
     let big: Big;
     if (typeof n == "string") {
@@ -213,7 +213,7 @@ export class Amount {
   /**
    * Round to a maximum of dp decimal places.
    */
-  round(dp?: number): Amount {
+  public round(dp?: number): Amount {
     let big = this.wrapped.round(dp);
     return this.wrap(big);
   }
@@ -223,7 +223,7 @@ export class Amount {
   /**
    * Multiply
    */
-  times(n: number | string | Amount): Amount {
+  public times(n: number | string | Amount): Amount {
     this.checkNumberNotNull(n);
     let big: Big;
     if (typeof n == "string") {
@@ -241,21 +241,21 @@ export class Amount {
   /**
    * Returns a string representing the value of this Amount in normal notation to a fixed number of decimal places dp.
    */
-  toFixed(dp?: number): string {
+  public toFixed(dp?: number): string {
     return this.wrapped.toFixed(dp);
   }
 
   /**
    * Returns a string representing the value of this Amount.
    */
-  toString(): string {
+  public toString(): string {
     return this.wrapped.toString();
   }
 
   /**
    * Returns a primitive number representing the value of this Amount.
    */
-  toNumber(): number {
+  public toNumber(): number {
     return this.wrapped.toNumber();
   }
 
