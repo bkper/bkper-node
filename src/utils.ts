@@ -71,7 +71,11 @@ export function parseValue(value: string, decimalSeparator: DecimalSeparator): A
   } else {
     value = value.replace(/\./g, '').replace(/\,/g, '.');
   }
-  return new Amount(value);
+  try {
+    return new Amount(value);
+  } catch (err) {
+    return null;
+  }
 }
 
 export function convertValueToDate(dateValue: number, offsetInMinutes: number): Date {

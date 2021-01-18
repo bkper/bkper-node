@@ -1,7 +1,7 @@
 import { Book } from "./Book";
 import { Account } from "./Account";
 import { normalizeText } from "../utils";
-import * as GroupService from  '../service/group-service';
+import * as GroupService from '../service/group-service';
 
 /**
  * This class defines a Group of [[Accounts]].
@@ -17,7 +17,7 @@ export class Group {
   /** @internal */
   wrapped: bkper.Group
 
-    /** @internal */
+  /** @internal */
   book: Book
 
   /**
@@ -39,11 +39,11 @@ export class Group {
    * Sets the name of the Group.
    * 
    * @returns This Group, for chainning.
-   */    
+   */
   public setName(name: string): Group {
     this.wrapped.name = name;
     return this;
-  }  
+  }
 
   /**
    * @returns The name of this group without spaces and special characters
@@ -83,9 +83,9 @@ export class Group {
 
   /**
    * Gets the custom properties stored in this Group
-   */  
-  public getProperties(): {[key: string]: string} {
-    return this.wrapped.properties != null ?  {...this.wrapped.properties} : {};
+   */
+  public getProperties(): { [key: string]: string } {
+    return this.wrapped.properties != null ? { ...this.wrapped.properties } : {};
   }
 
   /**
@@ -95,8 +95,8 @@ export class Group {
    * 
    * @returns This Group, for chainning. 
    */
-  public setProperties(properties: {[key: string]: string}): Group {
-    this.wrapped.properties = {...properties};
+  public setProperties(properties: { [key: string]: string }): Group {
+    this.wrapped.properties = { ...properties };
     return this;
   }
 
@@ -108,7 +108,7 @@ export class Group {
   public getProperty(...keys: string[]): string {
     for (let index = 0; index < keys.length; index++) {
       const key = keys[index];
-      let value = this.wrapped.properties != null ?  this.wrapped.properties[key] : null 
+      let value = this.wrapped.properties != null ? this.wrapped.properties[key] : null
       if (value != null && value.trim() != '') {
         return value;
       }
@@ -125,7 +125,7 @@ export class Group {
   public setProperty(key: string, value: string): Group {
     if (key == null || key.trim() == '') {
       return this;
-    }    
+    }
     if (this.wrapped.properties == null) {
       this.wrapped.properties = {};
     }
@@ -167,7 +167,7 @@ export class Group {
     this.wrapped = await GroupService.createGroup(this.book.getId(), this.wrapped);
     this.book.clearAccountsCache();
     return this;
-  }   
+  }
 
   /**
    * Perform update group, applying pending changes.
@@ -177,8 +177,8 @@ export class Group {
     this.book.clearAccountsCache();
     return this;
 
-  }   
-  
+  }
+
   /**
    * Perform delete group.
    */
@@ -186,6 +186,6 @@ export class Group {
     this.wrapped = await GroupService.deleteGroup(this.book.getId(), this.wrapped);
     this.book.clearAccountsCache();
     return this;
-  }   
+  }
 
 }

@@ -1,5 +1,4 @@
 import Big from "big.js";
-import { wrapObject } from "../utils";
 
 /**
  * This class defines an amount for arbitrary-precision math calculation.
@@ -8,18 +7,22 @@ import { wrapObject } from "../utils";
  */
 export class Amount {
 
+  /** @internal */
   wrapped: Big
 
   /**
    * The Amount constructor.
    */
-  public constructor(amount: number | string | Amount) {
-    if (!isNaN(+amount)) {
-      this.wrapped = new Big(+amount);
-    } if (typeof amount == "string") {
-      this.wrapped = new Big(amount);
+  public constructor(n: number | string | Amount) {
+    this.checkNumberNotNull(n);
+    if (typeof n == "string") {
+      this.wrapped = new Big(n);
+    } else if (n instanceof Amount) {
+      this.wrapped = new Big(n.wrapped)
+    } else if (n.toString) {
+      this.wrapped = new Big(n.toString())
     } else {
-      this.wrapped = new Big((amount as Amount).wrapped)
+      this.wrapped = new Big(+n);
     }
   }
 
@@ -28,19 +31,22 @@ export class Amount {
    */
   public abs(): Amount {
     let big = this.wrapped.abs();
-    return wrapObject(new Amount(null), big)
+    return this.wrap(big)
   }
 
   /**
    * Compare
    */
   cmp(n: number | string | Amount): -1 | 0 | 1 {
-    if (!isNaN(+n)) {
-      return this.wrapped.cmp(+n);
-    } if (typeof n == "string") {
+    this.checkNumberNotNull(n);
+    if (typeof n == "string") {
       return this.wrapped.cmp(n);
+    } else if (n instanceof Amount) {
+      return this.wrapped.cmp(n.wrapped)
+    } else if (n.toString) {
+      return this.wrapped.cmp(n.toString())
     } else {
-      return this.wrapped.cmp((n as Amount).wrapped)
+      return this.wrapped.cmp(+n);
     }
   }
 
@@ -48,27 +54,33 @@ export class Amount {
    * Divide by
    */
   div(n: number | string | Amount): Amount {
+    this.checkNumberNotNull(n);
     let big: Big;
-    if (!isNaN(+n)) {
-      big = this.wrapped.div(+n);
-    } if (typeof n == "string") {
+    if (typeof n == "string") {
       big = this.wrapped.div(n);
+    } else if (n instanceof Amount) {
+      big = this.wrapped.div(n.wrapped)
+    } else if (n.toString) {
+      big = this.wrapped.div(n.toString())
     } else {
-      big = this.wrapped.div((n as Amount).wrapped)
+      big = this.wrapped.div(+n);
     }
-    return wrapObject(new Amount(null), big);    
+    return this.wrap(big);
   }
 
   /**
    * Equals to
    */
   eq(n: number | string | Amount): boolean {
-    if (!isNaN(+n)) {
-      return this.wrapped.eq(+n);
-    } if (typeof n == "string") {
+    this.checkNumberNotNull(n);
+    if (typeof n == "string") {
       return this.wrapped.eq(n);
+    } else if (n instanceof Amount) {
+      return this.wrapped.eq(n.wrapped)
+    } else if (n.toString) {
+      return this.wrapped.eq(n.toString())
     } else {
-      return this.wrapped.eq((n as Amount).wrapped)
+      return this.wrapped.eq(+n);
     }
   }
 
@@ -76,26 +88,33 @@ export class Amount {
    * Greater than
    */
   gt(n: number | string | Amount): boolean {
-    if (!isNaN(+n)) {
-      return this.wrapped.gt(+n);
-    } if (typeof n == "string") {
+    this.checkNumberNotNull(n);
+    if (typeof n == "string") {
       return this.wrapped.gt(n);
+    } else if (n instanceof Amount) {
+      return this.wrapped.gt(n.wrapped)
+    } else if (n.toString) {
+      return this.wrapped.gt(n.toString())
     } else {
-      return this.wrapped.gt((n as Amount).wrapped)
-    }    
+      return this.wrapped.gt(+n);
+    }
   }
 
   /**
    * Greater than or equal
    */
   gte(n: number | string | Amount): boolean {
-    if (!isNaN(+n)) {
-      return this.wrapped.gte(+n);
-    } if (typeof n == "string") {
+    this.checkNumberNotNull(n);
+    if (typeof n == "string") {
       return this.wrapped.gte(n);
+    } else if (n instanceof Amount) {
+      return this.wrapped.gte(n.wrapped)
+    } else if (n.toString) {
+      return this.wrapped.gte(n.toString())
     } else {
-      return this.wrapped.gte((n as Amount).wrapped)
-    }  
+      return this.wrapped.gte(+n);
+
+    }
   }
 
 
@@ -103,13 +122,16 @@ export class Amount {
    * Less than
    */
   lt(n: number | string | Amount): boolean {
-    if (!isNaN(+n)) {
-      return this.wrapped.lt(+n);
-    } if (typeof n == "string") {
+    this.checkNumberNotNull(n);
+    if (typeof n == "string") {
       return this.wrapped.lt(n);
+    } else if (n instanceof Amount) {
+      return this.wrapped.lt(n.wrapped)
+    } else if (n.toString) {
+      return this.wrapped.lt(n.toString())
     } else {
-      return this.wrapped.lt((n as Amount).wrapped)
-    }  
+      return this.wrapped.lt(+n);
+    }
   }
 
 
@@ -117,43 +139,53 @@ export class Amount {
    * Less than or equal to
    */
   lte(n: number | string | Amount): boolean {
-    if (!isNaN(+n)) {
-      return this.wrapped.lte(+n);
-    } if (typeof n == "string") {
+    this.checkNumberNotNull(n);
+    if (typeof n == "string") {
       return this.wrapped.lte(n);
+    } else if (n instanceof Amount) {
+      return this.wrapped.lte(n.wrapped)
+    } else if (n.toString) {
+      return this.wrapped.lte(n.toString())
     } else {
-      return this.wrapped.lte((n as Amount).wrapped)
-    }  
+      return this.wrapped.lte(+n);
+    }
   }
 
   /**
    * Sum
    */
   plus(n: number | string | Amount): Amount {
+    this.checkNumberNotNull(n);
     let big: Big;
-    if (!isNaN(+n)) {
-      big = this.wrapped.plus(+n);
-    } if (typeof n == "string") {
+    if (typeof n == "string") {
       big = this.wrapped.plus(n);
+    } else if (n instanceof Amount) {
+      big = this.wrapped.plus(n.wrapped)
+    } else if (n.toString) {
+      big = this.wrapped.plus(n.toString())
     } else {
-      big = this.wrapped.plus((n as Amount).wrapped)
+      big = this.wrapped.plus(+n);
+
     }
-    return wrapObject(new Amount(null), big);
+    return this.wrap(big);
   }
 
   /**
    * Minus
    */
   minus(n: number | string | Amount): Amount {
+    this.checkNumberNotNull(n);
     let big: Big;
-    if (!isNaN(+n)) {
-      big = this.wrapped.minus(+n);
-    } if (typeof n == "string") {
+    if (typeof n == "string") {
       big = this.wrapped.minus(n);
+    } else if (n instanceof Amount) {
+      big = this.wrapped.minus(n.wrapped)
+    } else if (n.toString) {
+      big = this.wrapped.minus(n.toString())
     } else {
-      big = this.wrapped.minus((n as Amount).wrapped)
+      big = this.wrapped.minus(+n);
     }
-    return wrapObject(new Amount(null), big);
+    return this.wrap(big);
   }
 
   /**
@@ -163,15 +195,18 @@ export class Amount {
    *
    */
   mod(n: number | string | Amount): Amount {
+    this.checkNumberNotNull(n);
     let big: Big;
-    if (!isNaN(+n)) {
-      big = this.wrapped.mod(+n);
-    } if (typeof n == "string") {
+    if (typeof n == "string") {
       big = this.wrapped.mod(n);
+    } else if (n instanceof Amount) {
+      big = this.wrapped.mod(n.wrapped)
+    } else if (n.toString) {
+      big = this.wrapped.mod(n.toString())
     } else {
-      big = this.wrapped.mod((n as Amount).wrapped)
+      big = this.wrapped.mod(+n);
     }
-    return wrapObject(new Amount(null), big);
+    return this.wrap(big);
   }
 
 
@@ -180,7 +215,7 @@ export class Amount {
    */
   round(dp?: number): Amount {
     let big = this.wrapped.round(dp);
-    return wrapObject(new Amount(null), big);
+    return this.wrap(big);
   }
 
 
@@ -189,15 +224,18 @@ export class Amount {
    * Multiply
    */
   times(n: number | string | Amount): Amount {
+    this.checkNumberNotNull(n);
     let big: Big;
-    if (!isNaN(+n)) {
-      big = this.wrapped.times(+n);
-    } if (typeof n == "string") {
+    if (typeof n == "string") {
       big = this.wrapped.times(n);
+    } else if (n instanceof Amount) {
+      big = this.wrapped.times(n.wrapped)
+    } else if (n.toString) {
+      big = this.wrapped.times(n.toString())
     } else {
-      big = this.wrapped.times((n as Amount).wrapped)
+      big = this.wrapped.times(+n);
     }
-    return wrapObject(new Amount(null), big);
+    return this.wrap(big);
   }
 
   /**
@@ -222,5 +260,22 @@ export class Amount {
   }
 
 
+  /** @internal */
+  private checkNumberNotNull(amount: string | number | Amount) {
+    if (amount == null) {
+      throw new Error(`Invalid number: null`);
+    }
+  }
 
+  /** @internal */
+  static create() {
+    return Object.create(this.prototype);
+  }
+
+  /** @internal */
+  private wrap(big: Big): Amount {
+    let amount = Amount.create();
+    amount.wrapped = big;
+    return amount;
+  }
 }

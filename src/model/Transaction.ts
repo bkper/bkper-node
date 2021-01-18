@@ -18,7 +18,7 @@ export class Transaction {
 
   /** @internal */
   wrapped: bkper.Transaction
-  
+
   /** @internal */
   book: Book;
 
@@ -60,7 +60,7 @@ export class Transaction {
       this.wrapped.remoteIds.push(remoteId);
     }
     return this;
-  }  
+  }
 
   /**
    * @returns True if transaction was already posted to the accounts. False if is still a Draft.
@@ -78,7 +78,7 @@ export class Transaction {
 
   /**
    * @returns True if transaction is in trash.
-   */  
+   */
   public isTrashed(): boolean {
     return this.wrapped.trashed;
   }
@@ -136,17 +136,17 @@ export class Transaction {
    * @returns The files attached to the transaction.
    */
   public getFiles(): File[] {
-      if (this.wrapped.files && this.wrapped.files.length > 0) {
-        const files = Utils.wrapObjects(new File(), this.wrapped.files);
-        if (files != null) {
-          for (const file of files) {
-            file.book = this.book;
-          }
+    if (this.wrapped.files && this.wrapped.files.length > 0) {
+      const files = Utils.wrapObjects(new File(), this.wrapped.files);
+      if (files != null) {
+        for (const file of files) {
+          file.book = this.book;
         }
-        return files
-      } else {
-        return [];
       }
+      return files
+    } else {
+      return [];
+    }
   }
 
   /**
@@ -193,9 +193,9 @@ export class Transaction {
 
   /**
    * Gets the custom properties stored in this Transaction.
-   */  
-  public getProperties(): {[key: string]: string} {
-    return this.wrapped.properties != null ?  {...this.wrapped.properties} : {};
+   */
+  public getProperties(): { [key: string]: string } {
+    return this.wrapped.properties != null ? { ...this.wrapped.properties } : {};
   }
 
   /**
@@ -205,8 +205,8 @@ export class Transaction {
    * 
    * @returns This Transaction, for chainning. 
    */
-  public setProperties(properties: {[key: string]: string}): Transaction {
-    this.wrapped.properties = {...properties};
+  public setProperties(properties: { [key: string]: string }): Transaction {
+    this.wrapped.properties = { ...properties };
     return this;
   }
 
@@ -218,7 +218,7 @@ export class Transaction {
   public getProperty(...keys: string[]): string {
     for (let index = 0; index < keys.length; index++) {
       const key = keys[index];
-      let value = this.wrapped.properties != null ?  this.wrapped.properties[key] : null 
+      let value = this.wrapped.properties != null ? this.wrapped.properties[key] : null
       if (value != null && value.trim() != '') {
         return value;
       }
@@ -237,7 +237,7 @@ export class Transaction {
   public setProperty(key: string, value: string): Transaction {
     if (key == null || key.trim() == '') {
       return this;
-    }    
+    }
     if (this.wrapped.properties == null) {
       this.wrapped.properties = {};
     }
@@ -255,7 +255,7 @@ export class Transaction {
   public deleteProperty(key: string): Transaction {
     this.setProperty(key, null);
     return this;
-  }  
+  }
 
 
   //ORIGIN ACCOUNT
@@ -275,7 +275,7 @@ export class Transaction {
     } else {
       return "";
     }
-  }  
+  }
 
   /**
    * 
@@ -368,20 +368,21 @@ export class Transaction {
    * @returns This Transaction, for chainning.
    */
   public setAmount(amount: Amount | number | string): Transaction {
-    
+
     if (typeof amount == "string") {
-      amount = Utils.parseValue(amount, this.book.getDecimalSeparator())+'';
+      amount = Utils.parseValue(amount, this.book.getDecimalSeparator()) + '';
       this.wrapped.amount = amount.toString();
       return this;
     }
-    
-    if (!isNaN(+amount)) {
-      if (amount == 0 || !isFinite(+amount)) {
-        return this;
-      }
+
+    amount = new Amount(amount);
+
+    if (amount.eq(0)) {
+      this.wrapped.amount = null;
+      return this;
     }
 
-    this.wrapped.amount = new Amount(amount).abs().toString();
+    this.wrapped.amount = amount.abs().toString();
 
     return this;
   }
@@ -482,7 +483,7 @@ export class Transaction {
   public setDescription(description: string): Transaction {
     this.wrapped.description = description;
     return this;
-  }  
+  }
 
 
   //DATE
@@ -499,10 +500,10 @@ export class Transaction {
    * Sets the date of the Transaction.
    * 
    * @returns This Transaction, for chainning
-   */  
+   */
   public setDate(date: string | Date): Transaction {
     if (typeof date == "string") {
-      if(date.indexOf('/') > 0) {
+      if (date.indexOf('/') > 0) {
         let dateObject = Utils.parseDate(date, this.book.getDatePattern(), this.book.getTimeZoneOffset())
         this.wrapped.date = Utils.formatDateISO(dateObject, this.book.getTimeZone())
       } else if (date.indexOf('-')) {
@@ -518,7 +519,7 @@ export class Transaction {
    * @returns The Transaction Date object, on the time zone of the [[Book]].
    */
   public getDateObject(): Date {
-      return Utils.convertValueToDate(this.getDateValue(), this.book.getTimeZoneOffset());
+    return Utils.convertValueToDate(this.getDateValue(), this.book.getTimeZoneOffset());
   }
 
   /**
@@ -527,7 +528,7 @@ export class Transaction {
   public getDateValue(): number {
     return this.wrapped.dateValue;
   }
-  
+
   /**
    * @returns The Transaction date, formatted on the date pattern of the [[Book]].
    */
@@ -546,7 +547,7 @@ export class Transaction {
    * @returns The date the transaction was created, formatted according to the date pattern of [[Book]].
    */
   public getCreatedAtFormatted(): string {
-      return Utils.formatDate(this.getCreatedAt(), this.book.getTimeZone(), this.book.getDatePattern() + " HH:mm:ss");
+    return Utils.formatDate(this.getCreatedAt(), this.book.getTimeZone(), this.book.getDatePattern() + " HH:mm:ss");
   }
 
 
@@ -596,17 +597,17 @@ export class Transaction {
     this.wrapped = operation.transaction;
     this.book.clearAccountsCache();
     return this;
-  } 
+  }
 
   /**
    * Upddate transaction, applying pending changes.
-   */  
+   */
   public async update(): Promise<Transaction> {
     let operation = await TransactionService.updateTransaction(this.book.getId(), this.wrapped);
     this.wrapped = operation.transaction;
     this.book.clearAccountsCache();
     return this;
-  }    
+  }
 
 
   /**
@@ -614,20 +615,20 @@ export class Transaction {
    */
   public async check(): Promise<Transaction> {
     let operation = await TransactionService.checkTransaction(this.book.getId(), this.wrapped);
-    this.wrapped = operation.transaction;
+    this.wrapped.checked = operation.transaction.checked;
     this.book.clearAccountsCache();
     return this;
   }
 
   /**
    * Perform uncheck transaction.
-   */  
+   */
   public async uncheck(): Promise<Transaction> {
     let operation = await TransactionService.uncheckTransaction(this.book.getId(), this.wrapped);
-    this.wrapped = operation.transaction;
+    this.wrapped.checked = operation.transaction.checked;
     this.book.clearAccountsCache();
     return this;
-  }  
+  }
 
   /**
    * Perform post transaction, changing credit and debit [[Account]] balances.
@@ -637,27 +638,27 @@ export class Transaction {
     this.wrapped = operation.transaction;
     this.book.clearAccountsCache();
     return this;
-  }    
+  }
 
   /**
    * Remove the transaction, sending to trash.
-   */  
+   */
   public async remove(): Promise<Transaction> {
     let operation = await TransactionService.removeTransaction(this.book.getId(), this.wrapped);
-    this.wrapped = operation.transaction;
+    this.wrapped.trashed = operation.transaction.trashed;
     this.book.clearAccountsCache();
     return this;
-  }  
+  }
 
   /**
    * Restore the transaction from trash.
-   */  
+   */
   public async restore(): Promise<Transaction> {
     let operation = await TransactionService.restoreTransaction(this.book.getId(), this.wrapped);
-    this.wrapped = operation.transaction;
+    this.wrapped.trashed = operation.transaction.trashed;
     this.book.clearAccountsCache();
     return this;
-  }  
+  }
 
 
 }

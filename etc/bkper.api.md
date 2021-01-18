@@ -65,9 +65,11 @@ export enum AccountType {
 
 // @public
 export class Amount {
-    constructor(amount: number | string | Amount);
+    constructor(n: number | string | Amount);
     abs(): Amount;
     cmp(n: number | string | Amount): -1 | 0 | 1;
+    // @internal (undocumented)
+    static create(): any;
     div(n: number | string | Amount): Amount;
     eq(n: number | string | Amount): boolean;
     gt(n: number | string | Amount): boolean;
@@ -82,7 +84,7 @@ export class Amount {
     toFixed(dp?: number): string;
     toNumber(): number;
     toString(): string;
-    // (undocumented)
+    // @internal (undocumented)
     wrapped: Big;
 }
 
