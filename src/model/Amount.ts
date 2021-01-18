@@ -1,7 +1,9 @@
 import Big from "big.js";
 
 /**
- * This class defines an amount for arbitrary-precision math calculation.
+ * This class defines an Amount for arbitrary-precision decimal arithmetic.
+ * 
+ * It inherits methods from [big.js](http://mikemcl.github.io/big.js/) library
  * 
  * @public
  */
