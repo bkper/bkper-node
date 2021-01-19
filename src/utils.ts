@@ -1,4 +1,4 @@
-import moment from 'moment-timezone';
+var format = require('date-format');
 import { Amount } from './model/Amount';
 import { DecimalSeparator, Periodicity } from './model/Enums';
 
@@ -116,7 +116,10 @@ export function formatDate(date: Date, pattern: string, timeZone: string): strin
     timeZone = "UTC";
   }
 
-  var formatedDate = moment.tz(date, timeZone).format(pattern);
+  // var formatedDate = moment.tz(date, timeZone).format(pattern);
+  var formatedDate = format.asString(pattern, date); //just the time
+
+
   return formatedDate;
 }
 
@@ -129,7 +132,7 @@ export function formatDateISO(date: Date, timeZone: string): string {
     timeZone = "UTC";
   }
 
-  var formatedDate = formatDate(date, timeZone, 'yyyy-MM-dd');
+  var formatedDate = formatDate(date, 'yyyy-MM-dd', timeZone);
   return formatedDate;
 }
 

@@ -36,6 +36,21 @@ describe('utils', () => {
     });
 
   });
+  
+  describe('#formatDateISO()', () => {
+    it('should format yyyy-MM-dd', () => {
+      let value = utils.formatDateISO(new Date(2020, 0, 25), 'UTC');
+      expect(value).to.equal('2020-01-25');
+    });
+
+  });
+  
+  describe('#formatDate()', () => {
+    it('should format yyyy/MM/dd', () => {
+      let value = utils.formatDate(new Date(2020, 0, 25), 'yyyy/MM/dd', 'UTC');
+      expect(value).to.equal('2020/01/25');
+    });
+  });
 
   describe('#parseValue()', () => {
     it('should parse DOT separator', () => {

@@ -39,6 +39,7 @@
     "@google-cloud/local-auth": "^1.0.0",
     "big.js": "^6.0.3",
     "commander": "^6.2.1",
+    "date-format": "^3.0.0",
     "google-auth-library": "^6.1.4",
     "moment-timezone": "^0.5.32",
     "node-fetch": "^2.6.1",
