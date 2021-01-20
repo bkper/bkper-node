@@ -1,4 +1,4 @@
-var format = require('date-format');
+import { DateTime } from "luxon";
 import { Amount } from './model/Amount';
 import { DecimalSeparator, Periodicity } from './model/Enums';
 
@@ -78,14 +78,14 @@ export function parseValue(value: string, decimalSeparator: DecimalSeparator): A
   }
 }
 
-export function convertValueToDate(dateValue: number, offsetInMinutes: number): Date {
+export function convertValueToDate(dateValue: number): Date {
   if (dateValue == null) {
     return new Date();
   }
   var year = dateValue / 10000;
   var month = (dateValue / 100) % 100;
   var day = dateValue % 100;
-  var date = this.createDate(year, month, day, offsetInMinutes);
+  var date = createDate(year, month, day);
   return date;
 }
 
@@ -100,10 +100,8 @@ export function isString(obj: object): boolean {
   }
 }
 
-export function createDate(year: number, month: number, day: number, offsetInMinutes: number): Date {
-  var date = new Date(year, month - 1, day);
-  date.setTime(date.getTime() + offsetInMinutes * 60 * 1000);
-  return date;
+export function createDate(year: number, month: number, day: number): Date {
+  return DateTime.fromObject({year, month, day}).toJSDate();
 }
 
 
@@ -116,10 +114,7 @@ export function formatDate(date: Date, pattern: string, timeZone: string): strin
     timeZone = "UTC";
   }
 
-  // var formatedDate = moment.tz(date, timeZone).format(pattern);
-  var formatedDate = format.asString(pattern, date); //just the time
-
-
+  var formatedDate = DateTime.fromJSDate(date, {zone: timeZone}).toFormat(pattern);
   return formatedDate;
 }
 
@@ -132,47 +127,12 @@ export function formatDateISO(date: Date, timeZone: string): string {
     timeZone = "UTC";
   }
 
-  var formatedDate = formatDate(date, 'yyyy-MM-dd', timeZone);
+  var formatedDate = DateTime.fromJSDate(date, {zone: timeZone}).toISODate();
   return formatedDate;
 }
 
-export function parseDate(date: string, pattern: string, offsetInMinutes: number): Date {
-  if (pattern == 'dd/MM/yyyy') {
-    let split = date.split('/');
-    if (split.length == 3) {
-      let year = +split[2];
-      let month = +split[1];
-      let day = +split[0];
-      return this.createDate(year, month, day, offsetInMinutes);
-    }
-  } else if (pattern == 'MM/dd/yyyy') {
-    let split = date.split('/');
-    if (split.length == 3) {
-      let year = +split[2];
-      let month = +split[0];
-      let day = +split[1];
-      return this.createDate(year, month, day, offsetInMinutes);
-    }
-  } else if (pattern == 'yyyy/MM/dd') {
-    let split = date.split('/');
-    if (split.length == 3) {
-      let year = +split[0];
-      let month = +split[1];
-      let day = +split[2];
-      return this.createDate(year, month, day, offsetInMinutes);
-    }
-  } else if (pattern == 'yyyy-MM-dd') {
-    let split = date.split('-');
-    if (split.length == 3) {
-      let year = +split[0];
-      let month = +split[1];
-      let day = +split[2];
-      return this.createDate(year, month, day, offsetInMinutes);
-    }
-  }
-  let now = new Date()
-  return this.createDate(now.getFullYear(), now.getMonth() + 1, now.getDate(), offsetInMinutes);
-
+export function parseDate(date: string, pattern: string): Date {
+  return DateTime.fromFormat(date, pattern).toJSDate();
 }
 
 export function getDateFormatterPattern(datePattern: string, periodicity: Periodicity): string {
@@ -203,7 +163,7 @@ export function wrapObjects<E extends Object>(wrapper: E, wrappeds: Array<Object
   var newObjects = [];
   if (wrappeds != null) {
     for (var i = 0; i < wrappeds.length; i++) {
-      var newObject = this.wrapObject(wrapper, wrappeds[i]);
+      var newObject = wrapObject(wrapper, wrappeds[i]);
       newObjects.push(newObject);
     }
   }

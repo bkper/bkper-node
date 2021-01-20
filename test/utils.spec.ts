@@ -23,15 +23,15 @@ describe('utils', () => {
 
   describe('#parseDate()', () => {
     it('should parse yyyy/MM/dd', () => {
-      let value = utils.parseDate('2020/01/25', 'yyyy/MM/dd', 0);
+      let value = utils.parseDate('2020/01/25', 'yyyy/MM/dd');
       expect(value.toString()).to.equal(new Date(2020, 0, 25).toString());
     });
     it('should parse MM/dd/yyyy', () => {
-      let value = utils.parseDate('01/25/2020', 'MM/dd/yyyy', 0);
+      let value = utils.parseDate('01/25/2020', 'MM/dd/yyyy');
       expect(value.toString()).to.equal(new Date(2020, 0, 25).toString());
     });
     it('should parse dd/MM/yyyy', () => {
-      let value = utils.parseDate('25/01/2020', 'dd/MM/yyyy', 0);
+      let value = utils.parseDate('25/01/2020', 'dd/MM/yyyy');
       expect(value.toString()).to.equal(new Date(2020, 0, 25).toString());
     });
 
