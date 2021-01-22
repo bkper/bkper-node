@@ -78,14 +78,14 @@ export function parseValue(value: string, decimalSeparator: DecimalSeparator): A
   }
 }
 
-export function convertValueToDate(dateValue: number): Date {
+export function convertValueToDate(dateValue: number, offsetInMinutes: number): Date {
   if (dateValue == null) {
     return new Date();
   }
   var year = dateValue / 10000;
   var month = (dateValue / 100) % 100;
   var day = dateValue % 100;
-  var date = createDate(year, month, day);
+  var date = createDate(year, month, day, offsetInMinutes);
   return date;
 }
 
@@ -100,8 +100,10 @@ export function isString(obj: object): boolean {
   }
 }
 
-export function createDate(year: number, month: number, day: number): Date {
-  return DateTime.fromObject({year, month, day}).toJSDate();
+export function createDate(year: number, month: number, day: number, offsetInMinutes: number): Date {
+  var date = new Date(year, month - 1, day);
+  date.setTime(date.getTime() + offsetInMinutes * 60 * 1000);
+  return date;
 }
 
 
@@ -131,8 +133,8 @@ export function formatDateISO(date: Date, timeZone: string): string {
   return formatedDate;
 }
 
-export function parseDate(date: string, pattern: string): Date {
-  return DateTime.fromFormat(date, pattern).toJSDate();
+export function parseDate(date: string, pattern: string, timeZone: string): Date {
+  return DateTime.fromFormat(date, pattern, {zone: timeZone}).toJSDate();
 }
 
 export function getDateFormatterPattern(datePattern: string, periodicity: Periodicity): string {

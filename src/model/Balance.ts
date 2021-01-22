@@ -62,7 +62,7 @@ export class Balance {
     if (day == null || day == 0) {
       month++;
     }
-    var date = createDate(year, month, day);
+    var date = createDate(year, month, day, this.container.getBalancesReport().getBook().getTimeZoneOffset());
     return date;
   }
 
