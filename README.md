@@ -21,8 +21,8 @@ yarn add bkper
 ## Commands
 - ```login```   - Logs the user in. Saves the client credentials to a ~/.bkper-credentials.json file.
 - ```logout```  - Logs out the user by deleting client credentials.
-- ```app -c```  - Create a new App based on bkperapp.json file
-- ```app -u```  - Update an existing App based on bkperapp.json file 
+- ```app -c```  - Create a new App based on ```./bkperapp.json``` file
+- ```app -u```  - Update an existing App based on ```./bkperapp.json``` file 
 
 ### Environment Variables
 
@@ -37,7 +37,7 @@ BKPER_DEVELOPER_EMAIL=somedeveloer@mycompany.com
 
 You can add a ```.env``` file at the root of your project with those variables and bkper will automatically load from it. 
 
-> WARNING: Never upload those variables to the source repository.
+> WARNING: Never upload variables to the source code repository.
 
 
 ## API
