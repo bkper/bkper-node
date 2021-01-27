@@ -32,6 +32,7 @@ program
         .setJson(JSON.parse(fs.readFileSync('./bkperapp.json', 'utf8')))
         .setReadme(fs.readFileSync('./README.md', 'utf8'))
         .setClientSecret(process.env.BKPER_CLIENT_SECRET)
+        .setDeveloperEmail(process.env.BKPER_DEVELOPER_EMAIL)
         .setUserEmails(process.env.BKPER_USER_EMAILS);
       if (options.update) {
         app = await app.update();
