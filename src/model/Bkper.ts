@@ -5,7 +5,7 @@ import { HttpApiRequest } from '../service/HttpApiRequest';
 import { OAuthTokenProvider } from '../auth/OAuthTokenProvider';
 
 /**
- * This is the main Entry Point to start interacting with Bkper.
+ * This is the main Entry Point of the [bkper-node](https://www.npmjs.com/package/bkper) library.
  * 
  * @public
  */
