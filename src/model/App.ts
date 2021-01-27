@@ -18,7 +18,7 @@ export class App {
   }
 
   /** @internal */
-  setJson(json: bkper.App): App {
+  setJson(json: any): App {
     this.wrapped = json;
     return this;
   }

@@ -93,7 +93,7 @@ export class App {
     setClientSecret(clientSecret: string): App;
     setDeveloperEmail(email: string): App;
     // @internal (undocumented)
-    setJson(json: bkper.App): App;
+    setJson(json: any): App;
     setReadme(readme: string): App;
     setUserEmails(emails: string): App;
     setWebhookUrlDev(webhookUrlDev: string): App;
