@@ -92,6 +92,7 @@ export class App {
     create(): Promise<App>;
     // @internal (undocumented)
     getId(): string;
+    patch(): Promise<App>;
     // @internal (undocumented)
     setClientSecret(clientSecret: string): App;
     // @internal (undocumented)
@@ -103,6 +104,7 @@ export class App {
     // @internal (undocumented)
     setUserEmails(emails: string): App;
     setWebhookUrlDev(webhookUrlDev: string): App;
+    // @internal (undocumented)
     update(): Promise<App>;
     }
 
