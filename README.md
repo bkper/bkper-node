@@ -2,6 +2,8 @@
 
 ## Bkper Node
 
+[![npm](https://img.shields.io/npm/v/bkper?color=%235889e4)](https://www.npmjs.com/package/bkper)
+
 Bkper Node.js client provides a simple and secure way to access the [Bkper REST API] on [Node.js](https://nodejs.dev/)
 
 It also provide a **command line** utility to create and update [Bkper Apps and Bots](https://bkper.com/docs/)
