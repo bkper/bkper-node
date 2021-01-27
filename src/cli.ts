@@ -3,8 +3,11 @@
 import program from 'commander';
 import { login, logout } from './auth/local-auth-service';
 import { Bkper } from './model/Bkper';
+import { NODE_ENV_DEV } from './utils';
 var fs = require('fs');
 require('dotenv').config();
+
+process.env.NODE_ENV=NODE_ENV_DEV;
 
 program
   .command('login')

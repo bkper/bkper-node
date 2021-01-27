@@ -2,6 +2,8 @@ import { DateTime } from "luxon";
 import { Amount } from './model/Amount';
 import { DecimalSeparator, Periodicity } from './model/Enums';
 
+export const NODE_ENV_DEV = 'development';
+
 export function sleep(ms: number) {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);

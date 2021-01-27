@@ -3,7 +3,7 @@ import { getOAuthToken, isLoggedIn } from '../auth/local-auth-service';
 import { OAuthTokenProvider } from '../auth/OAuthTokenProvider';
 import fetch, { Response } from 'node-fetch';
 import https from 'https';
-import { sleep } from '../utils';
+import { NODE_ENV_DEV, sleep } from '../utils';
 
 type HttpMethod = "GET"|"POST"|"PUT"|"PATCH"|"DELETE";
 const httpsAgent = new https.Agent({keepAlive: true});
@@ -95,7 +95,7 @@ export class HttpApiRequest  {
         })
       } catch (addressUnavailable) {
         //Error on fetch service
-        if (retries > 4) {
+        if (retries > 4 || process.env.NODE_ENV != NODE_ENV_DEV) {
             throw addressUnavailable;
         } else {
           console.log("Retrying in " + (sleepTime / 1000) + " secs...");
@@ -119,7 +119,7 @@ export class HttpApiRequest  {
         } catch (e) {
           unknowError = true;
         }
-        if (unknowError || response.status == 429 || response.status >= 500) {
+        if (process.env.NODE_ENV != NODE_ENV_DEV && (unknowError || response.status == 429 || response.status >= 500)) {
           //Retry in case of server error
           if (retries > 4) {
             if (unknowError) {
@@ -134,7 +134,11 @@ export class HttpApiRequest  {
             retries++;
           }
         } else {
-          throw error.message;
+          if (unknowError) {
+            throw responseText;
+          } else {
+            throw error.message;
+          }
         }
       }
     }
