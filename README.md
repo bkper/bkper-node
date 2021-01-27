@@ -19,7 +19,7 @@ yarn add bkper
 ```
 
 ## Commands
-- ```login```   - Logs the user in. Saves the client credentials to a ~/.bkper-credentials.json file.
+- ```login```   - Logs the user in. Saves the client credentials to a ```~/.bkper-credentials.json``` file.
 - ```logout```  - Logs out the user by deleting client credentials.
 - ```app -c```  - Create a new App based on ```./bkperapp.json``` file
 - ```app -u```  - Update an existing App based on ```./bkperapp.json``` file 
