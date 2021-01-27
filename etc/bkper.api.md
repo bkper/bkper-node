@@ -88,13 +88,19 @@ export class Amount {
 export class App {
     // @internal
     constructor();
+    // @internal (undocumented)
     create(): Promise<App>;
+    // @internal (undocumented)
     getId(): string;
+    // @internal (undocumented)
     setClientSecret(clientSecret: string): App;
+    // @internal (undocumented)
     setDeveloperEmail(email: string): App;
     // @internal (undocumented)
     setJson(json: any): App;
+    // @internal (undocumented)
     setReadme(readme: string): App;
+    // @internal (undocumented)
     setUserEmails(emails: string): App;
     setWebhookUrlDev(webhookUrlDev: string): App;
     update(): Promise<App>;
