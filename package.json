@@ -35,11 +35,12 @@
     "postversion": "git push --tags && yarn publish --new-version $npm_package_version && git push && echo \"Successfully released version $npm_package_version!\""
   },
   "dependencies": {
-    "@bkper/bkper-api-types": "^3.7.2",
+    "@bkper/bkper-api-types": "^3.7.4",
     "@google-cloud/local-auth": "^1.0.0",
     "big.js": "^6.0.3",
     "commander": "^6.2.1",
     "dayjs": "^1.10.3",
+    "dotenv": "^8.2.0",
     "google-auth-library": "^6.1.4",
     "luxon": "^1.25.0",
     "node-fetch": "^2.6.1",

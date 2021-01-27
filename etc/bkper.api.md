@@ -88,6 +88,14 @@ export class Amount {
 export class App {
     // @internal
     constructor();
+    create(): Promise<App>;
+    getId(): string;
+    setClientSecret(clientSecret: string): App;
+    setDeveloperEmail(email: string): App;
+    // @internal (undocumented)
+    setJson(json: bkper.App): App;
+    setReadme(readme: string): App;
+    setUserEmails(emails: string): App;
     setWebhookUrlDev(webhookUrlDev: string): App;
     update(): Promise<App>;
     }

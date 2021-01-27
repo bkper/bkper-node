@@ -23,10 +23,10 @@
     chalk "^2.0.0"
     js-tokens "^4.0.0"
 
-"@bkper/bkper-api-types@^3.7.2":
-  version "3.7.2"
-  resolved "https://registry.yarnpkg.com/@bkper/bkper-api-types/-/bkper-api-types-3.7.2.tgz#81b3970cea516f0be7838689499d1148576916a1"
-  integrity sha512-b2HFF+xReM72gvvHzyUoLgAnMlkzoKjMn06NX5Fj17AtdyKjKC5l7kcQd4xqC6m4LE++bQ/2blTxSgtaqB935Q==
+"@bkper/bkper-api-types@^3.7.4":
+  version "3.7.4"
+  resolved "https://registry.yarnpkg.com/@bkper/bkper-api-types/-/bkper-api-types-3.7.4.tgz#70de18a3b1a8780791c1c7003bb0dffc6288e76a"
+  integrity sha512-uM32YhiJClnUw+x/WorCbArdlLPHdGFsJY4Y3p2f/eNaceXj6EIoV/j9UZOXij0BVKhv6kxox4I6Pp+Bcd1pxA==
 
 "@eslint/eslintrc@^0.2.2":
   version "0.2.2"
@@ -849,6 +849,11 @@ dot-prop@^5.2.0:
   integrity sha512-QM8q3zDe58hqUqjraQOmzZ1LIH9SWQJTlEKCH4kJ2oQvLZk7RbQXvtDM2XEq3fwkV9CCvvH4LA0AV+ogFsBM2Q==
   dependencies:
     is-obj "^2.0.0"
+
+dotenv@^8.2.0:
+  version "8.2.0"
+  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-8.2.0.tgz#97e619259ada750eea3e4ea3e26bceea5424b16a"
+  integrity sha512-8sJ78ElpbDJBHNeBzUbUVLsqKdccaa/BXF1uPTw3GrvQTBgrQrtObr2mUrE38vzYd8cEv+m/JBfDLioYcfXoaw==
 
 duplexer3@^0.1.4:
   version "0.1.4"
