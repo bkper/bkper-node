@@ -40,9 +40,10 @@ You can add a ```.env``` file at the root of your project with those variables a
 > WARNING: Never upload variables to the source code repository.
 
 
-## API
+## Documentation
 
-See the complete reference docs at https://bkper.com/docs
+- [Developer Docs](https://bkper.com/docs)
+- [API Reference](https://bkper.com/docs/bkper-node/)
 
 
 
