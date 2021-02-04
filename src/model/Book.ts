@@ -12,7 +12,7 @@ import { BalancesDataTableBuilder } from './BalancesDataTableBuilder';
 import { BalancesReport } from './BalancesReport';
 import { File } from './File';
 import { normalizeName } from '../utils';
-import { DecimalSeparator, Permission } from './Enums';
+import { DecimalSeparator, Month, Period, Permission } from './Enums';
 import { Group } from './Group';
 import { Transaction } from './Transaction';
 import { TransactionIterator } from './TransactionIterator';
@@ -118,6 +118,58 @@ export class Book {
     this.wrapped.fractionDigits = fractionDigits;
     return this;
   }
+
+  /**
+   * @returns The period slice for balances visualization
+   */  
+  public getPeriod(): Period {
+    return this.wrapped.period as Period;
+  }
+
+  /**
+   * Sets the period slice for balances visualization
+   * 
+   * @returns This Book, for chainning.
+   */     
+  public setPeriod(period: Period): Book {
+    this.wrapped.period = period;
+    return this;
+  }
+
+  /**
+   * @returns The start month when YEAR period set
+   */    
+  public getPeriodStartMonth(): Month {
+    return this.wrapped.periodStartMonth as Month;
+  }
+
+  /**
+   * Sets the start month when YEAR period set
+   * 
+   * @returns This Book, for chainning.
+   */     
+  public setPeriodStartMonth(month: Month): Book {
+    this.wrapped.periodStartMonth = month;
+    return this;
+  }
+
+  /**
+   * @returns The transactions pagination page size
+   */      
+  public getPageSize(): number {
+    return this.wrapped.pageSize;
+  }
+
+  /**
+   * Sets the transactions pagination page size
+   * 
+   * @returns This Book, for chainning.
+   */     
+  public setPageSize(pageSize: number): Book {
+    this.wrapped.pageSize = pageSize;
+    return this;
+  }
+
 
   /**
    * @returns The name of the owner of the Book

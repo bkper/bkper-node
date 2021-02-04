@@ -156,3 +156,47 @@ export enum BalanceCheckedType {
    */
   UNCHECKED_BALANCE = "UNCHECKED_BALANCE"
 }
+
+/**
+ * Enum that represents a period slice.
+ * 
+ * @public
+ */
+export enum Period {
+
+  /**
+   *  Monthly period
+   */
+  MONTH = "MONTH",
+
+  /**
+   * Quarterly period
+   */
+  QUARTER = "QUARTER",
+
+  /**
+   * Yearly period
+   */
+  YEAR = "YEAR"
+}
+
+/**
+ * Enum that represents a Month.
+ * 
+ * @public
+ */
+export enum Month {
+
+  JANUARY = "JANUARY",
+  FEBRUARY = "FEBRUARY",
+  MARCH = "MARCH",
+  APRIL = "APRIL",
+  MAY = "MAY",
+  JUNE = "JUNE",
+  JULY = "JULY",
+  AUGUST = "AUGUST",
+  SEPTEMBER = "SEPTEMBER",
+  OCTOBER = "OCTOBER",
+  NOVEMBER = "NOVEMBER",
+  DECEMBER = "DECEMBER"
+}
