@@ -238,6 +238,16 @@ export class Book {
     // (undocumented)
     getOwnerName(): string;
     // (undocumented)
+    getPageSize(): number;
+    // Warning: (ae-forgotten-export) The symbol "Period" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    getPeriod(): Period;
+    // Warning: (ae-forgotten-export) The symbol "Month" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    getPeriodStartMonth(): Month;
+    // (undocumented)
     getPermission(): Permission;
     getProperties(): {
         [key: string]: string;
@@ -264,6 +274,9 @@ export class Book {
     setDecimalSeparator(decimalSeparator: DecimalSeparator): Book;
     setFractionDigits(fractionDigits: number): Book;
     setName(name: string): Book;
+    setPageSize(pageSize: number): Book;
+    setPeriod(period: Period): Book;
+    setPeriodStartMonth(month: Month): Book;
     setProperties(properties: {
         [key: string]: string;
     }): Book;
