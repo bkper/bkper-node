@@ -72,7 +72,7 @@ export class Group {
     var accounts = [];
     var accs = await this.book.getAccounts();
     for (var i = 0; i < accs.length; i++) {
-      if (accs[i].isInGroup(this)) {
+      if (await accs[i].isInGroup(this)) {
         accounts.push(accs[i]);
       }
     }
