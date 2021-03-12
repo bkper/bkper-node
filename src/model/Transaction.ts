@@ -226,6 +226,23 @@ export class Transaction {
     return null;
   }
 
+   /**
+   * Gets the custom properties keys stored in this Transaction.
+   */  
+    public getPropertyKeys(): string[] {
+      let properties = this.getProperties();
+      let propertyKeys:string[] = []
+      if (properties) {
+        for (var key in properties) {
+          if (Object.prototype.hasOwnProperty.call(properties, key)) {
+              propertyKeys.push(key)
+          }
+        }
+      }
+      propertyKeys = propertyKeys.sort();
+      return propertyKeys;
+    } 
+
   /**
    * Sets a custom property in the Transaction.
    * 

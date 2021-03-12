@@ -3,6 +3,7 @@ import { BalanceType, BalanceCheckedType, Periodicity } from "./Enums";
 
 import { Book } from "./Book";
 import { formatDate, formatValue, getDateFormatterPattern, getRepresentativeValue, round } from "../utils";
+import { Amount } from "./Amount";
 
 
 /**
@@ -65,7 +66,7 @@ export class BalancesDataTableBuilder implements BalancesDataTableBuilder {
    *
    * @returns This builder with respective formatting option, for chaining.
    */
-  public formatDates(format: boolean): BalancesDataTableBuilder {
+   public formatDates(format: boolean): BalancesDataTableBuilder {
     this.shouldFormatDate = format;
     return this;
   }
@@ -94,7 +95,7 @@ export class BalancesDataTableBuilder implements BalancesDataTableBuilder {
   /**
    * Fluent method to set the [[BalanceType]] for the builder.
    * 
-   * @param type - The type of balance for this data table
+   * @param type The type of balance for this data table
    * 
    * For **TOTAL** [[BalanceType]], the table format looks like:
    * 
@@ -267,11 +268,11 @@ export class BalancesDataTableBuilder implements BalancesDataTableBuilder {
           }
         } else {
             if (this.balanceCheckedType == BalanceCheckedType.CHECKED_BALANCE) {
-              amount = balances.getCheckedCumulativeBalance();
+              amount = balances.getCheckedCumulativeBalance().toNumber();
             } else if (this.balanceCheckedType == BalanceCheckedType.UNCHECKED_BALANCE) {
-              amount = balances.getUncheckedCumulativeBalance();
+              amount = balances.getUncheckedCumulativeBalance().toNumber();
             } else {
-              amount = balances.getCumulativeBalance();
+              amount = balances.getCumulativeBalance().toNumber();
             }
         }
         line.push(amount);
@@ -376,6 +377,8 @@ export class BalancesDataTableBuilder implements BalancesDataTableBuilder {
           amount = round(amount, this.book.getFractionDigits());
           if (this.shouldFormatValue) {
             amount = formatValue(amount, this.book.getDecimalSeparator(), this.book.getFractionDigits());
+          } else {
+            amount = amount.toNumber();
           }
         }
         row.push(amount);
@@ -395,9 +398,11 @@ export class BalancesDataTableBuilder implements BalancesDataTableBuilder {
         for (var j = 1; j < row.length; j++) {
           var cell = row[j];
           if (cell == "null_amount") {
-            var amount: any = 0;
+            var amount: any = new Amount(0);
             if (this.shouldFormatValue) {
               amount = formatValue(amount, this.book.getDecimalSeparator(), this.book.getFractionDigits());
+            } else {
+              amount = amount.toNumber();
             }
             row[j] = amount;
           }
@@ -408,9 +413,11 @@ export class BalancesDataTableBuilder implements BalancesDataTableBuilder {
           if (cell == "null_amount" && cumulativeBalance) {
             row[j] = lastRow[j];
           } else if (cell == "null_amount") {
-            var amount: any = 0;
+            var amount: any = new Amount(0);
             if (this.shouldFormatValue) {
               amount = formatValue(amount, this.book.getDecimalSeparator(), this.book.getFractionDigits());
+            } else {
+              amount = amount.toNumber();
             }
             row[j] = amount;
           }
@@ -447,7 +454,5 @@ export class BalancesDataTableBuilder implements BalancesDataTableBuilder {
 
     return table;
   }
-
-
 
 }
