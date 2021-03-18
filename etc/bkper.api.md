@@ -112,25 +112,14 @@ export class App {
 export class Balance {
     // @internal
     constructor(container: BalancesContainer, balancePlain: bkper.Balance);
-    getCheckedCumulativeBalance(): Amount;
-    getCheckedPeriodBalance(): Amount;
     getCumulativeBalance(): Amount;
     getDate(): Date;
     getDay(): number;
     getFuzzyDate(): number;
     getMonth(): number;
     getPeriodBalance(): Amount;
-    getUncheckedCumulativeBalance(): Amount;
-    getUncheckedPeriodBalance(): Amount;
     getYear(): number;
     }
-
-// @public
-export enum BalanceCheckedType {
-    CHECKED_BALANCE = "CHECKED_BALANCE",
-    FULL_BALANCE = "FULL_BALANCE",
-    UNCHECKED_BALANCE = "UNCHECKED_BALANCE"
-}
 
 // @public
 export interface BalancesContainer {
@@ -139,26 +128,18 @@ export interface BalancesContainer {
     getBalancesContainer(name: string): BalancesContainer;
     getBalancesContainers(): BalancesContainer[];
     getBalancesReport(): BalancesReport;
-    getCheckedCumulativeBalance(): Amount;
-    getCheckedCumulativeBalanceText(): string;
-    getCheckedPeriodBalance(): Amount;
-    getCheckedPeriodBalanceText(): string;
     getCumulativeBalance(): Amount;
     getCumulativeBalanceText(): string;
     getName(): string;
     getPeriodBalance(): Amount;
     getPeriodBalanceText(): string;
-    getUncheckedCumulativeBalance(): Amount;
-    getUncheckedCumulativeBalanceText(): string;
-    getUncheckedPeriodBalance(): Amount;
-    getUncheckedPeriodBalanceText(): string;
     isCredit(): boolean;
 }
 
 // @public
 export class BalancesDataTableBuilder implements BalancesDataTableBuilder {
     // @internal
-    constructor(book: Book, balancesContainers: BalancesContainer[], periodicity: Periodicity, balanceCheckedType: BalanceCheckedType);
+    constructor(book: Book, balancesContainers: BalancesContainer[], periodicity: Periodicity);
     build(): any[][];
     expanded(expanded: boolean): BalancesDataTableBuilder;
     formatDates(format: boolean): BalancesDataTableBuilder;
@@ -174,7 +155,6 @@ export class BalancesReport {
     // @internal
     constructor(book: Book, balancesReportPlain: bkper.Balances);
     createDataTable(): BalancesDataTableBuilder;
-    getBalanceCheckedType(): BalanceCheckedType;
     getBalancesContainer(groupName: string): BalancesContainer;
     getBalancesContainers(): BalancesContainer[];
     getBook(): Book;
@@ -428,6 +408,7 @@ export class Transaction {
         [key: string]: string;
     };
     getProperty(...keys: string[]): string;
+    getPropertyKeys(): string[];
     getRemoteIds(): string[];
     // (undocumented)
     getTags(): string[];
@@ -483,6 +464,9 @@ export class TransactionsDataTableBuilder {
     formatValues(format: boolean): TransactionsDataTableBuilder;
     // (undocumented)
     getAccount(): Promise<Account>;
+    // (undocumented)
+    getHeaderLine(): Promise<string[]>;
+    includeProperties(include: boolean): TransactionsDataTableBuilder;
     includeUrls(include: boolean): TransactionsDataTableBuilder;
     }
 

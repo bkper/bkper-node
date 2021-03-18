@@ -1,7 +1,7 @@
 import { BalancesContainer, AccountBalancesContainer, GroupBalancesContainer } from "./BalancesContainer";
 import { BalancesDataTableBuilder } from "./BalancesDataTableBuilder";
 import { Book } from "./Book";
-import { BalanceCheckedType, Periodicity } from "./Enums";
+import { Periodicity } from "./Enums";
 
 /**
  * Class representing a Balance Report, generated when calling [Book.getBalanceReport](#book_getbalancesreport)
@@ -41,7 +41,7 @@ export class BalancesReport {
    * Creates a BalancesDataTableBuilder to generate a two-dimensional array with all [[BalancesContainers]].
    */
   public createDataTable(): BalancesDataTableBuilder {
-    return new BalancesDataTableBuilder(this.book, this.getBalancesContainers(), this.getPeriodicity(), this.getBalanceCheckedType());
+    return new BalancesDataTableBuilder(this.book, this.getBalancesContainers(), this.getPeriodicity());
   }
 
   /**
@@ -64,13 +64,6 @@ export class BalancesReport {
    */
   public getPeriodicity(): Periodicity {
     return this.wrapped.periodicity as Periodicity;
-  }
-
-  /**
-   * The [[BalanceCheckedType]] of the query used to generate the report.
-   */  
-  public getBalanceCheckedType(): BalanceCheckedType {
-    return this.wrapped.balanceCheckedType as BalanceCheckedType;
   }
 
   /**
@@ -99,7 +92,7 @@ export class BalancesReport {
       this.groupBalancesContainers = [];
       for (var i = 0; i < this.wrapped.groupBalances.length; i++) {
         var grouBalances = this.wrapped.groupBalances[i];
-        var accGroupBalances = new GroupBalancesContainer(this, grouBalances, this.getPeriodicity(), this.getBalanceCheckedType());
+        var accGroupBalances = new GroupBalancesContainer(this, grouBalances, this.getPeriodicity());
         this.groupBalancesContainers.push(accGroupBalances);
       }
     }

@@ -133,31 +133,6 @@ export enum BalanceType {
 }
 
 /**
- * Enum that represents queried balances of checked/unchecked transactions.
- * 
- * The type is obtained from parsing the **is:checked is:unchecked** query operator. 
- * 
- * @public
- */
-export enum BalanceCheckedType {
-
-  /**
-   *  Balances of all transactions, no matter its checked or unchecked state.
-   */
-  FULL_BALANCE = "FULL_BALANCE",
-
-  /**
-   * Balances of is:checked transactions only.
-   */
-  CHECKED_BALANCE = "CHECKED_BALANCE",
-
-  /**
-   * Balances of is:unchecked transactions only.
-   */
-  UNCHECKED_BALANCE = "UNCHECKED_BALANCE"
-}
-
-/**
  * Enum that represents a period slice.
  * 
  * @public

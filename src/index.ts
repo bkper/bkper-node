@@ -26,7 +26,6 @@ export { TransactionsDataTableBuilder } from './model/TransactionsDataTableBuild
 export { 
   Periodicity, 
   AccountType,
-  BalanceCheckedType,
   BalanceType,
   DecimalSeparator,
   Permission
