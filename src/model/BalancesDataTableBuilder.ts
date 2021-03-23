@@ -79,7 +79,7 @@ export class BalancesDataTableBuilder implements BalancesDataTableBuilder {
   }
   
   /**
-   * Defines wheter Groups should expand its child accounts.
+   * Defines whether Groups should expand its child accounts.
    * 
    * @returns This builder with respective expanded option, for chaining.
    */
@@ -128,7 +128,7 @@ export class BalancesDataTableBuilder implements BalancesDataTableBuilder {
   }
 
   /**
-   * Defines wheter should rows and columns should be transposed.
+   * Defines whether should rows and columns should be transposed.
    * 
    * For **TOTAL** [[BalanceType]], the **transposed** table looks like:
    * 
