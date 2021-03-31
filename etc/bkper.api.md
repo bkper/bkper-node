@@ -213,6 +213,7 @@ export class Book {
     getId(): string;
     // (undocumented)
     getLastUpdateMs(): number;
+    getLockDate(): string;
     // (undocumented)
     getName(): string;
     // (undocumented)
@@ -253,6 +254,7 @@ export class Book {
     setDatePattern(datePattern: string): Book;
     setDecimalSeparator(decimalSeparator: DecimalSeparator): Book;
     setFractionDigits(fractionDigits: number): Book;
+    setLockDate(lockDate: string): Book;
     setName(name: string): Book;
     setPageSize(pageSize: number): Book;
     setPeriod(period: Period): Book;
