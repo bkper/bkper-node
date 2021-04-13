@@ -95,7 +95,7 @@ export class HttpApiRequest  {
         })
       } catch (addressUnavailable) {
         //Error on fetch service
-        if (retries > 4 || process.env.NODE_ENV != NODE_ENV_DEV) {
+        if (retries > 4 || process.env.NODE_ENV == NODE_ENV_DEV) {
             throw addressUnavailable;
         } else {
           console.log("Retrying in " + (sleepTime / 1000) + " secs...");
@@ -119,9 +119,9 @@ export class HttpApiRequest  {
         } catch (e) {
           unknowError = true;
         }
-        if (process.env.NODE_ENV != NODE_ENV_DEV && (unknowError || response.status == 429 || response.status >= 500)) {
+        if (unknowError || response.status == 429 || response.status >= 500) {
           //Retry in case of server error
-          if (retries > 4) {
+          if (retries > 4 || process.env.NODE_ENV == NODE_ENV_DEV) {
             if (unknowError) {
               throw responseText;
             } else {
