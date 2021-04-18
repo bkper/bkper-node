@@ -12,7 +12,7 @@ export class Account {
     create(): Promise<Account>;
     deleteProperty(key: string): Account;
     getBalance(raw?: boolean): Amount;
-    getCheckedBalance(raw?: boolean): Amount;
+    getBalanceRaw(): Amount;
     getGroups(): Promise<Group[]>;
     getId(): string;
     getName(): string;
@@ -129,16 +129,27 @@ export interface BalancesContainer {
     getBalancesContainers(): BalancesContainer[];
     getBalancesReport(): BalancesReport;
     getCumulativeBalance(): Amount;
+    getCumulativeBalanceRaw(): Amount;
+    getCumulativeBalanceRawText(): string;
     getCumulativeBalanceText(): string;
+    getCumulativeCredit(): Amount;
+    getCumulativeCreditText(): string;
+    getCumulativeDebit(): Amount;
+    getCumulativeDebitText(): string;
     getName(): string;
     getPeriodBalance(): Amount;
+    getPeriodBalanceRaw(): Amount;
+    getPeriodBalanceRawText(): string;
     getPeriodBalanceText(): string;
+    getPeriodCredit(): Amount;
+    getPeriodCreditText(): string;
+    getPeriodDebit(): Amount;
+    getPeriodDebitText(): string;
     isCredit(): boolean;
 }
 
 // @public
 export class BalancesDataTableBuilder implements BalancesDataTableBuilder {
-    // @internal
     constructor(book: Book, balancesContainers: BalancesContainer[], periodicity: Periodicity);
     build(): any[][];
     expanded(expanded: boolean): BalancesDataTableBuilder;
@@ -146,7 +157,10 @@ export class BalancesDataTableBuilder implements BalancesDataTableBuilder {
     formatValues(format: boolean): BalancesDataTableBuilder;
     hideDates(hide: boolean): BalancesDataTableBuilder;
     hideNames(hide: boolean): BalancesDataTableBuilder;
+    period(period: boolean): BalancesDataTableBuilder;
+    raw(raw: boolean): BalancesDataTableBuilder;
     transposed(transposed: boolean): BalancesDataTableBuilder;
+    trial(trial: boolean): BalancesDataTableBuilder;
     type(type: BalanceType): BalancesDataTableBuilder;
 }
 
@@ -213,6 +227,7 @@ export class Book {
     getId(): string;
     // (undocumented)
     getLastUpdateMs(): number;
+    // (undocumented)
     getLockDate(): string;
     // (undocumented)
     getName(): string;

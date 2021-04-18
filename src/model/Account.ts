@@ -166,24 +166,17 @@ export class Account {
   }
 
   /**
-   * Gets the checked balance based on credit nature of this Account.
-   * 
-   * @param raw - True to get the raw balance, no matter the credit nature of this Account.
-   * 
-   * @returns The checked balance of this Account
-   */
-  public getCheckedBalance(raw?: boolean): Amount {
-    var balance = new Amount('0');
-    if (this.wrapped.balance != null) {
-      balance = round(this.wrapped.checkedBalance, this.book.getFractionDigits());
-    }
-
-    if (raw) {
+   * Gets the raw balance, no matter credit nature of this Account.
+   *  
+   * @returns The balance of this account.
+   */  
+     public getBalanceRaw(): Amount {
+      var balance = new Amount('0');
+      if (this.wrapped.balance != null) {
+        balance = round(this.wrapped.balance, this.book.getFractionDigits());
+      }
       return balance;
-    } else {
-      return getRepresentativeValue(balance, this.isCredit());
     }
-  }
 
   /**
    * Tell if this account is archived.

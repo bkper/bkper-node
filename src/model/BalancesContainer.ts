@@ -12,7 +12,7 @@ import { Amount } from './Amount';
  * 
  * @public
  */
-export interface BalancesContainer {
+ export interface BalancesContainer {
 
   /**
    * The parent BalancesReport of the container
@@ -40,25 +40,86 @@ export interface BalancesContainer {
    */
   isCredit(): boolean;
 
-
   /**
-   * The cumulative balance to the date, since the first transaction posted.
+   * The cumulative balance to the date.
    */
   getCumulativeBalance(): Amount;
+
+  /**
+   * The cumulative raw balance to the date.
+   */
+  getCumulativeBalanceRaw(): Amount;
+
+  /**
+   * The cumulative credit to the date.
+   */
+  getCumulativeCredit(): Amount;
+
+  /**
+   * The cumulative debit to the date.
+   */
+  getCumulativeDebit(): Amount;
+
   /**
    * The cumulative balance formatted according to [[Book]] decimal format and fraction digits.
    */
   getCumulativeBalanceText(): string;
+
+  /**
+   * The cumulative raw balance formatted according to [[Book]] decimal format and fraction digits.
+   */
+  getCumulativeBalanceRawText(): string;
+
+  /**
+   * The cumulative credit formatted according to [[Book]] decimal format and fraction digits.
+   */
+  getCumulativeCreditText(): string;
+
+  /**
+   * The cumulative credit formatted according to [[Book]] decimal format and fraction digits.
+   */
+  getCumulativeDebitText(): string;
 
 
   /**
    * The balance on the date period.
    */
   getPeriodBalance(): Amount;
+
+  /**
+   * The raw balance on the date period.
+   */
+  getPeriodBalanceRaw(): Amount;
+
+  /**
+   * The credit on the date period.
+   */
+  getPeriodCredit(): Amount;
+
+  /**
+   * The debit on the date period.
+   */
+  getPeriodDebit(): Amount;
+
   /**
    * The balance on the date period formatted according to [[Book]] decimal format and fraction digits
    */
   getPeriodBalanceText(): string;
+
+  /**
+   * The raw balance on the date period formatted according to [[Book]] decimal format and fraction digits
+   */
+  getPeriodBalanceRawText(): string;
+
+  /**
+   * The credit on the date period formatted according to [[Book]] decimal format and fraction digits
+   */
+  getPeriodCreditText(): string;
+
+  /**
+   * The debit on the date period formatted according to [[Book]] decimal format and fraction digits
+   */
+  getPeriodDebitText(): string;
 
 
   /**
@@ -110,52 +171,67 @@ export class AccountBalancesContainer implements BalancesContainer {
     balance = getRepresentativeValue(balance, this.isCredit());
     return balance;
   }
+
+  public getCumulativeBalanceRaw(): Amount {
+    var balance = round(this.wrapped.cumulativeBalance, this.balancesReport.getBook().getFractionDigits());
+    return balance;
+  }
+
+  public getCumulativeCredit(): Amount {
+    var balance = round(this.wrapped.cumulativeCredit, this.balancesReport.getBook().getFractionDigits());
+    return balance;
+  }
+
+  public getCumulativeDebit(): Amount {
+    var balance = round(this.wrapped.cumulativeDebit, this.balancesReport.getBook().getFractionDigits());
+    return balance;
+  }
+  
   public getCumulativeBalanceText(): string {
     return this.balancesReport.getBook().formatValue(this.getCumulativeBalance());
   }
-
-  public getCheckedCumulativeBalance(): Amount {
-    var balance = round(this.wrapped.checkedCumulativeBalance, this.balancesReport.getBook().getFractionDigits());
-    balance = getRepresentativeValue(balance, this.isCredit());
-    return balance;
-  }
-  public getCheckedCumulativeBalanceText(): string {
-    return this.balancesReport.getBook().formatValue(this.getCheckedCumulativeBalance());
+  
+  public getCumulativeBalanceRawText(): string {
+    return this.balancesReport.getBook().formatValue(this.getCumulativeBalanceRaw());
   }
 
-  public getUncheckedCumulativeBalance(): Amount {
-    var balance = round(this.wrapped.uncheckedCumulativeBalance, this.balancesReport.getBook().getFractionDigits());
-    balance = getRepresentativeValue(balance, this.isCredit());
-    return balance;
+  public getCumulativeCreditText(): string {
+    return this.balancesReport.getBook().formatValue(this.getCumulativeCredit());
   }
-  public getUncheckedCumulativeBalanceText(): string {
-    return this.balancesReport.getBook().formatValue(this.getUncheckedCumulativeBalance());
+  public getCumulativeDebitText(): string {
+    return this.balancesReport.getBook().formatValue(this.getCumulativeDebit());
   }
+
 
   public getPeriodBalance(): Amount {
     var balance = round(this.wrapped.periodBalance, this.balancesReport.getBook().getFractionDigits());
     return getRepresentativeValue(balance, this.isCredit());
   }
+  public getPeriodBalanceRaw(): Amount {
+    var balance = round(this.wrapped.periodBalance, this.balancesReport.getBook().getFractionDigits());
+    return balance;
+  }
+  public getPeriodCredit(): Amount {
+    var balance = round(this.wrapped.periodCredit, this.balancesReport.getBook().getFractionDigits());
+    return balance;
+  }
+  public getPeriodDebit(): Amount {
+    var balance = round(this.wrapped.periodDebit, this.balancesReport.getBook().getFractionDigits());
+    return balance;
+  }
+
   public getPeriodBalanceText(): string {
     return this.balancesReport.getBook().formatValue(this.getPeriodBalance());
   }
-
-  public getCheckedPeriodBalance(): Amount {
-    var balance = round(this.wrapped.checkedPeriodBalance, this.balancesReport.getBook().getFractionDigits());
-    return getRepresentativeValue(balance, this.isCredit());
+  public getPeriodBalanceRawText(): string {
+    return this.balancesReport.getBook().formatValue(this.getPeriodBalanceRaw());
   }
-  public getCheckedPeriodBalanceText(): string {
-    return this.balancesReport.getBook().formatValue(this.getCheckedPeriodBalance());
+  public getPeriodCreditText(): string {
+    return this.balancesReport.getBook().formatValue(this.getPeriodCredit());
   }
-
-  public getUncheckedPeriodBalance(): Amount {
-    var balance = round(this.wrapped.uncheckedPeriodBalance, this.balancesReport.getBook().getFractionDigits());
-    return getRepresentativeValue(balance, this.isCredit());
+  public getPeriodDebitText(): string {
+    return this.balancesReport.getBook().formatValue(this.getPeriodDebit());
   }
-  public getUncheckedPeriodBalanceText(): string {
-    return this.balancesReport.getBook().formatValue(this.getUncheckedPeriodBalance());
-  }
-
 
   public getBalances(): Balance[] {
     if (!this.wrapped.balances) {
@@ -206,31 +282,38 @@ export class GroupBalancesContainer implements BalancesContainer {
     return this.wrapped.credit;
   }
 
-
   public getCumulativeBalance(): Amount {
     var balance = round(this.wrapped.cumulativeBalance, this.balancesReport.getBook().getFractionDigits());
-    return getRepresentativeValue(balance, this.isCredit());
+    balance = getRepresentativeValue(balance, this.isCredit());
+    return balance;
   }
+
+  public getCumulativeBalanceRaw(): Amount {
+    var balance = round(this.wrapped.cumulativeBalance, this.balancesReport.getBook().getFractionDigits());
+    return balance;
+  }
+
+  public getCumulativeCredit(): Amount {
+    var balance = round(this.wrapped.cumulativeCredit, this.balancesReport.getBook().getFractionDigits());
+    return balance;
+  }
+
+  public getCumulativeDebit(): Amount {
+    var balance = round(this.wrapped.cumulativeDebit, this.balancesReport.getBook().getFractionDigits());
+    return balance;
+  }
+  
   public getCumulativeBalanceText(): string {
     return this.balancesReport.getBook().formatValue(this.getCumulativeBalance());
   }
-
-
-  public getCheckedCumulativeBalance(): Amount {
-    var balance = round(this.wrapped.checkedCumulativeBalance, this.balancesReport.getBook().getFractionDigits());
-    return getRepresentativeValue(balance, this.isCredit());
+  public getCumulativeBalanceRawText(): string {
+    return this.balancesReport.getBook().formatValue(this.getCumulativeBalanceRaw());
   }
-  public getCheckedCumulativeBalanceText(): string {
-    return this.balancesReport.getBook().formatValue(this.getCheckedCumulativeBalance());
+  public getCumulativeCreditText(): string {
+    return this.balancesReport.getBook().formatValue(this.getCumulativeCredit());
   }
-
-
-  public getUncheckedCumulativeBalance(): Amount {
-    var balance = round(this.wrapped.uncheckedCumulativeBalance, this.balancesReport.getBook().getFractionDigits());
-    return getRepresentativeValue(balance, this.isCredit());
-  }
-  public getUncheckedCumulativeBalanceText(): string {
-    return this.balancesReport.getBook().formatValue(this.getUncheckedCumulativeBalance());
+  public getCumulativeDebitText(): string {
+    return this.balancesReport.getBook().formatValue(this.getCumulativeDebit());
   }
 
 
@@ -238,32 +321,36 @@ export class GroupBalancesContainer implements BalancesContainer {
     var balance = round(this.wrapped.periodBalance, this.balancesReport.getBook().getFractionDigits());
     return getRepresentativeValue(balance, this.isCredit());
   }
+  public getPeriodBalanceRaw(): Amount {
+    var balance = round(this.wrapped.periodBalance, this.balancesReport.getBook().getFractionDigits());
+    return balance;
+  }
+  public getPeriodCredit(): Amount {
+    var balance = round(this.wrapped.periodCredit, this.balancesReport.getBook().getFractionDigits());
+    return balance;
+  }
+  public getPeriodDebit(): Amount {
+    var balance = round(this.wrapped.periodDebit, this.balancesReport.getBook().getFractionDigits());
+    return balance;
+  }
+
   public getPeriodBalanceText(): string {
     return this.balancesReport.getBook().formatValue(this.getPeriodBalance());
-  }  
-
-
-  public getCheckedPeriodBalance(): Amount {
-    var balance = round(this.wrapped.checkedPeriodBalance, this.balancesReport.getBook().getFractionDigits());
-    return getRepresentativeValue(balance, this.isCredit());
   }
-  public getCheckedPeriodBalanceText(): string {
-    return this.balancesReport.getBook().formatValue(this.getCheckedPeriodBalance());
-  }    
-
-  public getUncheckedPeriodBalance(): Amount {
-    var balance = round(this.wrapped.uncheckedPeriodBalance, this.balancesReport.getBook().getFractionDigits());
-    return getRepresentativeValue(balance, this.isCredit());
+  public getPeriodBalanceRawText(): string {
+    return this.balancesReport.getBook().formatValue(this.getPeriodBalanceRaw());
   }
-  public getUncheckedPeriodBalanceText(): string {
-    return this.balancesReport.getBook().formatValue(this.getUncheckedPeriodBalance());
-  }    
-  
+  public getPeriodCreditText(): string {
+    return this.balancesReport.getBook().formatValue(this.getPeriodCredit());
+  }
+  public getPeriodDebitText(): string {
+    return this.balancesReport.getBook().formatValue(this.getPeriodDebit());
+  }
 
   public getBalances(): Balance[] {
     if (!this.wrapped.balances) {
       return new Array<Balance>();
-    }    
+    }
     return this.wrapped.balances.map(balancePlain => new Balance(this, balancePlain));
   }
 
@@ -287,5 +374,4 @@ export class GroupBalancesContainer implements BalancesContainer {
   public getBalancesContainer(name: string): BalancesContainer {
     return null;
   }
-
 }
