@@ -411,7 +411,7 @@ export class Transaction {
    */
   public async getCreditAmount(account: Account | string): Promise<Amount> {
     let accountObject = await this.getAccount_(account);
-    if (this.isCreditOnTransaction_(accountObject)) {
+    if (this.isCredit(accountObject)) {
       return this.getAmount();
     }
     return null;
@@ -424,7 +424,7 @@ export class Transaction {
    */
   public async getDebitAmount(account: Account | string): Promise<Amount> {
     let accountObject = await this.getAccount_(account);
-    if (this.isDebitOnTransaction_(accountObject)) {
+    if (this.isDebit(accountObject)) {
       return this.getAmount();
     }
     return null;
@@ -437,10 +437,10 @@ export class Transaction {
    */
   public async getOtherAccount(account: Account | string): Promise<Account> {
     let accountObject = await this.getAccount_(account);
-    if (this.isCreditOnTransaction_(accountObject)) {
+    if (this.isCredit(accountObject)) {
       return await this.getDebitAccount();
     }
-    if (this.isDebitOnTransaction_(accountObject)) {
+    if (this.isDebit(accountObject)) {
       return await this.getCreditAccount();
     }
     return null;
@@ -469,14 +469,12 @@ export class Transaction {
     return await this.book.getAccount(account);
   }
 
-  /** @internal */
-  private async isCreditOnTransaction_(account: Account) {
-    return await this.getCreditAccount() != null && account != null && (await this.getCreditAccount()).getId() == account.getId();
+  public async isCredit(account: Account): Promise<boolean> {
+    return (await this.getCreditAccount()) != null && account != null && (await this.getCreditAccount()).getNormalizedName() == account.getNormalizedName();
   }
 
-  /** @internal */
-  private async isDebitOnTransaction_(account: Account) {
-    return await this.getDebitAccount() != null && account != null && (await this.getDebitAccount()).getId() == account.getId();
+  private async isDebit(account: Account): Promise<boolean> {
+    return (await this.getDebitAccount()) != null && account != null && (await this.getDebitAccount()).getNormalizedName() == account.getNormalizedName();
   }
 
 
