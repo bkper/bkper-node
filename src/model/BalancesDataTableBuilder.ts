@@ -76,7 +76,7 @@ import { Amount } from "./Amount";
   /**
    * Fluent method to set the [[BalanceType]] for the builder.
    * 
-   * @param type The type of balance for this data table
+   * @param type - The type of balance for this data table
    * 
    * For **TOTAL** [[BalanceType]], the table format looks like:
    * 

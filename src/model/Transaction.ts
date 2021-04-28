@@ -461,21 +461,34 @@ export class Transaction {
     }
   }
 
+  /**
+   * 
+   * Tell if the given account is credit on the transaction
+   * 
+   * @param account The account object
+   */  
+  public async isCredit(account: Account): Promise<boolean> {
+    return (await this.getCreditAccount()) != null && account != null && (await this.getCreditAccount()).getNormalizedName() == account.getNormalizedName();
+  }
+
+  /**
+   * 
+   * Tell if the given account is debit on the transaction
+   * 
+   * @param account The account object
+   */  
+  public async isDebit(account: Account): Promise<boolean> {
+    return (await this.getDebitAccount()) != null && account != null && (await this.getDebitAccount()).getNormalizedName() == account.getNormalizedName();
+  }
+
+
   /** @internal */
   private async getAccount_(account: Account | string): Promise<Account> {
     if (account == null || account instanceof Account) {
       return account as Account;
     }
     return await this.book.getAccount(account);
-  }
-
-  public async isCredit(account: Account): Promise<boolean> {
-    return (await this.getCreditAccount()) != null && account != null && (await this.getCreditAccount()).getNormalizedName() == account.getNormalizedName();
-  }
-
-  private async isDebit(account: Account): Promise<boolean> {
-    return (await this.getDebitAccount()) != null && account != null && (await this.getDebitAccount()).getNormalizedName() == account.getNormalizedName();
-  }
+  }  
 
 
   //DESCRIPTION

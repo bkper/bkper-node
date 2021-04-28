@@ -434,6 +434,8 @@ export class Transaction {
     hasTag(tag: string): boolean;
     // (undocumented)
     isChecked(): boolean;
+    isCredit(account: Account): Promise<boolean>;
+    isDebit(account: Account): Promise<boolean>;
     // (undocumented)
     isPosted(): boolean;
     // (undocumented)
