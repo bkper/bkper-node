@@ -465,7 +465,7 @@ export class Transaction {
    * 
    * Tell if the given account is credit on the transaction
    * 
-   * @param account The account object
+   * @param account - The account object
    */  
   public async isCredit(account: Account): Promise<boolean> {
     return (await this.getCreditAccount()) != null && account != null && (await this.getCreditAccount()).getNormalizedName() == account.getNormalizedName();
@@ -475,7 +475,7 @@ export class Transaction {
    * 
    * Tell if the given account is debit on the transaction
    * 
-   * @param account The account object
+   * @param account - The account object
    */  
   public async isDebit(account: Account): Promise<boolean> {
     return (await this.getDebitAccount()) != null && account != null && (await this.getDebitAccount()).getNormalizedName() == account.getNormalizedName();
