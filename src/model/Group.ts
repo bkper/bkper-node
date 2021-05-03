@@ -28,6 +28,31 @@ export class Group {
   }
 
   /**
+   * @returns The parent Group
+   */
+  public async getParent(): Promise<Group> {
+    if (this.wrapped.parent) {
+      return await this.book.getGroup(this.wrapped.parent.id)
+    } else {
+      return null;
+    }
+  }
+
+  /**
+   * Sets the parent Group.
+   * 
+   * @returns This Group, for chainning.
+   */  
+  public setParent(group: Group): Group {
+    if (group) {
+      this.wrapped.parent = {id: group.getId(), name: group.getName(), normalizedName: group.getNormalizedName()};
+    } else {
+      this.wrapped.parent = null;
+    }
+    return this;
+  }
+
+  /**
    * @returns The name of this Group
    */
   public getName(): string {
@@ -35,7 +60,6 @@ export class Group {
   }
 
   /**
-   * 
    * Sets the name of the Group.
    * 
    * @returns This Group, for chainning.
