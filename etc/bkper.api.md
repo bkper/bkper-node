@@ -334,6 +334,8 @@ export class Group {
     getName(): string;
     // (undocumented)
     getNormalizedName(): string;
+    // (undocumented)
+    getParent(): Promise<Group>;
     getProperties(): {
         [key: string]: string;
     };
@@ -344,6 +346,7 @@ export class Group {
     remove(): Promise<Group>;
     setHidden(hidden: boolean): Group;
     setName(name: string): Group;
+    setParent(group: Group): Group;
     setProperties(properties: {
         [key: string]: string;
     }): Group;
