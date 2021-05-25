@@ -45,15 +45,6 @@ export class Account {
 }
 
 // @public
-export class AccountsDataTableBuilder {
-    // @internal
-    constructor(accounts: Account[]);
-    // (undocumented)
-    build(): Promise<any[][]>;
-    includeArchived(include: boolean): AccountsDataTableBuilder;
-    }
-
-// @public
 export enum AccountType {
     ASSET = "ASSET",
     INCOMING = "INCOMING",
@@ -109,74 +100,6 @@ export class App {
     }
 
 // @public
-export class Balance {
-    // @internal
-    constructor(container: BalancesContainer, balancePlain: bkper.Balance);
-    getCumulativeBalance(): Amount;
-    getDate(): Date;
-    getDay(): number;
-    getFuzzyDate(): number;
-    getMonth(): number;
-    getPeriodBalance(): Amount;
-    getYear(): number;
-    }
-
-// @public
-export interface BalancesContainer {
-    createDataTable(): BalancesDataTableBuilder;
-    getBalances(): Balance[];
-    getBalancesContainer(name: string): BalancesContainer;
-    getBalancesContainers(): BalancesContainer[];
-    getBalancesReport(): BalancesReport;
-    getCumulativeBalance(): Amount;
-    getCumulativeBalanceRaw(): Amount;
-    getCumulativeBalanceRawText(): string;
-    getCumulativeBalanceText(): string;
-    getCumulativeCredit(): Amount;
-    getCumulativeCreditText(): string;
-    getCumulativeDebit(): Amount;
-    getCumulativeDebitText(): string;
-    getName(): string;
-    getPeriodBalance(): Amount;
-    getPeriodBalanceRaw(): Amount;
-    getPeriodBalanceRawText(): string;
-    getPeriodBalanceText(): string;
-    getPeriodCredit(): Amount;
-    getPeriodCreditText(): string;
-    getPeriodDebit(): Amount;
-    getPeriodDebitText(): string;
-    isCredit(): boolean;
-}
-
-// @public
-export class BalancesDataTableBuilder implements BalancesDataTableBuilder {
-    constructor(book: Book, balancesContainers: BalancesContainer[], periodicity: Periodicity);
-    build(): any[][];
-    expanded(expanded: boolean): BalancesDataTableBuilder;
-    formatDates(format: boolean): BalancesDataTableBuilder;
-    formatValues(format: boolean): BalancesDataTableBuilder;
-    hideDates(hide: boolean): BalancesDataTableBuilder;
-    hideNames(hide: boolean): BalancesDataTableBuilder;
-    period(period: boolean): BalancesDataTableBuilder;
-    raw(raw: boolean): BalancesDataTableBuilder;
-    transposed(transposed: boolean): BalancesDataTableBuilder;
-    trial(trial: boolean): BalancesDataTableBuilder;
-    type(type: BalanceType): BalancesDataTableBuilder;
-}
-
-// @public
-export class BalancesReport {
-    // @internal
-    constructor(book: Book, balancesReportPlain: bkper.Balances);
-    createDataTable(): BalancesDataTableBuilder;
-    getBalancesContainer(groupName: string): BalancesContainer;
-    getBalancesContainers(): BalancesContainer[];
-    getBook(): Book;
-    getPeriodicity(): Periodicity;
-    hasOnlyOneGroup(): boolean;
-    }
-
-// @public
 export enum BalanceType {
     CUMULATIVE = "CUMULATIVE",
     PERIOD = "PERIOD",
@@ -203,14 +126,10 @@ export class Book {
     // (undocumented)
     configureTransactions_(transactions: Transaction[]): Transaction[];
     continueTransactionIterator(query: string, continuationToken: string): TransactionIterator;
-    createAccountsDataTable(): Promise<AccountsDataTableBuilder>;
-    createBalancesDataTable(query: string): Promise<BalancesDataTableBuilder>;
-    createTransactionsDataTable(query?: string): TransactionsDataTableBuilder;
     formatDate(date: Date, timeZone?: string): string;
     formatValue(value: Amount | number): string;
     getAccount(idOrName: string): Promise<Account>;
     getAccounts(): Promise<Account[]>;
-    getBalancesReport(query: string): Promise<BalancesReport>;
     // (undocumented)
     getCollection(): Collection;
     // (undocumented)
@@ -475,22 +394,6 @@ export class TransactionIterator {
     next(): Promise<Transaction>;
     setContinuationToken(continuationToken: string): Promise<void>;
 }
-
-// @public
-export class TransactionsDataTableBuilder {
-    // @internal
-    constructor(transactionIterator: TransactionIterator);
-    // (undocumented)
-    build(): Promise<any[][]>;
-    formatDates(format: boolean): TransactionsDataTableBuilder;
-    formatValues(format: boolean): TransactionsDataTableBuilder;
-    // (undocumented)
-    getAccount(): Promise<Account>;
-    // (undocumented)
-    getHeaderLine(): Promise<string[]>;
-    includeProperties(include: boolean): TransactionsDataTableBuilder;
-    includeUrls(include: boolean): TransactionsDataTableBuilder;
-    }
 
 
 ```

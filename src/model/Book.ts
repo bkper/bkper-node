@@ -7,16 +7,12 @@ import * as FileService from '../service/file-service';
 import * as GroupService from '../service/group-service';
 import { Account } from './Account';
 import { Collection } from './Collection';
-import { AccountsDataTableBuilder } from './AccountsDataTableBuilder';
-import { BalancesDataTableBuilder } from './BalancesDataTableBuilder';
-import { BalancesReport } from './BalancesReport';
 import { File } from './File';
 import { normalizeName } from '../utils';
 import { DecimalSeparator, Month, Period, Permission } from './Enums';
 import { Group } from './Group';
 import { Transaction } from './Transaction';
 import { TransactionIterator } from './TransactionIterator';
-import { TransactionsDataTableBuilder } from './TransactionsDataTableBuilder';
 import * as Utils from '../utils';
 import { Amount } from './Amount';
 
@@ -681,72 +677,8 @@ export class Book {
     return this.savedQueries;
   }
 
-  /**
-   * 
-   * Create a [[BalancesReport]] based on query
-   * 
-   * @param query - The balances report query
-   */
-  public async getBalancesReport(query: string): Promise<BalancesReport> {
-    var balances = await BalancesService.getBalances(this.getId(), query);
-    return new BalancesReport(this, balances);
-  }
-
-  /**
-   * Create a [[BalancesDataTableBuilder]] based on a query, to create two dimensional Array representation of balances of [[Account]], [[Group]] or #hashtag
-   * 
-   * See [Query Guide](https://help.bkper.com/en/articles/2569178-search-query-guide) to learn more
-   * 
-   * @param query - The balances report query
-   * 
-   * @returns The balances data table builder
-   * 
-   * Example:
-   * 
-   * ```js
-   * var book = BkperApp.getBook("agtzfmJrcGVyLWhyZHITCxIGTGVkZ2VyGICAgIDggqALDA");
-   * 
-   * var balancesDataTable = book.createBalancesDataTable("#rental #energy after:8/2013 before:9/2013").build();
-   * ```
-   */
-  public async createBalancesDataTable(query: string): Promise<BalancesDataTableBuilder> {
-    var balances = await BalancesService.getBalances(this.getId(), query);
-    return new BalancesReport(this, balances).createDataTable();
-  }
-
-  /**
-   * Create a [[AccountsDataTableBuilder]], to build two dimensional Array representations of [[Accounts]] dataset.
-   * 
-   * @returns Accounts data table builder.
-   * 
-   */
-  public async createAccountsDataTable(): Promise<AccountsDataTableBuilder> {
-    let accounts = await this.getAccounts();
-    return new AccountsDataTableBuilder(accounts);
-  }
 
 
-  /**
-   * Create a [[TransactionsDataTableBuilder]] based on a query, to build two dimensional Array representations of [[Transactions]] dataset.
-   * 
-   * See [Query Guide](https://help.bkper.com/en/articles/2569178-search-query-guide) to learn more
-   * 
-   * @param query - The flter query.
-   * 
-   * @returns Transactions data table builder.
-   * 
-   * Example: 
-   * 
-   * ```js
-   * var book = BkperApp.getBook("agtzfmJrcGVyLWhyZHITCxIGTGVkZ2VyGICAgIDggqALDA");
-   * 
-   * var transactionsDataTable = book.createTransactionsDataTable("account:'Bank' after:8/2013 before:9/2013").build();
-   * ```
-   */
-  public createTransactionsDataTable(query?: string): TransactionsDataTableBuilder {
-    var transactionIterator = this.getTransactions(query);
-    return new TransactionsDataTableBuilder(transactionIterator);
-  }
 
   /**
    * Get Book transactions based on a query.
