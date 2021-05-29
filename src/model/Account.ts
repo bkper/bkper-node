@@ -22,6 +22,9 @@ export class Account {
   
   /** @internal */
   book: Book;
+  
+  /** @internal */
+  private groups: Set<Group>
 
   /**
    * Gets the account internal id.
@@ -249,16 +252,19 @@ export class Account {
   /**
    * Get the [[Groups]] of this account.
    */  
-  public async getGroups(): Promise<Group[]> {
-    let groups = new Array<Group>();
-    if (this.wrapped.groups != null) {
-      for (var i = 0; i < this.wrapped.groups.length; i++) {
-        let groupId = this.wrapped.groups[i];
-        let group = await this.book.getGroup(groupId);
-        groups.push(group);
+  public async getGroups(): Promise<Set<Group>> {
+    if (!this.groups) {
+      this.groups = new Set<Group>();
+      if (this.wrapped.groups != null) {
+        for (var i = 0; i < this.wrapped.groups.length; i++) {
+          let groupId = this.wrapped.groups[i];
+          let group = await this.book.getGroup(groupId);
+          this.groups.add(group);
+          group.addAccount(this)
+        }
       }
     }
-    return groups;
+    return this.groups;
   }
 
   /**
@@ -294,6 +300,12 @@ export class Account {
     if (groupObject) {
       this.wrapped.groups.push(groupObject.getId())
     }
+
+    if (!this.groups) {
+      this.groups = new Set<Group>();
+    }
+    this.groups.add(groupObject)
+    groupObject.addAccount(this)
 
     return this;
   }

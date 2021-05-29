@@ -20,6 +20,8 @@ export class Group {
   /** @internal */
   book: Book
 
+  accounts = new Set<Account>();
+
   /**
    * @returns The id of this Group
    */
@@ -85,25 +87,24 @@ export class Group {
    * @returns True if this group has any account in it
    */
   public async hasAccounts(): Promise<boolean> {
-    return (await this.getAccounts()).length > 0;
+    return this.getAccounts() != null && (await this.getAccounts()).size > 0;
   }
 
 
   /**
    * @returns All Accounts of this group.
    */
-  public async getAccounts(): Promise<Account[]> {
-    var accounts = [];
-    var accs = await this.book.getAccounts();
-    for (var i = 0; i < accs.length; i++) {
-      if (await accs[i].isInGroup(this)) {
-        accounts.push(accs[i]);
-      }
-    }
-    return accounts;
+  public async getAccounts(): Promise<Set<Account>> {
+    await this.book.getAccounts();
+    return this.accounts;
   }
 
-
+  /**
+   * @internal
+   */
+  addAccount(account: Account): void {
+    this.accounts.add(account)
+  }
 
   /**
    * Gets the custom properties stored in this Group

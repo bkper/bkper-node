@@ -286,9 +286,9 @@ export class Transaction {
   /**
    * @returns The credit account name.
    */
-  public async getCreditAccountName(): Promise<string> {
-    if (await this.getCreditAccount() != null) {
-      return (await this.getCreditAccount()).getName();
+  public getCreditAccountName(): string {
+    if (this.wrapped.creditAccount) {
+      return this.wrapped.creditAccount.name;
     } else {
       return "";
     }
@@ -334,9 +334,9 @@ export class Transaction {
   /**
    * @returns The debit account name.
    */
-  public async getDebitAccountName(): Promise<string> {
-    if (await this.getDebitAccount() != null) {
-      return (await this.getDebitAccount()).getName();
+  public getDebitAccountName(): string {
+    if (this.wrapped.debitAccount) {
+      return this.wrapped.debitAccount.name;
     } else {
       return "";
     }

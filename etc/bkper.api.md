@@ -13,7 +13,7 @@ export class Account {
     deleteProperty(key: string): Account;
     getBalance(raw?: boolean): Amount;
     getBalanceRaw(): Amount;
-    getGroups(): Promise<Group[]>;
+    getGroups(): Promise<Set<Group>>;
     getId(): string;
     getName(): string;
     // (undocumented)
@@ -241,12 +241,16 @@ export class File {
 
 // @public
 export class Group {
+    // (undocumented)
+    accounts: Set<Account>;
+    // @internal (undocumented)
+    addAccount(account: Account): void;
     // @internal (undocumented)
     book: Book;
     create(): Promise<Group>;
     deleteProperty(key: string): Group;
     // (undocumented)
-    getAccounts(): Promise<Account[]>;
+    getAccounts(): Promise<Set<Account>>;
     // (undocumented)
     getId(): string;
     // (undocumented)

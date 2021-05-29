@@ -39,16 +39,16 @@ export class Book {
   private collection: Collection;
 
   /** @internal */
-  private idAccountMap: any;
+  private idAccountMap: Map<string, Account>;
   
   /** @internal */
-  private nameAccountMap: any;
+  private nameAccountMap: Map<string, Account>;
 
   /** @internal */
-  private idGroupMap: any;
+  private idGroupMap: Map<string, Group>;
 
   /** @internal */
-  private nameGroupMap: any;
+  private nameGroupMap: Map<string, Group>;
 
   /** @internal */
   private savedQueries: bkper.Query[];
@@ -176,13 +176,14 @@ export class Book {
 
   /** @internal */
   private async checkAccountsLoaded_(): Promise<void> {
-    if (this.wrapped == null || this.idAccountMap == null || this.idAccountMap == null) {
+    if (this.wrapped == null || this.idAccountMap == null || this.idGroupMap == null) {
       await this.loadBook_();
     }
   }
 
   /** @internal */
   private async loadBook_(): Promise<void> {
+    console.log(`LOADING ${this.getName()}...`)
     this.wrapped = await BookService.loadBook(this.getId());
     this.configureGroups_(this.wrapped.groups);
     this.configureAccounts_(this.wrapped.accounts);
@@ -544,10 +545,10 @@ export class Book {
 
     await this.checkAccountsLoaded_();
 
-    var account = this.idAccountMap[idOrName];
+    var account = this.idAccountMap.get(idOrName);
     if (account == null) {
       var normalizedIdOfName = normalizeName(idOrName);
-      account = this.nameAccountMap[normalizedIdOfName];
+      account = this.nameAccountMap.get(normalizedIdOfName);
     }
 
     return account;
@@ -579,13 +580,15 @@ export class Book {
   /** @internal */
   private configureAccounts_(accounts: bkper.Account[]): void {
     this.accounts = Utils.wrapObjects(new Account(), accounts);
-    this.idAccountMap = new Object();
-    this.nameAccountMap = new Object();
+    this.idAccountMap = new Map<string, Account>();
+    this.nameAccountMap = new Map<string, Account>();
     for (var i = 0; i < this.accounts.length; i++) {
       var account = this.accounts[i];
       account.book = this;
-      this.idAccountMap[account.getId()] = account;
-      this.nameAccountMap[account.getNormalizedName()] = account;
+      this.idAccountMap.set(account.getId(), account);
+      this.nameAccountMap.set(account.getNormalizedName(), account);
+      //bind groups
+      account.getGroups();
     }
   }
 
@@ -645,9 +648,9 @@ export class Book {
 
     await this.checkAccountsLoaded_();
 
-    var group = this.idGroupMap[idOrName];
+    var group = this.idGroupMap.get(idOrName);
     if (group == null) {
-      group = this.nameGroupMap[normalizeName(idOrName)];
+      group = this.nameGroupMap.get(normalizeName(idOrName));
     }
 
     return group;
@@ -656,13 +659,13 @@ export class Book {
   /** @internal */
   private configureGroups_(groups: bkper.Group[]): void {
     this.groups = Utils.wrapObjects(new Group(), groups);
-    this.idGroupMap = new Object();
-    this.nameGroupMap = new Object();
+    this.idGroupMap = new Map<string, Group>();
+    this.nameGroupMap = new Map<string, Group>();
     for (var i = 0; i < this.groups.length; i++) {
       var group = this.groups[i];
       group.book = this;
-      this.idGroupMap[group.getId()] = group;
-      this.nameGroupMap[normalizeName(group.getName())] = group;
+      this.idGroupMap.set(group.getId(), group);
+      this.nameGroupMap.set(normalizeName(group.getName()), group);
     }
   }
 
