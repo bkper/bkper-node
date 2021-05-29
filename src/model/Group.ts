@@ -20,7 +20,7 @@ export class Group {
   /** @internal */
   book: Book
 
-  accounts = new Set<Account>();
+  accounts;
 
   /**
    * @returns The id of this Group
@@ -87,7 +87,7 @@ export class Group {
    * @returns True if this group has any account in it
    */
   public async hasAccounts(): Promise<boolean> {
-    return this.getAccounts() != null && (await this.getAccounts()).size > 0;
+    return (await this.getAccounts()) != null && (await this.getAccounts()).size > 0;
   }
 
 
@@ -103,6 +103,10 @@ export class Group {
    * @internal
    */
   addAccount(account: Account): void {
+    console.log(`Adding account ${account.getName()} to group ${this.getName()}`)
+    if (!this.accounts){
+      this.accounts = new Set<Account>()
+    }
     this.accounts.add(account)
   }
 

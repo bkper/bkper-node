@@ -256,8 +256,8 @@ export class Account {
     if (!this.groups) {
       this.groups = new Set<Group>();
       if (this.wrapped.groups != null) {
-        for (var i = 0; i < this.wrapped.groups.length; i++) {
-          let groupId = this.wrapped.groups[i];
+        console.log(this.wrapped.groups)
+        for (const groupId of this.wrapped.groups) {
           let group = await this.book.getGroup(groupId);
           this.groups.add(group);
           group.addAccount(this)
