@@ -19,8 +19,9 @@ export class Group {
 
   /** @internal */
   book: Book
-
-  accounts;
+  
+  /** @internal */
+  private accounts: Set<Account>;
 
   /**
    * @returns The id of this Group

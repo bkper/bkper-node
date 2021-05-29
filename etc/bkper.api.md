@@ -241,8 +241,6 @@ export class File {
 
 // @public
 export class Group {
-    // (undocumented)
-    accounts: Set<Account>;
     // @internal (undocumented)
     addAccount(account: Account): void;
     // @internal (undocumented)
