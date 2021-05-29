@@ -104,7 +104,6 @@ export class Group {
    * @internal
    */
   addAccount(account: Account): void {
-    console.log(`Adding account ${account.getName()} to group ${this.getName()}`)
     if (!this.accounts){
       this.accounts = new Set<Account>()
     }
