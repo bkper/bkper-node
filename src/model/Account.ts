@@ -302,8 +302,10 @@ export class Account {
     if (!this.groups) {
       this.groups = new Set<Group>();
     }
-    this.groups.add(groupObject)
-    groupObject.addAccount(this)
+    if (groupObject) {
+      this.groups.add(groupObject)
+      groupObject.addAccount(this)
+    }
 
     return this;
   }
