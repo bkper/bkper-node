@@ -259,7 +259,6 @@ export class Account {
         for (const groupId of this.wrapped.groups) {
           let group = await this.book.getGroup(groupId);
           this.groups.add(group);
-          group.addAccount(this)
         }
       }
     }

@@ -63,6 +63,7 @@ export class Book {
     if (this.wrapped.accounts) {
       this.configureAccounts_(this.wrapped.accounts);
     }
+
   }
 
   /**
@@ -587,8 +588,14 @@ export class Book {
       account.book = this;
       this.idAccountMap.set(account.getId(), account);
       this.nameAccountMap.set(account.getNormalizedName(), account);
-      //bind groups
-      account.getGroups();
+      if (account.wrapped.groups) {
+        for (const groupId of account.wrapped.groups) {
+          let group = this.idGroupMap.get(groupId);
+          if (group) {
+            group.addAccount(account)
+          }
+        }
+      }
     }
   }
 
@@ -667,6 +674,7 @@ export class Book {
       this.idGroupMap.set(group.getId(), group);
       this.nameGroupMap.set(normalizeName(group.getName()), group);
     }
+
   }
 
 
