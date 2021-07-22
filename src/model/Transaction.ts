@@ -284,7 +284,15 @@ export class Transaction {
    * @returns The credit account. The same as origin account.
    */
   public async getCreditAccount(): Promise<Account> {
-    return this.wrapped.creditAccount != null ? await this.book.getAccount(this.wrapped.creditAccount.id) : null;;
+    if (!this.wrapped.creditAccount) {
+      this.creditAccount = null;
+      return null;
+    }
+    if (this.creditAccount == null) {
+      this.creditAccount = await this.book.getAccount(this.wrapped.creditAccount.id);
+    }
+    return this.creditAccount;
+
   }
 
   /**
@@ -309,6 +317,7 @@ export class Transaction {
   public setCreditAccount(account: Account): Transaction {
     if (account != null && account.getId() != null) {
       this.wrapped.creditAccount = account.wrapped
+      this.creditAccount = account;
     }
     return this;
   }
@@ -332,8 +341,14 @@ export class Transaction {
    * 
    */
   public async getDebitAccount(): Promise<Account> {
-    return this.wrapped.debitAccount != null ? await this.book.getAccount(this.wrapped.debitAccount.id) : null;
-  }
+    if (!this.wrapped.debitAccount) {
+      this.debitAccount = null;
+      return null;
+    }
+    if (this.debitAccount == null) {
+      this.debitAccount = await this.book.getAccount(this.wrapped.debitAccount.id);
+    }
+    return this.debitAccount;  }
 
   /**
    * @returns The debit account name.
@@ -357,6 +372,7 @@ export class Transaction {
   public setDebitAccount(account: Account): Transaction {
     if (account != null && account.getId() != null) {
       this.wrapped.debitAccount = account.wrapped
+      this.debitAccount = account;
     }
     return this;
   }
