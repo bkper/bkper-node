@@ -118,6 +118,7 @@ export class Book {
     // @internal
     constructor(wrapped: bkper.Book);
     audit(): void;
+    batchCreateTransactions(transactions: Transaction[]): Promise<Transaction[]>;
     // (undocumented)
     configureTransactions_(transactions: Transaction[]): Transaction[];
     continueTransactionIterator(query: string, continuationToken: string): TransactionIterator;
@@ -136,6 +137,7 @@ export class Book {
     // (undocumented)
     getFractionDigits(): number;
     getGroup(idOrName: string): Promise<Group>;
+    getGroups(): Promise<Group[]>;
     getId(): string;
     // (undocumented)
     getLastUpdateMs(): number;
@@ -172,6 +174,8 @@ export class Book {
     newGroup(): Group;
     newTransaction(): Transaction;
     parseValue(value: string): Amount;
+    // (undocumented)
+    removeGroupCache(group: Group): void;
     round(value: Amount | number): Amount;
     setDatePattern(datePattern: string): Book;
     setDecimalSeparator(decimalSeparator: DecimalSeparator): Book;
@@ -187,6 +191,8 @@ export class Book {
     setProperty(key: string, value: string): Book;
     setTimeZone(timeZone: string): Book;
     update(): Promise<Book>;
+    // @internal (undocumented)
+    updateGroupCache(group: Group): void;
     }
 
 // @public
@@ -229,10 +235,14 @@ export class File {
 
 // @public
 export class Group {
+    // (undocumented)
+    accounts: Set<Account>;
     // @internal (undocumented)
     book: Book;
     create(): Promise<Group>;
     deleteProperty(key: string): Group;
+    // (undocumented)
+    getAccounts(): Promise<Account[]>;
     // (undocumented)
     getId(): string;
     // (undocumented)
@@ -245,6 +255,8 @@ export class Group {
         [key: string]: string;
     };
     getProperty(...keys: string[]): string;
+    // (undocumented)
+    getType(): AccountType;
     // (undocumented)
     hasAccounts(): boolean;
     isHidden(): boolean;
