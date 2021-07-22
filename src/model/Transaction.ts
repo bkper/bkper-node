@@ -19,6 +19,10 @@ export class Transaction {
   /** @internal */
   wrapped: bkper.Transaction
 
+  creditAccount: Account;
+
+  debitAccount: Account
+
   /** @internal */
   book: Book;
 
@@ -623,7 +627,6 @@ export class Transaction {
   public async create(): Promise<Transaction> {
     let operation = await TransactionService.createTransaction(this.book.getId(), this.wrapped);
     this.wrapped = operation.transaction;
-    this.book.clearAccountsCache();
     return this;
   }
 
@@ -633,7 +636,6 @@ export class Transaction {
   public async update(): Promise<Transaction> {
     let operation = await TransactionService.updateTransaction(this.book.getId(), this.wrapped);
     this.wrapped = operation.transaction;
-    this.book.clearAccountsCache();
     return this;
   }
 
@@ -644,7 +646,6 @@ export class Transaction {
   public async check(): Promise<Transaction> {
     let operation = await TransactionService.checkTransaction(this.book.getId(), this.wrapped);
     this.wrapped.checked = operation.transaction.checked;
-    this.book.clearAccountsCache();
     return this;
   }
 
@@ -654,7 +655,6 @@ export class Transaction {
   public async uncheck(): Promise<Transaction> {
     let operation = await TransactionService.uncheckTransaction(this.book.getId(), this.wrapped);
     this.wrapped.checked = operation.transaction.checked;
-    this.book.clearAccountsCache();
     return this;
   }
 
@@ -664,7 +664,6 @@ export class Transaction {
   public async post(): Promise<Transaction> {
     let operation = await TransactionService.postTransaction(this.book.getId(), this.wrapped);
     this.wrapped = operation.transaction;
-    this.book.clearAccountsCache();
     return this;
   }
 
@@ -674,7 +673,6 @@ export class Transaction {
   public async remove(): Promise<Transaction> {
     let operation = await TransactionService.removeTransaction(this.book.getId(), this.wrapped);
     this.wrapped.trashed = operation.transaction.trashed;
-    this.book.clearAccountsCache();
     return this;
   }
 
@@ -684,7 +682,6 @@ export class Transaction {
   public async restore(): Promise<Transaction> {
     let operation = await TransactionService.restoreTransaction(this.book.getId(), this.wrapped);
     this.wrapped.trashed = operation.transaction.trashed;
-    this.book.clearAccountsCache();
     return this;
   }
 

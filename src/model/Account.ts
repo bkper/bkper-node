@@ -302,9 +302,9 @@ export class Account {
     if (!this.groups) {
       this.groups = new Set<Group>();
     }
+
     if (groupObject) {
       this.groups.add(groupObject)
-      groupObject.addAccount(this)
     }
 
     return this;
@@ -378,7 +378,6 @@ export class Account {
    */
   public async create(): Promise<Account> {
     this.wrapped = await AccountService.createAccount(this.book.getId(), this.wrapped);
-    this.book.clearAccountsCache();
     return this;
   }   
 
@@ -387,7 +386,6 @@ export class Account {
    */
   public async update(): Promise<Account> {
     this.wrapped = await AccountService.updateAccount(this.book.getId(), this.wrapped);
-    this.book.clearAccountsCache();
     return this;
 
   }   
@@ -397,7 +395,6 @@ export class Account {
    */
   public async remove(): Promise<Account> {
     this.wrapped = await AccountService.deleteAccount(this.book.getId(), this.wrapped);
-    this.book.clearAccountsCache();
     return this;
   }   
 

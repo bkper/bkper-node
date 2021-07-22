@@ -1,20 +1,18 @@
 import * as AccountService from '../service/account-service';
-import * as TransactionService from '../service/transaction-service';
-import * as BalancesService from '../service/balances-service';
-import * as BookService from '../service/book-service';
-import * as SavedQueryService from '../service/query-service';
-import * as FileService from '../service/file-service';
 import * as GroupService from '../service/group-service';
-import { Account } from './Account';
-import { Collection } from './Collection';
-import { File } from './File';
+import * as BookService from '../service/book-service';
+import * as FileService from '../service/file-service';
+import * as TransactionService from '../service/transaction-service';
+import * as Utils from '../utils';
 import { normalizeName } from '../utils';
+import { Account } from './Account';
+import { Amount } from './Amount';
+import { Collection } from './Collection';
 import { DecimalSeparator, Month, Period, Permission } from './Enums';
+import { File } from './File';
 import { Group } from './Group';
 import { Transaction } from './Transaction';
 import { TransactionIterator } from './TransactionIterator';
-import * as Utils from '../utils';
-import { Amount } from './Amount';
 
 /**
  *
@@ -32,24 +30,14 @@ export class Book {
   /** @internal */
   private accounts: Account[];
 
-  /** @internal */
-  private groups: Group[];
   
   /** @internal */
   private collection: Collection;
-
-  /** @internal */
-  private idAccountMap: Map<string, Account>;
-  
-  /** @internal */
-  private nameAccountMap: Map<string, Account>;
-
   /** @internal */
   private idGroupMap: Map<string, Group>;
 
   /** @internal */
   private nameGroupMap: Map<string, Group>;
-
   /** @internal */
   private savedQueries: bkper.Query[];
 
@@ -57,13 +45,6 @@ export class Book {
   /** @internal */
   constructor(wrapped: bkper.Book) {
     this.wrapped = wrapped;
-    if (this.wrapped.groups) {
-      this.configureGroups_(this.wrapped.groups);
-    }
-    if (this.wrapped.accounts) {
-      this.configureAccounts_(this.wrapped.accounts);
-    }
-
   }
 
   /**
@@ -173,21 +154,6 @@ export class Book {
    */
   public getOwnerName(): string {
     return this.wrapped.ownerName;
-  }
-
-  /** @internal */
-  private async checkAccountsLoaded_(): Promise<void> {
-    if (this.wrapped == null || this.idAccountMap == null || this.idGroupMap == null) {
-      await this.loadBook_();
-    }
-  }
-
-  /** @internal */
-  private async loadBook_(): Promise<void> {
-    console.log(`LOADING ${this.getName()}...`)
-    this.wrapped = await BookService.loadBook(this.getId());
-    this.configureGroups_(this.wrapped.groups);
-    this.configureAccounts_(this.wrapped.accounts);
   }
 
   /**
@@ -407,13 +373,12 @@ export class Book {
   /**
    * Create [[Transactions]] on the Book, in batch. 
    */
-  public async batchCreateTransactions(transactions: Transaction[]): Promise<Transaction[]> {
+   public async batchCreateTransactions(transactions: Transaction[]): Promise<Transaction[]> {
     let transactionPayloads: bkper.Transaction[] = [];
     transactions.forEach(tx => transactionPayloads.push(tx.wrapped))
     transactionPayloads = await TransactionService.createTransactionsBatch(this.getId(), transactionPayloads);
     transactions = Utils.wrapObjects(new Transaction(), transactionPayloads);
     this.configureTransactions_(transactions);
-    this.clearAccountsCache();
     return transactions;
   }
 
@@ -521,15 +486,6 @@ export class Book {
   }
 
   /**
-   * Gets all [[Accounts]] of this Book
-   */
-  public async getAccounts(): Promise<Account[]> {
-    await this.checkAccountsLoaded_();
-    return this.accounts;
-  }
-
-
-  /**
    * Gets an [[Account]] object
    * 
    * @param idOrName - The id or name of the Account
@@ -537,106 +493,35 @@ export class Book {
    * @returns The matching Account object
    */
   public async getAccount(idOrName: string): Promise<Account> {
-
     if (idOrName == null) {
       return null;
     }
-
     idOrName = idOrName + '';
-
-    await this.checkAccountsLoaded_();
-
-    var account = this.idAccountMap.get(idOrName);
-    if (account == null) {
-      var normalizedIdOfName = normalizeName(idOrName);
-      account = this.nameAccountMap.get(normalizedIdOfName);
+    const accountPlain = await AccountService.getAccount(this.getId(), idOrName);
+    if (!accountPlain) {
+      return null;
     }
-
+    const account = Utils.wrapObject(new Account(), accountPlain);
+    account.book = this;
     return account;
   }
-
-
-  /**
-   * Create [[Accounts]] on the Book, in batch.
-   */
-  public async batchCreateAccounts(accounts: Account[]): Promise<Account[]> {
-    let accountsPayloads: bkper.Account[] = []
-    for (const account of accounts) {
-      accountsPayloads.push(account.wrapped);
-    }
-    if (accountsPayloads.length > 0) {
-      let createdAccountsPlain = await AccountService.createAccounts(this.getId(), accountsPayloads);
-      let createdAccounts = Utils.wrapObjects(new Account(), createdAccountsPlain);
-      this.clearBookCache_();
-      for (var i = 0; i < createdAccounts.length; i++) {
-        var account = createdAccounts[i];
-        account.book = this;
-      }
-      return createdAccounts;
-    }
-    return [];
-  }
-
-
+  
   /** @internal */
-  private configureAccounts_(accounts: bkper.Account[]): void {
-    this.accounts = Utils.wrapObjects(new Account(), accounts);
-    this.idAccountMap = new Map<string, Account>();
-    this.nameAccountMap = new Map<string, Account>();
-    for (var i = 0; i < this.accounts.length; i++) {
-      var account = this.accounts[i];
-      account.book = this;
-      this.idAccountMap.set(account.getId(), account);
-      this.nameAccountMap.set(account.getNormalizedName(), account);
-      if (account.wrapped.groups) {
-        for (const groupId of account.wrapped.groups) {
-          let group = this.idGroupMap.get(groupId);
-          if (group) {
-            group.addAccount(account)
-          }
-        }
-      }
+  updateGroupCache(group: Group) {
+    group.book = this;
+    if (this.idGroupMap) {
+      this.idGroupMap.set(group.getId(), group);
+      this.nameGroupMap.set(normalizeName(group.getName()), group);
     }
   }
 
-
-  /**
-   * Gets all [[Groups]] of this Book
-   */
-  public async getGroups(): Promise<Group[]> {
-    await this.checkAccountsLoaded_();
-    return this.groups;
-  }
-
-  /**
-   * Create [[Groups]] on the Book, in batch.
-   */
-  public async batchCreateGroups(groups: Group[]): Promise<Group[]> {
-    if (groups.length > 0) {
-      let groupsSave: bkper.Group[] = groups.map(g => { return g.wrapped });
-      let createdGroupsPlain = await GroupService.createGroups(this.getId(), groupsSave);
-      let createdGroups = Utils.wrapObjects(new Group(), createdGroupsPlain);
-      this.clearBookCache_();
-
-      for (var i = 0; i < createdGroups.length; i++) {
-        var group = createdGroups[i];
-        group.book = this;
-      }
-
-      return createdGroups;
+  removeGroupCache(group: Group) {
+    if (this.idGroupMap) {
+      this.idGroupMap.delete(group.getId());
+      this.nameGroupMap.delete(normalizeName(group.getName()));
     }
-    return [];
   }
 
-  clearAccountsCache() {
-    this.idAccountMap = null;
-    this.idGroupMap = null;
-  }
-
-  /** @internal */
-  private clearBookCache_() {
-    this.wrapped = null;
-  }
 
   /**
    * Gets a [[Group]] object
@@ -653,42 +538,44 @@ export class Book {
 
     idOrName = idOrName + '';
 
-    await this.checkAccountsLoaded_();
-
-    var group = this.idGroupMap.get(idOrName);
-    if (group == null) {
-      group = this.nameGroupMap.get(normalizeName(idOrName));
+    if (this.idGroupMap) {
+      let group = this.idGroupMap.get(idOrName);
+      if (!group) {
+        group = this.nameGroupMap.get(normalizeName(idOrName));
+      }
+      if (group) {
+        return group;
+      }
     }
 
+    const groupPlain = await GroupService.getGroup(this.getId(), idOrName);
+    if (!groupPlain) {
+      return null;
+    }
+    let group = Utils.wrapObject(new Group(), groupPlain);
+    this.updateGroupCache(group);
     return group;
-  }
-
-  /** @internal */
-  private configureGroups_(groups: bkper.Group[]): void {
-    this.groups = Utils.wrapObjects(new Group(), groups);
-    this.idGroupMap = new Map<string, Group>();
-    this.nameGroupMap = new Map<string, Group>();
-    for (var i = 0; i < this.groups.length; i++) {
-      var group = this.groups[i];
-      group.book = this;
-      this.idGroupMap.set(group.getId(), group);
-      this.nameGroupMap.set(normalizeName(group.getName()), group);
-    }
-
   }
 
 
   /**
-   * Gets all saved queries from this book
+   * Gets all [[Groups]] of this Book
    */
-  public async getSavedQueries(): Promise<{ id?: string, query?: string, title?: string }[]> {
-    if (this.savedQueries == null) {
-      this.savedQueries = await SavedQueryService.getSavedQueries(this.getId());
+   public async getGroups(): Promise<Group[]> {
+    if (this.idGroupMap) {
+      return Array.from(this.idGroupMap.values())
     }
-    return this.savedQueries;
+    let groups = await GroupService.getGroups(this.getId());
+    let groupsObj = Utils.wrapObjects(new Group(), groups);
+    this.idGroupMap = new Map<string, Group>();
+    this.nameGroupMap = new Map<string, Group>();
+    for (var i = 0; i < groupsObj.length; i++) {
+      var group = groupsObj[i];
+      this.updateGroupCache(group);
+    }
+    return groupsObj;
+
   }
-
-
 
 
   /**

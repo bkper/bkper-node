@@ -1,7 +1,9 @@
-import { Book } from "./Book";
-import { Account } from "./Account";
-import { normalizeText } from "../utils";
 import * as GroupService from '../service/group-service';
+import { normalizeText } from "../utils";
+import { Account } from './Account';
+import { Book } from "./Book";
+import { AccountType } from './Enums';
+import * as Utils from '../utils';
 
 /**
  * This class defines a Group of [[Accounts]].
@@ -17,12 +19,11 @@ export class Group {
   /** @internal */
   wrapped: bkper.Group
 
+  accounts: Set<Account>
+
   /** @internal */
   book: Book
   
-  /** @internal */
-  private accounts: Set<Account>;
-
   /**
    * @returns The id of this Group
    */
@@ -83,31 +84,34 @@ export class Group {
     }
   }
 
+  /**
+   * @returns All Accounts of this group.
+   */
+  public async getAccounts(): Promise<Account[]> {
+    let accountsPlain = await GroupService.getAccounts(this.book.getId(), this.getId());
+    if (!accountsPlain) {
+      return [];
+    }
+    let accounts = Utils.wrapObjects(new Account(), accountsPlain);
+    for (const account of accounts) {
+      account.book = this.book;
+    }
+    return accounts;
+  }
+
 
   /**
    * @returns True if this group has any account in it
    */
-  public async hasAccounts(): Promise<boolean> {
-    return (await this.getAccounts()) != null && (await this.getAccounts()).size > 0;
-  }
-
-
-  /**
-   * @returns All Accounts of this group.
-   */
-  public async getAccounts(): Promise<Set<Account>> {
-    await this.book.getAccounts();
-    return this.accounts;
+  public hasAccounts(): boolean {
+    return this.wrapped.hasAccounts;
   }
 
   /**
-   * @internal
+   * @returns The type for of the accounts of this group. Null if mixed
    */
-  addAccount(account: Account): void {
-    if (!this.accounts){
-      this.accounts = new Set<Account>()
-    }
-    this.accounts.add(account)
+  public getType(): AccountType {
+    return this.wrapped.type as AccountType;
   }
 
   /**
@@ -194,7 +198,7 @@ export class Group {
    */
   public async create(): Promise<Group> {
     this.wrapped = await GroupService.createGroup(this.book.getId(), this.wrapped);
-    this.book.clearAccountsCache();
+    this.book.updateGroupCache(this);
     return this;
   }
 
@@ -203,7 +207,7 @@ export class Group {
    */
   public async update(): Promise<Group> {
     this.wrapped = await GroupService.updateGroup(this.book.getId(), this.wrapped);
-    this.book.clearAccountsCache();
+    this.book.updateGroupCache(this);
     return this;
 
   }
@@ -213,7 +217,7 @@ export class Group {
    */
   public async remove(): Promise<Group> {
     this.wrapped = await GroupService.deleteGroup(this.book.getId(), this.wrapped);
-    this.book.clearAccountsCache();
+    this.book.removeGroupCache(this);
     return this;
   }
 

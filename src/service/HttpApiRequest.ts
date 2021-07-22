@@ -1,13 +1,25 @@
 
 import { getOAuthToken, isLoggedIn } from '../auth/local-auth-service';
+import { GaxiosError, request, GaxiosResponse } from 'gaxios';
 import { OAuthTokenProvider } from '../auth/OAuthTokenProvider';
-import fetch, { Response } from 'node-fetch';
 import https from 'https';
-import { NODE_ENV_DEV, sleep } from '../utils';
+import { NODE_ENV_DEV } from '../utils';
 
 type HttpMethod = "GET"|"POST"|"PUT"|"PATCH"|"DELETE";
 const httpsAgent = new https.Agent({keepAlive: true});
 
+interface HttpError {
+  error: {
+    errors:
+      {
+        domain: string,
+        reason: string,
+        message: string
+      }[]
+    code: number,
+    message: string
+  }
+}
 
 export class HttpApiRequest  {
 
@@ -74,74 +86,35 @@ export class HttpApiRequest  {
   }
 
 
-  async fetch(): Promise<Response> {
+  async fetch(): Promise<GaxiosResponse> {
 
     this.headers['Authorization'] = `Bearer ${await getAccessToken()}`;
     this.addParam('key', HttpApiRequest.API_KEY);
     // this.httpRequest.setMuteHttpExceptions(true);
-
-    var retries = 0;
-    var sleepTime = 1000;
-    while (true) {
-      let response: Response;
-      try {
-        let body = this.payload;
-
-        response = await fetch(this.getUrl(), {
-          method: this.method,
-          body: body,
-          headers: this.headers,
-          agent: httpsAgent
-        })
-      } catch (addressUnavailable) {
-        //Error on fetch service
-        if (retries > 4 || process.env.NODE_ENV == NODE_ENV_DEV) {
-            throw addressUnavailable;
-        } else {
-          console.log("Retrying in " + (sleepTime / 1000) + " secs...");
-          await sleep(sleepTime);
-          sleepTime = sleepTime * 2;
-          retries++;
-          continue;
+    const url = this.getUrl();
+    try {
+      return await request({
+        url: url,
+        method: this.method,
+        headers: this.headers,
+        body: this.payload,
+        agent: httpsAgent,
+        retryConfig: {
+          statusCodesToRetry: [[100, 199], [429, 429], [500, 599]],
+          retry: process.env.NODE_ENV == NODE_ENV_DEV ? 0 : 6,
+          onRetryAttempt: (err: GaxiosError) => {console.log(`${err.message} - Retrying... `)},
+          retryDelay: 1000
         }
-      }
-
-      if (response.status >= 200 && response.status < 300) {
-        //OK
-        return response;      
+      })
+    } catch (e) {
+      let error: HttpError = e.response.data
+      if (error.error) {
+        throw `[${error.error.message}] calling url ${url}`
       } else {
-        //ERROR
-        let responseText = await response.text();
-        let error: any;
-        let unknowError = false;
-        try {
-           error = JSON.parse(responseText).error;
-        } catch (e) {
-          unknowError = true;
-        }
-        if (unknowError || response.status == 429 || response.status >= 500) {
-          //Retry in case of server error
-          if (retries > 4 || process.env.NODE_ENV == NODE_ENV_DEV) {
-            if (unknowError) {
-              throw responseText;
-            } else {
-              throw error.message;
-            }
-          } else {
-            console.log("Retrying in " + (sleepTime / 1000) + " secs...");
-            await sleep(sleepTime);
-            sleepTime = sleepTime * 2;
-            retries++;
-          }
-        } else {
-          if (unknowError) {
-            throw responseText;
-          } else {
-            throw error.message;
-          }
-        }
+        throw `[${e.message}] calling url ${url}`
       }
     }
+
   }
 }
 
@@ -164,8 +137,8 @@ export class HttpBooksApiV2Request extends HttpApiRequest {
   }
 }
 
-export class HttpBooksApiV3Request extends HttpApiRequest {
+export class HttpBooksApiV4Request extends HttpApiRequest {
   constructor(service: string) {
-    super(`v3/books/${service}`)
+    super(`v4/books/${service}`)
   }
 }

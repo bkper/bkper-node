@@ -118,18 +118,12 @@ export class Book {
     // @internal
     constructor(wrapped: bkper.Book);
     audit(): void;
-    batchCreateAccounts(accounts: Account[]): Promise<Account[]>;
-    batchCreateGroups(groups: Group[]): Promise<Group[]>;
-    batchCreateTransactions(transactions: Transaction[]): Promise<Transaction[]>;
-    // (undocumented)
-    clearAccountsCache(): void;
     // (undocumented)
     configureTransactions_(transactions: Transaction[]): Transaction[];
     continueTransactionIterator(query: string, continuationToken: string): TransactionIterator;
     formatDate(date: Date, timeZone?: string): string;
     formatValue(value: Amount | number): string;
     getAccount(idOrName: string): Promise<Account>;
-    getAccounts(): Promise<Account[]>;
     // (undocumented)
     getCollection(): Collection;
     // (undocumented)
@@ -142,7 +136,6 @@ export class Book {
     // (undocumented)
     getFractionDigits(): number;
     getGroup(idOrName: string): Promise<Group>;
-    getGroups(): Promise<Group[]>;
     getId(): string;
     // (undocumented)
     getLastUpdateMs(): number;
@@ -168,11 +161,6 @@ export class Book {
         [key: string]: string;
     };
     getProperty(...keys: string[]): string;
-    getSavedQueries(): Promise<{
-        id?: string;
-        query?: string;
-        title?: string;
-    }[]>;
     // (undocumented)
     getTimeZone(): string;
     // (undocumented)
@@ -242,13 +230,9 @@ export class File {
 // @public
 export class Group {
     // @internal (undocumented)
-    addAccount(account: Account): void;
-    // @internal (undocumented)
     book: Book;
     create(): Promise<Group>;
     deleteProperty(key: string): Group;
-    // (undocumented)
-    getAccounts(): Promise<Set<Account>>;
     // (undocumented)
     getId(): string;
     // (undocumented)
@@ -262,7 +246,7 @@ export class Group {
     };
     getProperty(...keys: string[]): string;
     // (undocumented)
-    hasAccounts(): Promise<boolean>;
+    hasAccounts(): boolean;
     isHidden(): boolean;
     remove(): Promise<Group>;
     setHidden(hidden: boolean): Group;
@@ -308,6 +292,10 @@ export class Transaction {
     book: Book;
     check(): Promise<Transaction>;
     create(): Promise<Transaction>;
+    // (undocumented)
+    creditAccount: Account;
+    // (undocumented)
+    debitAccount: Account;
     deleteProperty(key: string): Transaction;
     from(account: Account): Transaction;
     getAccountBalance(raw?: boolean): Promise<Amount>;
