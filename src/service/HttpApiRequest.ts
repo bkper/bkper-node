@@ -110,9 +110,9 @@ export class HttpApiRequest  {
     } catch (e) {
       let error: HttpError = e.response.data
       if (error.error) {
-        throw `[${error.error.message}] calling url ${url}`
+        throw error.error.message;
       } else {
-        throw `[${e.message}] calling url ${url}`
+        throw e.message;
       }
     }
 
