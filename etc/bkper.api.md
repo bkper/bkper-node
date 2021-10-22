@@ -13,7 +13,7 @@ export class Account {
     deleteProperty(key: string): Account;
     getBalance(raw?: boolean): Amount;
     getBalanceRaw(): Amount;
-    getGroups(): Promise<Set<Group>>;
+    getGroups(): Promise<Group[]>;
     getId(): string;
     getName(): string;
     // (undocumented)
@@ -138,6 +138,7 @@ export class Book {
     getFractionDigits(): number;
     getGroup(idOrName: string): Promise<Group>;
     getGroups(): Promise<Group[]>;
+    getGroupsByAccount(accountIdOrName: string): Promise<Group[]>;
     getId(): string;
     // (undocumented)
     getLastUpdateMs(): number;

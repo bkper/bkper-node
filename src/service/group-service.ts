@@ -39,6 +39,15 @@ export async function createGroups(bookId: string, groups: bkper.Group[]): Promi
   return groupsPlain.items;
 }
 
+export async function getGroupsByAccountId(bookId: string, accountId: string): Promise<bkper.Group[]> {
+  var response = await new HttpBooksApiV4Request(`${bookId}/accounts/${accountId}/groups`).setMethod('GET').fetch();
+  var groupsPlain = response.data;
+  if (groupsPlain.items == null) {
+    return [];
+  }
+  return groupsPlain.items;
+}
+
 export async function getGroups(bookId: string): Promise<bkper.Group[]> {
   var response = await new HttpBooksApiV4Request(`${bookId}/groups`).setMethod('GET').fetch();
   var groupsPlain = response.data;

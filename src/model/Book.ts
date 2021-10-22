@@ -574,7 +574,18 @@ export class Book {
       this.updateGroupCache(group);
     }
     return groupsObj;
+  }
 
+  /**
+   * Get the [[Groups]] of a given account.
+   */
+  public async getGroupsByAccount(accountIdOrName: string): Promise<Group[]> {
+    let groups = await GroupService.getGroupsByAccountId(this.getId(), accountIdOrName);
+    let groupsObj = Utils.wrapObjects(new Group(), groups);
+    for (const group of groupsObj) {
+      group.book = this;
+    }
+    return groupsObj;
   }
 
 

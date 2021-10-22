@@ -1,9 +1,11 @@
 import * as AccountService  from '../service/account-service'
+import * as GroupService  from '../service/group-service'
 import { Book } from './Book';
 import { AccountType } from './Enums';
 import { Group } from './Group';
 import { getRepresentativeValue, normalizeText, round } from '../utils';
 import { Amount } from './Amount';
+import * as Utils from '../utils';
 
 /**
  * 
@@ -23,9 +25,6 @@ export class Account {
   /** @internal */
   book: Book;
   
-  /** @internal */
-  private groups: Set<Group>
-
   /**
    * Gets the account internal id.
    */
@@ -252,17 +251,13 @@ export class Account {
   /**
    * Get the [[Groups]] of this account.
    */  
-  public async getGroups(): Promise<Set<Group>> {
-    if (!this.groups) {
-      this.groups = new Set<Group>();
-      if (this.wrapped.groups != null) {
-        for (const groupId of this.wrapped.groups) {
-          let group = await this.book.getGroup(groupId);
-          this.groups.add(group);
-        }
-      }
+  public async getGroups(): Promise<Group[]> {
+    let groups = await GroupService.getGroupsByAccountId(this.book.getId(), this.getId());
+    let groupsObj = Utils.wrapObjects(new Group(), groups);
+    for (const group of groupsObj) {
+      group.book = this.book;
     }
-    return this.groups;
+    return groupsObj;
   }
 
   /**
@@ -299,13 +294,6 @@ export class Account {
       this.wrapped.groups.push(groupObject.getId())
     }
 
-    if (!this.groups) {
-      this.groups = new Set<Group>();
-    }
-
-    if (groupObject) {
-      this.groups.add(groupObject)
-    }
 
     return this;
   }
