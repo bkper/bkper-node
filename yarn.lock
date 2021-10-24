@@ -23,10 +23,10 @@
     chalk "^2.0.0"
     js-tokens "^4.0.0"
 
-"@bkper/bkper-api-types@^4.0.3":
-  version "4.0.3"
-  resolved "https://registry.yarnpkg.com/@bkper/bkper-api-types/-/bkper-api-types-4.0.3.tgz#f193d92c2cc122ae10ee120478acc483e9e20ec8"
-  integrity sha512-bZGP8YVlqXKoSfb3uRUtwCWMUQmH4jwJkB+WwSwHFu5aE+VW7FYmmaMDvr8JBibWpwGgPhnRCQj5S1itzXp9Xg==
+"@bkper/bkper-api-types@^5.0.0":
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/@bkper/bkper-api-types/-/bkper-api-types-5.0.0.tgz#1d3d746988e5924cd941b5ab27d1d98bafadb694"
+  integrity sha512-OJS8T2tIlCndlAAVfJLxOovy23ZUoF3JCckqvO63pQkt9SbbUVAggS22yQ1NdnymoWG3BU/kpLdMLj+gXt95Dg==
 
 "@eslint/eslintrc@^0.2.2":
   version "0.2.2"

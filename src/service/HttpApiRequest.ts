@@ -138,8 +138,8 @@ export class HttpBooksApiV2Request extends HttpApiRequest {
   }
 }
 
-export class HttpBooksApiV4Request extends HttpApiRequest {
+export class HttpBooksApiV5Request extends HttpApiRequest {
   constructor(service: string) {
-    super(`v4/books/${service}`)
+    super(`v5/books/${service}`)
   }
 }

@@ -291,7 +291,7 @@ export class Account {
     }
 
     if (groupObject) {
-      this.wrapped.groups.push(groupObject.getId())
+      this.wrapped.groups.push(groupObject.wrapped)
     }
 
 
