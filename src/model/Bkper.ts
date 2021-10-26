@@ -23,6 +23,16 @@ export class Bkper {
   }
 
   /**
+   * Creates a new [[Book]] from a plain json Book
+   *
+   * @param book - The universal book id - The same bookId param of URL you access at app.bkper.com
+   * 
+   */
+  public static newBook(book: bkper.Book): Book {
+    return new Book(book);
+  }
+
+  /**
    * Sets the API key to identify the agent.
    * 
    * API keys are intended for agent identification only, not for authentication. [Learn more](https://cloud.google.com/endpoints/docs/frameworks/java/when-why-api-key)

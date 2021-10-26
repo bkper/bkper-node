@@ -109,6 +109,7 @@ export enum BalanceType {
 // @public
 export class Bkper {
     static getBook(id: string): Promise<Book>;
+    static newBook(book: bkper.Book): Book;
     static setApiKey(key: string): App;
     static setOAuthTokenProvider(oauthTokenProvider: OAuthTokenProvider): Promise<void>;
 }
