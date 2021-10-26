@@ -1,6 +1,6 @@
 {
   "name": "bkper",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "Node.js client for Bkper REST API",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
