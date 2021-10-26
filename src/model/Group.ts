@@ -23,6 +23,14 @@ export class Group {
 
   /** @internal */
   book: Book
+
+  /**
+   * 
+   * @returns The wrapped plain json object
+   */
+  public json(): bkper.Group {
+    return this.wrapped;
+  }
   
   /**
    * @returns The id of this Group

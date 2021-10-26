@@ -24,6 +24,14 @@ export class Account {
   
   /** @internal */
   book: Book;
+
+  /**
+   * 
+   * @returns The wrapped plain json object
+   */
+  public json(): bkper.Account {
+    return this.wrapped;
+  }
   
   /**
    * Gets the account internal id.
@@ -31,6 +39,8 @@ export class Account {
   public getId(): string {
     return this.wrapped.id;
   }
+
+  
 
   /**
    * Gets the account name.

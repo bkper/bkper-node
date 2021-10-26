@@ -22,15 +22,6 @@ export class Bkper {
     return new Book(book);
   }
 
-  /**
-   * Creates a new [[Book]] from a plain json Book
-   *
-   * @param book - The universal book id - The same bookId param of URL you access at app.bkper.com
-   * 
-   */
-  public static newBook(book: bkper.Book): Book {
-    return new Book(book);
-  }
 
   /**
    * Sets the API key to identify the agent.

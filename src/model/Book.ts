@@ -42,9 +42,16 @@ export class Book {
   private savedQueries: bkper.Query[];
 
 
-  /** @internal */
-  constructor(wrapped: bkper.Book) {
-    this.wrapped = wrapped;
+  constructor(json: bkper.Book) {
+    this.wrapped = json;
+  }
+
+  /**
+   * 
+   * @returns The wrapped plain json object
+   */
+  public json(): bkper.Book {
+    return this.wrapped;
   }
 
   /**

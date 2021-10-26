@@ -27,6 +27,14 @@ export class Transaction {
   book: Book;
 
   /**
+   * 
+   * @returns The wrapped plain json object
+   */
+  public json(): bkper.Transaction {
+    return this.wrapped;
+  }
+
+  /**
    * @returns The id of the Transaction.
    */
   public getId(): string {

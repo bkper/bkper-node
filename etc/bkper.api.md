@@ -29,6 +29,8 @@ export class Account {
     isCredit(): boolean;
     isInGroup(group: string | Group): Promise<boolean>;
     isPermanent(): boolean;
+    // (undocumented)
+    json(): bkper.Account;
     remove(): Promise<Account>;
     removeGroup(group: string | Group): Promise<Account>;
     setArchived(archived: boolean): Account;
@@ -109,15 +111,13 @@ export enum BalanceType {
 // @public
 export class Bkper {
     static getBook(id: string): Promise<Book>;
-    static newBook(book: bkper.Book): Book;
     static setApiKey(key: string): App;
     static setOAuthTokenProvider(oauthTokenProvider: OAuthTokenProvider): Promise<void>;
 }
 
 // @public
 export class Book {
-    // @internal
-    constructor(wrapped: bkper.Book);
+    constructor(json: bkper.Book);
     audit(): void;
     batchCreateTransactions(transactions: Transaction[]): Promise<Transaction[]>;
     // (undocumented)
@@ -171,6 +171,8 @@ export class Book {
     getTimeZoneOffset(): number;
     getTransaction(id: string): Promise<Transaction>;
     getTransactions(query?: string): TransactionIterator;
+    // (undocumented)
+    json(): bkper.Book;
     newAccount(): Account;
     newFile(): File;
     newGroup(): Group;
@@ -262,6 +264,8 @@ export class Group {
     // (undocumented)
     hasAccounts(): boolean;
     isHidden(): boolean;
+    // (undocumented)
+    json(): bkper.Group;
     remove(): Promise<Group>;
     setHidden(hidden: boolean): Group;
     setName(name: string): Group;
@@ -366,6 +370,8 @@ export class Transaction {
     isPosted(): boolean;
     // (undocumented)
     isTrashed(): boolean;
+    // (undocumented)
+    json(): bkper.Transaction;
     post(): Promise<Transaction>;
     remove(): Promise<Transaction>;
     restore(): Promise<Transaction>;
