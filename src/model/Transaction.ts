@@ -19,9 +19,6 @@ export class Transaction {
   /** @internal */
   wrapped: bkper.Transaction
 
-  creditAccount: Account;
-
-  debitAccount: Account
 
   /** @internal */
   book: Book;
@@ -293,13 +290,9 @@ export class Transaction {
    */
   public async getCreditAccount(): Promise<Account> {
     if (!this.wrapped.creditAccount) {
-      this.creditAccount = null;
       return null;
     }
-    if (this.creditAccount == null) {
-      this.creditAccount = await this.book.getAccount(this.wrapped.creditAccount.id);
-    }
-    return this.creditAccount;
+    return await this.book.getAccount(this.wrapped.creditAccount.id);
 
   }
 
@@ -322,10 +315,15 @@ export class Transaction {
    * 
    * @returns This Transaction, for chainning.
    */
-  public setCreditAccount(account: Account): Transaction {
-    if (account != null && account.getId() != null) {
-      this.wrapped.creditAccount = account.wrapped
-      this.creditAccount = account;
+  public setCreditAccount(account: Account | bkper.Account): Transaction {
+    if (account instanceof Account) {
+      if (account != null && account.getId() != null) {
+        this.wrapped.creditAccount = account.wrapped
+      }
+    } else {
+      if (account != null && account.id != null) {
+        this.wrapped.creditAccount = account
+      }
     }
     return this;
   }
@@ -338,7 +336,7 @@ export class Transaction {
    * 
    * @returns This Transaction, for chainning.
    */
-  public from(account: Account): Transaction {
+  public from(account: Account | bkper.Account): Transaction {
     return this.setCreditAccount(account);
   }
 
@@ -350,13 +348,10 @@ export class Transaction {
    */
   public async getDebitAccount(): Promise<Account> {
     if (!this.wrapped.debitAccount) {
-      this.debitAccount = null;
       return null;
     }
-    if (this.debitAccount == null) {
-      this.debitAccount = await this.book.getAccount(this.wrapped.debitAccount.id);
-    }
-    return this.debitAccount;  }
+    return await this.book.getAccount(this.wrapped.debitAccount.id);
+  }
 
   /**
    * @returns The debit account name.
@@ -377,10 +372,15 @@ export class Transaction {
    * 
    * @returns This Transaction, for chainning.
    */
-  public setDebitAccount(account: Account): Transaction {
-    if (account != null && account.getId() != null) {
-      this.wrapped.debitAccount = account.wrapped
-      this.debitAccount = account;
+  public setDebitAccount(account: Account | bkper.Account): Transaction {
+    if (account instanceof Account) {
+      if (account != null && account.getId() != null) {
+        this.wrapped.debitAccount = account.wrapped
+      }
+    } else {
+      if (account != null && account.id != null) {
+        this.wrapped.debitAccount = account
+      }
     }
     return this;
   }
@@ -393,7 +393,7 @@ export class Transaction {
    * 
    * @returns This Transaction, for chainning.
    */
-  public to(account: Account): Transaction {
+  public to(account: Account | bkper.Account): Transaction {
     return this.setDebitAccount(account);
   }
 

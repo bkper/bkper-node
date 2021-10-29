@@ -310,12 +310,8 @@ export class Transaction {
     book: Book;
     check(): Promise<Transaction>;
     create(): Promise<Transaction>;
-    // (undocumented)
-    creditAccount: Account;
-    // (undocumented)
-    debitAccount: Account;
     deleteProperty(key: string): Transaction;
-    from(account: Account): Transaction;
+    from(account: Account | bkper.Account): Transaction;
     getAccountBalance(raw?: boolean): Promise<Amount>;
     // (undocumented)
     getAgentId(): string;
@@ -376,16 +372,16 @@ export class Transaction {
     remove(): Promise<Transaction>;
     restore(): Promise<Transaction>;
     setAmount(amount: Amount | number | string): Transaction;
-    setCreditAccount(account: Account): Transaction;
+    setCreditAccount(account: Account | bkper.Account): Transaction;
     setDate(date: string | Date): Transaction;
-    setDebitAccount(account: Account): Transaction;
+    setDebitAccount(account: Account | bkper.Account): Transaction;
     setDescription(description: string): Transaction;
     setProperties(properties: {
         [key: string]: string;
     }): Transaction;
     setProperty(key: string, value: string): Transaction;
     setUrls(urls: string[]): Transaction;
-    to(account: Account): Transaction;
+    to(account: Account | bkper.Account): Transaction;
     uncheck(): Promise<Transaction>;
     update(): Promise<Transaction>;
     // @internal (undocumented)
