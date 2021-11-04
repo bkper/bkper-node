@@ -275,10 +275,10 @@ export class Account {
    * 
    * @returns This Account, for chainning.
    */  
-  public setGroups(groups: string[] | Group[]): Account {
+  public setGroups(groups: Group[] | bkper.Group[]): Account {
     this.wrapped.groups = null;
     if (groups != null) {
-      groups.forEach((group: string | Group) => this.addGroup(group))
+      groups.forEach(group => this.addGroup(group))
     }
     return this;
   }
@@ -288,22 +288,16 @@ export class Account {
    * 
    * @returns This Account, for chainning.
    */
-  public async addGroup(group: string | Group): Promise<Account> {
+  public addGroup(group: Group | bkper.Group): Account {
     if (this.wrapped.groups == null) {
       this.wrapped.groups = [];
     }
 
-    let groupObject: Group = null;
     if (group instanceof Group) {
-      groupObject = group;
-    } else if (typeof group == "string") {
-      groupObject = await this.book.getGroup(group);
+      this.wrapped.groups.push(group.wrapped)
+    } else {
+      this.wrapped.groups.push(group)
     }
-
-    if (groupObject) {
-      this.wrapped.groups.push(groupObject.wrapped)
-    }
-
 
     return this;
   }

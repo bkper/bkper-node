@@ -6,7 +6,7 @@
 
 // @public
 export class Account {
-    addGroup(group: string | Group): Promise<Account>;
+    addGroup(group: Group | bkper.Group): Account;
     // @internal (undocumented)
     book: Book;
     create(): Promise<Account>;
@@ -34,7 +34,7 @@ export class Account {
     remove(): Promise<Account>;
     removeGroup(group: string | Group): Promise<Account>;
     setArchived(archived: boolean): Account;
-    setGroups(groups: string[] | Group[]): Account;
+    setGroups(groups: Group[] | bkper.Group[]): Account;
     setName(name: string): Account;
     setProperties(properties: {
         [key: string]: string;
