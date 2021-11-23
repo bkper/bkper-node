@@ -102,13 +102,6 @@ export class App {
     }
 
 // @public
-export enum BalanceType {
-    CUMULATIVE = "CUMULATIVE",
-    PERIOD = "PERIOD",
-    TOTAL = "TOTAL"
-}
-
-// @public
 export class Bkper {
     static getBook(id: string): Promise<Book>;
     static setApiKey(key: string): App;
