@@ -20,7 +20,6 @@ export { TransactionIterator } from './model/TransactionIterator'
 export { 
   Periodicity, 
   AccountType,
-  BalanceType,
   DecimalSeparator,
   Permission
 } from './model/Enums'
