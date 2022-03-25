@@ -18,31 +18,10 @@ export async function deleteGroup(bookId: string, group: bkper.Group): Promise<b
 }
 
 
-export async function createGroups(bookId: string, groups: bkper.Group[]): Promise<bkper.Group[]> {
-
-  let groupList: bkper.GroupList = {
-    items: groups
-  };
-
-  var groupsBatchJSON = JSON.stringify(groupList);
-
-  var response = await new HttpBooksApiV5Request(`${bookId}/groups/batch`).setMethod('POST').setPayload(groupsBatchJSON).fetch();
-
-  if (response == null ) {
-    return [];
-  }
-
-  var groupsPlain = response.data;
-  if (groupsPlain.items == null) {
-    return [];
-  }
-  return groupsPlain.items;
-}
-
 export async function getGroupsByAccountId(bookId: string, accountId: string): Promise<bkper.Group[]> {
   var response = await new HttpBooksApiV5Request(`${bookId}/accounts/${accountId}/groups`).setMethod('GET').fetch();
   var groupsPlain = response.data;
-  if (groupsPlain.items == null) {
+  if (!groupsPlain?.items) {
     return [];
   }
   return groupsPlain.items;
@@ -51,25 +30,21 @@ export async function getGroupsByAccountId(bookId: string, accountId: string): P
 export async function getGroups(bookId: string): Promise<bkper.Group[]> {
   var response = await new HttpBooksApiV5Request(`${bookId}/groups`).setMethod('GET').fetch();
   var groupsPlain = response.data;
-  if (groupsPlain.items == null) {
+  if (!groupsPlain?.items) {
     return [];
   }
   return groupsPlain.items;
 }
 
 export async function getGroup(bookId: string, idOrName: string): Promise<bkper.Group> {
-  try {
     var response = await new HttpBooksApiV5Request(`${bookId}/groups/${encodeURIComponent(idOrName)}`).setMethod('GET').fetch();
     return response.data;
-  } catch (error) {
-    return null;
-  }
 }
 
 export async function getAccounts(bookId: string, idOrName: string): Promise<bkper.Account[]> {
   var response = await new HttpBooksApiV5Request(`${bookId}/groups/${encodeURIComponent(idOrName)}/accounts`).setMethod('GET').fetch();
   var accountsPlain = response.data;
-  if (accountsPlain.items == null) {
+  if (!accountsPlain?.items) {
     return [];
   }
   return accountsPlain.items;

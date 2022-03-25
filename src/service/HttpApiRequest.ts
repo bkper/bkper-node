@@ -8,8 +8,7 @@ import { NODE_ENV_DEV } from '../utils';
 type HttpMethod = "GET"|"POST"|"PUT"|"PATCH"|"DELETE";
 const httpsAgent = new https.Agent({keepAlive: true});
 
-interface HttpError {
-  error: {
+export interface HttpError {
     errors:
       {
         domain: string,
@@ -18,7 +17,10 @@ interface HttpError {
       }[]
     code: number,
     message: string
-  }
+}
+
+export interface HttpResponse {
+    data: any
 }
 
 export class HttpApiRequest  {
@@ -86,7 +88,7 @@ export class HttpApiRequest  {
   }
 
 
-  async fetch(): Promise<GaxiosResponse> {
+  async fetch(): Promise<HttpResponse> {
 
     this.headers['Authorization'] = `Bearer ${await getAccessToken()}`;
     this.addParam('key', HttpApiRequest.API_KEY);
@@ -108,9 +110,13 @@ export class HttpApiRequest  {
         }
       })
     } catch (e) {
-      let error: HttpError = e.response.data
-      if (error.error) {
-        throw error.error.message;
+      let error: HttpError = e.response.data?.error
+      if (error) {
+        if (error.code == 404) {
+            return {data: null};
+        } else {
+            throw error.message;
+        }
       } else {
         throw e.message;
       }

@@ -627,6 +627,9 @@ export class Book {
    */
   public async getTransaction(id: string): Promise<Transaction> {
     let wrapped = await TransactionService.getTransaction(this.getId(), id);
+    if (!wrapped) {
+      return null;
+    }
     let transaction = Utils.wrapObject(new Transaction(), wrapped);
     this.configureTransaction_(transaction);
     return transaction;
