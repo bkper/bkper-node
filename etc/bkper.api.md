@@ -120,6 +120,8 @@ export class Book {
     formatValue(value: Amount | number): string;
     getAccount(idOrName: string): Promise<Account>;
     // (undocumented)
+    getClosingDate(): string;
+    // (undocumented)
     getCollection(): Collection;
     // (undocumented)
     getDatePattern(): string;
@@ -174,6 +176,7 @@ export class Book {
     // (undocumented)
     removeGroupCache(group: Group): void;
     round(value: Amount | number): Amount;
+    setClosingDate(closingDate: string): Book;
     setDatePattern(datePattern: string): Book;
     setDecimalSeparator(decimalSeparator: DecimalSeparator): Book;
     setFractionDigits(fractionDigits: number): Book;
