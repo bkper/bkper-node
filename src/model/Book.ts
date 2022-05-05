@@ -367,6 +367,15 @@ export class Book {
         return Utils.formatDate(date, this.getDatePattern(), timeZone);
     }
 
+    /**
+     * Parse a date string according to date pattern and timezone of the Book. 
+     * 
+     * Also parse ISO yyyy-mm-dd format.
+     */
+     public parseDate(date: string): Date {
+        return Utils.parseDate(date, this.getDatePattern(), this.getTimeZone());
+    }    
+
 
     /**
      * Formats a value according to [[DecimalSeparator]] and fraction digits of the Book.

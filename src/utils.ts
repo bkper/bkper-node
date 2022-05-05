@@ -136,7 +136,13 @@ export function formatDateISO(date: Date, timeZone: string): string {
 }
 
 export function parseDate(date: string, pattern: string, timeZone: string): Date {
-  return DateTime.fromFormat(date, pattern, {zone: timeZone}).toJSDate();
+    let dateObject = DateTime.fromFormat(date, pattern, {zone: timeZone}).toJSDate();
+    if (dateObject instanceof Date && !isNaN(dateObject.getTime())) {
+        console.log(dateObject)
+        return dateObject
+    } else {
+        return DateTime.fromFormat(date, 'yyyy-MM-dd', {zone: timeZone}).toJSDate();
+    }
 }
 
 export function getDateFormatterPattern(datePattern: string, periodicity: Periodicity): string {

@@ -33,6 +33,10 @@ describe('utils', () => {
       let value = utils.parseDate('25/01/2020', 'dd/MM/yyyy', 'America/Sao_Paulo');
       expect(value.toString()).to.equal(new Date(2020, 0, 25).toString());
     });
+    it('should parse ISO', () => {
+      let value = utils.parseDate('2020-01-25', 'dd/MM/yyyy', 'America/Sao_Paulo');
+      expect(value.toString()).to.equal(new Date(2020, 0, 25).toString());
+    });
 
   });
   
