@@ -172,6 +172,7 @@ export class Book {
     newFile(): File;
     newGroup(): Group;
     newTransaction(): Transaction;
+    parseDate(date: string): Date;
     parseValue(value: string): Amount;
     // (undocumented)
     removeGroupCache(group: Group): void;
