@@ -159,27 +159,20 @@ export class Account {
 
   /**
    * Gets the balance based on credit nature of this Account.
-   *  
-   * @param raw - True to get the raw balance, no matter the credit nature of this Account.
-   * 
+   * @deprecated Use `Book.getBalancesReport` instead.
    * @returns The balance of this account.
    */
-  public getBalance(raw?: boolean): Amount {
+  public getBalance(): Amount {
     var balance = new Amount('0');
     if (this.wrapped.balance != null) {
       balance = round(this.wrapped.balance, this.book.getFractionDigits());
     }
-
-    if (raw) {
-      return balance;
-    } else {
-      return getRepresentativeValue(balance, this.isCredit());
-    }
+    return balance;
   }
 
   /**
    * Gets the raw balance, no matter credit nature of this Account.
-   *  
+   * @deprecated Use `Book.getBalancesReport` instead.
    * @returns The balance of this account.
    */  
      public getBalanceRaw(): Amount {
