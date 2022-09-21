@@ -11,7 +11,9 @@ export class Account {
     book: Book;
     create(): Promise<Account>;
     deleteProperty(key: string): Account;
-    getBalance(raw?: boolean): Amount;
+    // @deprecated
+    getBalance(): Amount;
+    // @deprecated
     getBalanceRaw(): Amount;
     getGroups(): Promise<Group[]>;
     getId(): string;
@@ -266,7 +268,7 @@ export class Group {
     remove(): Promise<Group>;
     setHidden(hidden: boolean): Group;
     setName(name: string): Group;
-    setParent(group: Group): Group;
+    setParent(group: Group | null): Group;
     setProperties(properties: {
         [key: string]: string;
     }): Group;
