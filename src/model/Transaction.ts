@@ -366,7 +366,7 @@ export class Transaction {
 
   /**
    * 
-   * Sets the debit/origin Account of the Transaction. Same as to().
+   * Sets the debit/destination Account of the Transaction. Same as to().
    * 
    * @param account - Account id, name or object.
    * 
@@ -387,7 +387,7 @@ export class Transaction {
 
   /**
    * 
-   * Sets the debit/origin Account of the Transaction. Same as setDebitAccount().
+   * Sets the debit/destination Account of the Transaction. Same as setDebitAccount().
    * 
    * @param account - Account id, name or object.
    * 
