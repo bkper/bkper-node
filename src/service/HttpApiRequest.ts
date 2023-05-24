@@ -1,41 +1,41 @@
 
 import { getOAuthToken, isLoggedIn } from '../auth/local-auth-service';
 import { GaxiosError, request, GaxiosResponse } from 'gaxios';
-import { OAuthTokenProvider } from '../auth/OAuthTokenProvider';
 import https from 'https';
 import { NODE_ENV_DEV } from '../utils';
+import { Config } from '../model/Config';
+import { config } from 'dotenv/types';
 
-type HttpMethod = "GET"|"POST"|"PUT"|"PATCH"|"DELETE";
-const httpsAgent = new https.Agent({keepAlive: true});
+type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+const httpsAgent = new https.Agent({ keepAlive: true });
 
 export interface HttpError {
-    errors:
-      {
-        domain: string,
-        reason: string,
-        message: string
-      }[]
-    code: number,
+  errors:
+  {
+    domain: string,
+    reason: string,
     message: string
+  }[]
+  code: number,
+  message: string
 }
 
 export interface HttpResponse {
-    data: any
+  data: any
 }
 
-export class HttpApiRequest  {
+export class HttpApiRequest {
 
-  private params: Array<{name: string, value: string}> = [];
+  private params: Array<{ name: string, value: string }> = [];
   private url: string;
-  private headers: {[key: string]: string} = {};
+  private headers: { [key: string]: string } = {};
   private method: HttpMethod = 'GET';
   private payload: any = null;
 
-  public static API_KEY: string;
-  public static OAUTH_TOKEN_PROVIDER: OAuthTokenProvider;
-  
+  public static config: Config = {}
+
   constructor(path: string) {
-    this.url = `https://app.bkper.com/_ah/api/bkper/${path}`;
+    this.url = `${HttpApiRequest.config.apiBaseUrl || "https://app.bkper.com/_ah/api/bkper"}/${path}`;
   }
 
   public setMethod(method: HttpMethod) {
@@ -44,12 +44,16 @@ export class HttpApiRequest  {
   }
 
   public setHeader(name: string, value: string) {
-    this.headers[name] = value;
+    if (value) {
+      this.headers[name] = value;
+    }
     return this;
   }
 
   public addParam(name: string, value: any) {
-    this.params.push({name, value});
+    if (value) {
+      this.params.push({ name, value });
+    }
     return this;
   }
 
@@ -59,9 +63,9 @@ export class HttpApiRequest  {
     return this;
   }
 
-    /**
-   * Gets the result url, with query params appended.
-   */
+  /**
+ * Gets the result url, with query params appended.
+ */
   private getUrl(): string {
     let url = this.url;
     if (this.params != null) {
@@ -72,16 +76,16 @@ export class HttpApiRequest  {
         i++;
       }
       for (const param of this.params) {
-          if (i > 0) {
-            url += "&";
-          }
-          var key = param.name;
-          var value = param.value;          
-          if (value != null) {
-            url += key + "=" + encodeURIComponent(value);
-            i++;
-          }
-      }      
+        if (i > 0) {
+          url += "&";
+        }
+        var key = param.name;
+        var value = param.value;
+        if (value != null) {
+          url += key + "=" + encodeURIComponent(value);
+          i++;
+        }
+      }
 
     }
     return url
@@ -91,7 +95,8 @@ export class HttpApiRequest  {
   async fetch(): Promise<HttpResponse> {
 
     this.headers['Authorization'] = `Bearer ${await getAccessToken()}`;
-    this.addParam('key', HttpApiRequest.API_KEY);
+    this.addParam('key', HttpApiRequest.config.apiKey);
+    this.setHeader('cookie', HttpApiRequest.config.cookieHeaderProvider ? HttpApiRequest.config.cookieHeaderProvider() : null);
     // this.httpRequest.setMuteHttpExceptions(true);
     const url = this.getUrl();
     try {
@@ -100,25 +105,30 @@ export class HttpApiRequest  {
         method: this.method,
         headers: this.headers,
         body: this.payload,
-        agent: httpsAgent,
+        agent: url.startsWith('https') ?  httpsAgent : null,
         retryConfig: {
-          httpMethodsToRetry: ['GET','PUT','POST','PATCH','HEAD','OPTIONS','DELETE'],
+          httpMethodsToRetry: ['GET', 'PUT', 'POST', 'PATCH', 'HEAD', 'OPTIONS', 'DELETE'],
           statusCodesToRetry: [[100, 199], [429, 429], [500, 599]],
           retry: process.env.NODE_ENV == NODE_ENV_DEV ? 0 : 6,
-          onRetryAttempt: (err: GaxiosError) => {console.log(`${err.message} - Retrying... `)},
+          onRetryAttempt: (err: GaxiosError) => { console.log(`${err.message} - Retrying... `) },
           retryDelay: 1000
         }
       })
     } catch (e) {
-      let error: HttpError = e.response.data?.error
-      if (error) {
-        if (error.code == 404) {
-            return {data: null};
-        } else {
-            throw error.message;
-        }
+      if (HttpApiRequest.config.requestErrorHandler) {
+        throw HttpApiRequest.config.requestErrorHandler(e)
       } else {
-        throw e.message;
+        //Default error handler
+        let error: HttpError = e.response.data?.error
+        if (error) {
+          if (error.code == 404) {
+            return { data: null };
+          } else {
+            throw error.message;
+          }
+        } else {
+          throw e.message;
+        }
       }
     }
 
@@ -127,25 +137,28 @@ export class HttpApiRequest  {
 
 async function getAccessToken() {
   let token: string = null;
-  if (HttpApiRequest.OAUTH_TOKEN_PROVIDER) {
-    token = await HttpApiRequest.OAUTH_TOKEN_PROVIDER();
+  if (HttpApiRequest.config.oauthTokenProvider) {
+    token = await HttpApiRequest.config.oauthTokenProvider();
   }
 
   if (isLoggedIn() && token == null) {
     token = await getOAuthToken();
   }
 
-  return token;
-}
+  token = token.replace('Bearer ', '')
+  token = token.replace('bearer ', '')
 
-export class HttpBooksApiV2Request extends HttpApiRequest {
-  constructor(service: string) {
-    super(`v2/ledgers/${service}`)
-  }
+  return token;
 }
 
 export class HttpBooksApiV5Request extends HttpApiRequest {
   constructor(service: string) {
     super(`v5/books/${service}`)
+  }
+}
+
+export class HttpApiV5Request extends HttpApiRequest {
+  constructor(service: string) {
+    super(`v5/${service}`)
   }
 }

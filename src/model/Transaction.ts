@@ -318,7 +318,7 @@ export class Transaction {
   public setCreditAccount(account: Account | bkper.Account): Transaction {
     if (account instanceof Account) {
       if (account != null && account.getId() != null) {
-        this.wrapped.creditAccount = account.wrapped
+        this.wrapped.creditAccount = account.json()
       }
     } else {
       if (account != null && account.id != null) {
@@ -375,7 +375,7 @@ export class Transaction {
   public setDebitAccount(account: Account | bkper.Account): Transaction {
     if (account instanceof Account) {
       if (account != null && account.getId() != null) {
-        this.wrapped.debitAccount = account.wrapped
+        this.wrapped.debitAccount = account.json()
       }
     } else {
       if (account != null && account.id != null) {

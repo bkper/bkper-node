@@ -17,7 +17,7 @@ import * as Utils from '../utils';
 export class Group {
 
   /** @internal */
-  wrapped: bkper.Group
+  private wrapped: bkper.Group
 
   accounts: Set<Account>
 

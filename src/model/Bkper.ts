@@ -1,8 +1,10 @@
 import { Book } from "./Book";
 import { App } from "./App";
 import * as BookService from '../service/book-service';
+import * as UserService from '../service/user-service';
 import { HttpApiRequest } from '../service/HttpApiRequest';
-import { OAuthTokenProvider } from '../auth/OAuthTokenProvider';
+import { User } from "./User";
+import { Config } from "./Config";
 
 /**
  * This is the main Entry Point of the [bkper-node](https://www.npmjs.com/package/bkper) library.
@@ -22,33 +24,20 @@ export class Bkper {
     return new Book(book);
   }
 
-
   /**
-   * Sets the API key to identify the agent.
-   * 
-   * API keys are intended for agent identification only, not for authentication. [Learn more](https://cloud.google.com/endpoints/docs/frameworks/java/when-why-api-key)
-   * 
-   * See how to create your api key [here](https://cloud.google.com/docs/authentication/api-keys).
-   *
-   * @param key - The key from GCP API & Services Credentials console.
-   * 
-   */
-  public static setApiKey(key: string): App {
-    HttpApiRequest.API_KEY = key;
-    return new App();
+   * Gets the current logged [[User]].
+   */  
+  public static async getUser(): Promise<User> {
+    let user = await UserService.getUser();
+    return new User(user);
   }
 
 
   /**
-   * Sets the [[OAuthTokenProvider]].
-   * 
-   * OAuthTokenProvider issue a valid OAuth token upon calling the Bkper Rest API. 
-   * 
-   * @param oauthTokenProvider - The [[OAuthTokenProvider]] implementation.
-   * 
+   * Sets the API [[Config]] object.
    */
-  public static async setOAuthTokenProvider(oauthTokenProvider: OAuthTokenProvider) {
-    HttpApiRequest.OAUTH_TOKEN_PROVIDER = oauthTokenProvider;
+  public static setConfig(config: Config) {
+    HttpApiRequest.config = config;
   }
 
 }

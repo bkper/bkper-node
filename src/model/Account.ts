@@ -20,7 +20,7 @@ import * as Utils from '../utils';
 export class Account {
 
   /** @internal */
-  wrapped: bkper.Account;
+  private wrapped: bkper.Account;
   
   /** @internal */
   book: Book;
@@ -287,7 +287,7 @@ export class Account {
     }
 
     if (group instanceof Group) {
-      this.wrapped.groups.push(group.wrapped)
+      this.wrapped.groups.push(group.json())
     } else {
       this.wrapped.groups.push(group)
     }

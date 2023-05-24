@@ -20,11 +20,7 @@ export async function deleteGroup(bookId: string, group: bkper.Group): Promise<b
 
 export async function getGroupsByAccountId(bookId: string, accountId: string): Promise<bkper.Group[]> {
   var response = await new HttpBooksApiV5Request(`${bookId}/accounts/${accountId}/groups`).setMethod('GET').fetch();
-  var groupsPlain = response.data;
-  if (!groupsPlain?.items) {
-    return [];
-  }
-  return groupsPlain.items;
+  return response?.data?.items || [];
 }
 
 export async function getGroups(bookId: string): Promise<bkper.Group[]> {
