@@ -132,6 +132,30 @@ export class Connection {
   }
 
   /**
+   * Clean any token property
+   */
+  public clearTokenProperties(): void {
+    this.getPropertyKeys().filter(key => key.includes("token")).forEach(key => this.deleteProperty(key))
+  }
+
+  /**
+   * Gets the custom properties keys stored in the Connection.
+   */
+  public getPropertyKeys(): string[] {
+    let properties = this.getProperties();
+    let propertyKeys: string[] = []
+    if (properties) {
+      for (var key in properties) {
+        if (Object.prototype.hasOwnProperty.call(properties, key)) {
+          propertyKeys.push(key)
+        }
+      }
+    }
+    propertyKeys = propertyKeys.sort();
+    return propertyKeys;
+  }
+
+  /**
    * Perform create new connection.
    */
   public async create(): Promise<Connection> {
