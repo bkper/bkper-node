@@ -18,17 +18,24 @@ export class User {
   }
 
   /**
-   * @returns The id of this User
+   * @returns The id of the User
    */
   public getId(): string {
     return this.wrapped.id;
   }
 
   /**
-   * @returns The name of this Group
+   * @returns The name of the User
    */
   public getName(): string {
     return this.wrapped.name;
+  }  
+
+  /**
+   * @returns The full name of the User
+   */
+  public getFullName(): string {
+    return this.wrapped.fullName;
   }  
 
   /**
