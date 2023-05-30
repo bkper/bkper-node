@@ -10,8 +10,7 @@ export async function loadBook(bookId: string): Promise<bkper.Book> {
 }
 
 export async function updateBook(bookId: string, book: bkper.Book): Promise<bkper.Book> {
-  var payload = JSON.stringify(book);
-  var response = await new HttpBooksApiV5Request(`${bookId}`).setMethod('PUT').setPayload(payload).fetch();
+  var response = await new HttpBooksApiV5Request(`${bookId}`).setMethod('PUT').setPayload(book).fetch();
   return response.data;
 }
 

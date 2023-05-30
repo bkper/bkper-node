@@ -1,8 +1,7 @@
 import {HttpBooksApiV5Request} from './HttpApiRequest';
 
 export async function createAccount(bookId: string, account: bkper.Account): Promise<bkper.Account> {
-  var payload = JSON.stringify(account);
-  var response = await new HttpBooksApiV5Request(`${bookId}/accounts`).setMethod('POST').setPayload(payload).fetch();
+  var response = await new HttpBooksApiV5Request(`${bookId}/accounts`).setMethod('POST').setPayload(account).fetch();
   return response.data;
 }
 

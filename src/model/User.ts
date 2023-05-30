@@ -42,13 +42,13 @@ export class User {
    * @returns The User connections
    */
   public async getConnections(): Promise<Connection[]> {
-    const connectionsPlain = await ConnectionService.listConnections();
-    return Utils.wrapObjects(new Connection(), connectionsPlain);
+    const json = await ConnectionService.listConnections();
+    return json.map(c => new Connection(c));
   }
 
   public async getConnection(id: string): Promise<Connection> {
-    const connectionPlain = await ConnectionService.getConnection(id);
-    return Utils.wrapObject(new Connection(), connectionPlain);
+    const json = await ConnectionService.getConnection(id);
+    return new Connection(json)
   }
 
 }

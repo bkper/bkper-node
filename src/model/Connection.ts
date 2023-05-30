@@ -1,4 +1,7 @@
 import * as ConnectionService from '../service/connection-service';
+import { Integration } from './Integration';
+import * as Utils from '../utils';
+
 
 /**
  * This class defines a Connection from an User to an external service.
@@ -9,6 +12,10 @@ export class Connection {
 
   /** @internal */
   private wrapped: bkper.Connection
+
+  constructor(json?: bkper.Connection) {
+    this.wrapped = json || {};
+  }
 
   /**
    * @returns The wrapped plain json object
@@ -153,6 +160,12 @@ export class Connection {
     }
     propertyKeys = propertyKeys.sort();
     return propertyKeys;
+  }
+
+  public async getIntegrations(): Promise<Integration[]> {
+    const integrationsPlain = await ConnectionService.listIntegrations(this.getId());
+    const integrations = Utils.wrapObjects(new Integration(), integrationsPlain);
+    return integrations;
   }
 
   /**

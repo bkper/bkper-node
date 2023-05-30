@@ -1,14 +1,12 @@
 import { HttpBooksApiV5Request } from "./HttpApiRequest";
 
 export async function createGroup(bookId: string, group: bkper.Group): Promise<bkper.Group> {
-  var payload = JSON.stringify(group);
-  var response = await new HttpBooksApiV5Request(`${bookId}/groups`).setMethod('POST').setPayload(payload).fetch();
+  var response = await new HttpBooksApiV5Request(`${bookId}/groups`).setMethod('POST').setPayload(group).fetch();
   return response.data;
 }
 
 export async function updateGroup(bookId: string, group: bkper.Group): Promise<bkper.Group> {
-  var payload = JSON.stringify(group);
-  var response = await new HttpBooksApiV5Request(`${bookId}/groups`).setMethod('PUT').setPayload(payload).fetch();
+  var response = await new HttpBooksApiV5Request(`${bookId}/groups`).setMethod('PUT').setPayload(group).fetch();
   return response.data;
 }
 

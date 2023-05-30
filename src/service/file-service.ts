@@ -1,8 +1,7 @@
 import { HttpBooksApiV5Request } from "./HttpApiRequest";
 
 export async function createFile(bookId: string, file: bkper.File): Promise<bkper.File> {
-  var payload = JSON.stringify(file);
-  var response = await new HttpBooksApiV5Request(`${bookId}/files`).setMethod('POST').setPayload(payload).fetch();
+  var response = await new HttpBooksApiV5Request(`${bookId}/files`).setMethod('POST').setPayload(file).fetch();
   return response.data;
 }
 

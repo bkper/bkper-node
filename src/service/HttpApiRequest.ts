@@ -59,7 +59,7 @@ export class HttpApiRequest {
 
 
   public setPayload(payload: any) {
-    this.payload = payload;
+    this.payload = typeof payload === "string" ? payload : JSON.stringify(payload);
     return this;
   }
 
