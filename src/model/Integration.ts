@@ -8,10 +8,14 @@ export class Integration {
   /** @internal */
   private wrapped: bkper.Integration
 
+  constructor(json: bkper.Integration) {
+    this.wrapped = json;
+  }
+
   /**
    * @returns The wrapped plain json object
    */
-  public json(): bkper.Book {
+  public json(): bkper.Integration {
     return this.wrapped;
   }  
 

@@ -30,12 +30,6 @@ export class Book {
   private wrapped: bkper.Book;
 
   /** @internal */
-  private accounts: Account[];
-
-  /** @internal */
-  private integrations: Integration[];
-
-  /** @internal */
   private collection: Collection;
 
   /** @internal */
@@ -433,11 +427,27 @@ export class Book {
   }
 
   public async getIntegrations(): Promise<Integration[]> {
-    if (!this.integrations) {
       const integrationsPlain = await IntegrationService.listIntegrations(this.getId());
-      this.integrations = Utils.wrapObjects(new Integration(), integrationsPlain);
+      const integrations = integrationsPlain.map(i => new Integration(i));
+      return integrations;
+  }
+
+  public async createIntegration(integration: bkper.Integration | Integration): Promise<Integration> {
+    if (integration instanceof Integration) {
+      integration = await IntegrationService.createIntegration(this.getId(), integration.json())
+    } else {
+      integration = await IntegrationService.createIntegration(this.getId(), integration)
     }
-    return this.integrations;
+    return new Integration(integration);
+  }
+
+  public async updateIntegration(integration: bkper.Integration): Promise<Integration> {
+    if (integration instanceof Integration) {
+      integration = await IntegrationService.updateIntegration(this.getId(), integration.json())
+    } else {
+      integration = await IntegrationService.updateIntegration(this.getId(), integration)
+    }
+    return new Integration(integration);
   }
 
 

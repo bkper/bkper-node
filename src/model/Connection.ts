@@ -20,7 +20,7 @@ export class Connection {
   /**
    * @returns The wrapped plain json object
    */
-  public json(): bkper.Book {
+  public json(): bkper.Connection {
     return this.wrapped;
   }
 
@@ -71,6 +71,23 @@ export class Connection {
    */
   public setUUID(uuid: string): Connection {
     this.wrapped.uuid = uuid;
+    return this;
+  }
+
+  /**
+   * @returns The connection type
+   */
+  public getType(): "APP"| "BANK" {
+    return this.wrapped.type;
+  }
+
+  /**
+   * Sets the connection type.
+   * 
+   * @returns This Connection, for chainning.
+   */
+  public setType(type: "APP"| "BANK"): Connection {
+    this.wrapped.type = type;
     return this;
   }
 
@@ -164,7 +181,7 @@ export class Connection {
 
   public async getIntegrations(): Promise<Integration[]> {
     const integrationsPlain = await ConnectionService.listIntegrations(this.getId());
-    const integrations = Utils.wrapObjects(new Integration(), integrationsPlain);
+    const integrations = integrationsPlain.map(i => new Integration(i));
     return integrations;
   }
 
