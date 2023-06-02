@@ -75,6 +75,14 @@ export class Connection {
   }
 
   /**
+   * @returns The name of universal unique identifier of the connection
+   */
+  public getUUID(): string {
+    return this.wrapped.uuid;
+  }
+
+
+  /**
    * @returns The connection type
    */
   public getType(): "APP"| "BANK" {
