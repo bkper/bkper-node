@@ -44,9 +44,7 @@ export class Account {
     setProperty(key: string, value: string): Account;
     setType(type: AccountType): Account;
     update(): Promise<Account>;
-    // @internal (undocumented)
-    wrapped: bkper.Account;
-}
+    }
 
 // @public
 export enum AccountType {
@@ -106,8 +104,9 @@ export class App {
 // @public
 export class Bkper {
     static getBook(id: string): Promise<Book>;
-    static setApiKey(key: string): App;
-    static setOAuthTokenProvider(oauthTokenProvider: OAuthTokenProvider): Promise<void>;
+    static getUser(): Promise<User>;
+    // Warning: (ae-forgotten-export) The symbol "Config" needs to be exported by the entry point index.d.ts
+    static setConfig(config: Config): void;
 }
 
 // @public
@@ -118,8 +117,10 @@ export class Book {
     // (undocumented)
     configureTransactions_(transactions: Transaction[]): Transaction[];
     continueTransactionIterator(query: string, continuationToken: string): TransactionIterator;
+    // (undocumented)
+    createIntegration(integration: bkper.Integration | Integration): Promise<Integration>;
     formatDate(date: Date, timeZone?: string): string;
-    formatValue(value: Amount | number): string;
+    formatValue(value: Amount | number | null | undefined): string;
     getAccount(idOrName: string): Promise<Account>;
     // (undocumented)
     getClosingDate(): string;
@@ -138,6 +139,8 @@ export class Book {
     getGroups(): Promise<Group[]>;
     getGroupsByAccount(accountIdOrName: string): Promise<Group[]>;
     getId(): string;
+    // (undocumented)
+    getIntegrations(): Promise<Integration[]>;
     // (undocumented)
     getLastUpdateMs(): number;
     // (undocumented)
@@ -196,6 +199,8 @@ export class Book {
     update(): Promise<Book>;
     // @internal (undocumented)
     updateGroupCache(group: Group): void;
+    // (undocumented)
+    updateIntegration(integration: bkper.Integration): Promise<Integration>;
     }
 
 // @public
@@ -208,6 +213,41 @@ export class Collection {
     getId(): string;
     // (undocumented)
     getName(): string;
+    }
+
+// @public
+export class Connection {
+    constructor(json?: bkper.Connection);
+    clearTokenProperties(): void;
+    create(): Promise<Connection>;
+    deleteProperty(key: string): Connection;
+    // (undocumented)
+    getAgentId(): string;
+    // (undocumented)
+    getId(): string;
+    // (undocumented)
+    getIntegrations(): Promise<Integration[]>;
+    // (undocumented)
+    getName(): string;
+    getProperties(): {
+        [key: string]: string;
+    };
+    getProperty(...keys: string[]): string;
+    getPropertyKeys(): string[];
+    // (undocumented)
+    getType(): "APP" | "BANK";
+    // (undocumented)
+    getUUID(): string;
+    // (undocumented)
+    json(): bkper.Connection;
+    setAgentId(agentId: string): Connection;
+    setName(name: string): Connection;
+    setProperties(properties: {
+        [key: string]: string;
+    }): Connection;
+    setProperty(key: string, value: string): Connection;
+    setType(type: "APP" | "BANK"): Connection;
+    setUUID(uuid: string): Connection;
     }
 
 // @public
@@ -274,14 +314,27 @@ export class Group {
     }): Group;
     setProperty(key: string, value: string): Group;
     update(): Promise<Group>;
-    // @internal (undocumented)
-    wrapped: bkper.Group;
-}
+    }
 
 // @public
-export interface OAuthTokenProvider {
-    (): Promise<string>;
-}
+export class Integration {
+    constructor(json: bkper.Integration);
+    deleteProperty(key: string): Integration;
+    // (undocumented)
+    getId(): string;
+    // (undocumented)
+    getName(): string;
+    getProperties(): {
+        [key: string]: string;
+    };
+    getProperty(...keys: string[]): string;
+    // (undocumented)
+    json(): bkper.Integration;
+    setProperties(properties: {
+        [key: string]: string;
+    }): Integration;
+    setProperty(key: string, value: string): Integration;
+    }
 
 // @public
 export enum Periodicity {
@@ -399,6 +452,21 @@ export class TransactionIterator {
     next(): Promise<Transaction>;
     setContinuationToken(continuationToken: string): Promise<void>;
 }
+
+// @public
+export class User {
+    constructor(wrapped: bkper.User);
+    // (undocumented)
+    getConnection(id: string): Promise<Connection>;
+    // (undocumented)
+    getConnections(): Promise<Connection[]>;
+    // (undocumented)
+    getFullName(): string;
+    // (undocumented)
+    getId(): string;
+    // (undocumented)
+    getName(): string;
+    }
 
 
 ```

@@ -96,7 +96,6 @@ export class HttpApiRequest {
 
     this.headers['Authorization'] = `Bearer ${await getAccessToken()}`;
     this.addParam('key', HttpApiRequest.config.apiKey);
-    this.setHeader('cookie', HttpApiRequest.config.cookieHeaderProvider ? HttpApiRequest.config.cookieHeaderProvider() : null);
     // this.httpRequest.setMuteHttpExceptions(true);
     const url = this.getUrl();
     try {

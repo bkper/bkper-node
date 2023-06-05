@@ -16,11 +16,6 @@ export interface Config {
   oauthTokenProvider?: () => Promise<string>;
 
   /*
-   * Cookie header provider
-   */
-  cookieHeaderProvider?: () => string;
-
-  /*
    *
    */
   requestErrorHandler?: (error: any) => any;
