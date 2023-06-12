@@ -93,9 +93,9 @@ export class HttpApiRequest {
 
 
   async fetch(): Promise<HttpResponse> {
-
+    this.addCustomHeaders();
     this.headers['Authorization'] = `Bearer ${await getAccessToken()}`;
-    this.addParam('key', HttpApiRequest.config.apiKey);
+    this.addParam('key', await getApiKey());
     // this.httpRequest.setMuteHttpExceptions(true);
     const url = this.getUrl();
     try {
@@ -130,14 +130,30 @@ export class HttpApiRequest {
         }
       }
     }
-
   }
+
+  private async addCustomHeaders() {
+    if (HttpApiRequest.config.requestHeadersProvider) {
+      const headers = await HttpApiRequest.config.requestHeadersProvider();
+      console.log(`Headers JSON: ${JSON.stringify(headers)}`)
+      Object.entries(headers).forEach(([key, value]) => this.setHeader(key, value));
+    }
+  }
+}
+
+
+async function getApiKey() {
+  if (HttpApiRequest.config.apiKeyProvider) {
+    return await HttpApiRequest.config.apiKeyProvider()
+  }
+  return null;
 }
 
 async function getAccessToken() {
   let token: string = null;
   if (HttpApiRequest.config.oauthTokenProvider) {
     token = await HttpApiRequest.config.oauthTokenProvider();
+    console.log(`Access token: ${token}`)
   }
 
   if (isLoggedIn() && token == null) {

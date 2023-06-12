@@ -32,7 +32,7 @@ program
   .action(async (options) => {
 
     try {
-       Bkper.setConfig({apiKey:process.env.BKPER_API_KEY})
+       Bkper.setConfig({apiKeyProvider: async () => process.env.BKPER_API_KEY})
        let app = new App()
        app.setJson(JSON.parse(fs.readFileSync('./bkperapp.json', 'utf8')))
         .setReadme(fs.readFileSync('./README.md', 'utf8'))

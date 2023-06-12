@@ -8,15 +8,20 @@ export interface Config {
    * 
    * See how to create your api key [here](https://cloud.google.com/docs/authentication/api-keys).
    */  
-  apiKey?: string;
+  apiKeyProvider?: () => Promise<string>;
 
   /*
    * Issue a valid OAuth2 access token with **https://www.googleapis.com/auth/userinfo.email** scope authorized.
    */
   oauthTokenProvider?: () => Promise<string>;
 
+  /**
+   * Provides additional headers to append to the API request
+   */
+  requestHeadersProvider?: () => Promise<{[key: string]: string }>;
+
   /*
-   *
+   * Custom request error handler
    */
   requestErrorHandler?: (error: any) => any;
 
