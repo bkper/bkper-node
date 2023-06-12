@@ -135,7 +135,6 @@ export class HttpApiRequest {
   private async addCustomHeaders() {
     if (HttpApiRequest.config.requestHeadersProvider) {
       const headers = await HttpApiRequest.config.requestHeadersProvider();
-      console.log(`Headers JSON: ${JSON.stringify(headers)}`)
       Object.entries(headers).forEach(([key, value]) => this.setHeader(key, value));
     }
   }
@@ -153,7 +152,6 @@ async function getAccessToken() {
   let token: string = null;
   if (HttpApiRequest.config.oauthTokenProvider) {
     token = await HttpApiRequest.config.oauthTokenProvider();
-    console.log(`Access token: ${token}`)
   }
 
   if (isLoggedIn() && token == null) {
