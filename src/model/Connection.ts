@@ -55,6 +55,13 @@ export class Connection {
   }
 
   /**
+   * @returns The email of the owner of this Connection
+   */
+  public getEmail(): string {
+    return this.wrapped.email;
+  }
+
+  /**
    * Sets the name of the Connection.
    * 
    * @returns This Connection, for chainning.

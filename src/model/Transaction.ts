@@ -695,7 +695,7 @@ export class Transaction {
    * Remove the transaction, sending to trash.
    */
   public async remove(): Promise<Transaction> {
-    let operation = await TransactionService.removeTransaction(this.book.getId(), this.wrapped);
+    let operation = await TransactionService.trashTransaction(this.book.getId(), this.wrapped);
     this.wrapped.trashed = operation.transaction.trashed;
     return this;
   }

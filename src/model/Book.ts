@@ -418,6 +418,15 @@ export class Book {
     return transactions;
   }
 
+  /**
+   * Trash [[Transactions]] on the Book, in batch. 
+   */
+  public async batchTrashTransactions(transactions: Transaction[]): Promise<void> {
+    let transactionPayloads: bkper.Transaction[] = [];
+    transactions.forEach(tx => transactionPayloads.push(tx.wrapped))
+    await TransactionService.trashTransactionsBatch(this.getId(), transactionPayloads);
+  }
+
 
   /**
    * Trigger [Balances Audit](https://help.bkper.com/en/articles/4412038-balances-audit) async process.

@@ -21,6 +21,21 @@ export async function createTransactionsBatch(bookId: string, transactions: bkpe
   return transactionList != null && transactionList.items != null ? transactionList.items : [];
 }
 
+export async function trashTransactionsBatch(bookId: string, transactions: bkper.Transaction[]): Promise<void> {
+
+  let transactionList: bkper.TransactionList = {
+    items: transactions
+  }
+  var payload = JSON.stringify(transactionList);
+
+  let response = await new HttpBooksApiV5Request(`${bookId}/transactions/trash/batch`)
+    .setMethod('PATCH')
+    .setPayload(payload)
+    .fetch();
+
+  transactionList = await response.data;
+}
+
 export async function updateTransaction(bookId: string, transaction: bkper.Transaction): Promise<bkper.TransactionOperation> {
   var response = await new HttpBooksApiV5Request(`${bookId}/transactions`).setMethod('PUT').setPayload(transaction).fetch();
   return response.data;
@@ -41,8 +56,8 @@ export async function uncheckTransaction(bookId: string, transaction: bkper.Tran
   return response.data;
 }
 
-export async function removeTransaction(bookId: string, transaction: bkper.Transaction): Promise<bkper.TransactionOperation> {
-  var response = await new HttpBooksApiV5Request(`${bookId}/transactions/remove`).setMethod('PATCH').setPayload(transaction).fetch();
+export async function trashTransaction(bookId: string, transaction: bkper.Transaction): Promise<bkper.TransactionOperation> {
+  var response = await new HttpBooksApiV5Request(`${bookId}/transactions/trash`).setMethod('PATCH').setPayload(transaction).fetch();
   return response.data;
 }
 

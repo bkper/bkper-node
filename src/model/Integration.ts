@@ -1,3 +1,4 @@
+
 /**
  * This class defines a Integration from an User to an external service.
  * 
@@ -18,6 +19,10 @@ export class Integration {
   public json(): bkper.Integration {
     return this.wrapped;
   }  
+
+  public getBookId(): string {
+    return this.wrapped.bookId
+  }
 
   /**
    * @returns The id of this User
