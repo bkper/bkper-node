@@ -40,4 +40,19 @@ export class Bkper {
     HttpApiRequest.config = config;
   }
 
+  /**
+   * @deprecated Use `setConfig()` instead
+   */
+  public static setApiKey(key: string): App {
+    HttpApiRequest.config.apiKeyProvider = async () => key;
+    return new App();
+  }
+
+  /**
+   * @deprecated Use `setConfig()` instead
+   */
+  public static async setOAuthTokenProvider(oauthTokenProvider: () => Promise<string>) {
+    HttpApiRequest.config.oauthTokenProvider = oauthTokenProvider;
+  }
+
 }
