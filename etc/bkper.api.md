@@ -105,8 +105,12 @@ export class App {
 export class Bkper {
     static getBook(id: string): Promise<Book>;
     static getUser(): Promise<User>;
+    // @deprecated (undocumented)
+    static setApiKey(key: string): App;
     // Warning: (ae-forgotten-export) The symbol "Config" needs to be exported by the entry point index.d.ts
     static setConfig(config: Config): void;
+    // @deprecated (undocumented)
+    static setOAuthTokenProvider(oauthTokenProvider: () => Promise<string>): Promise<void>;
 }
 
 // @public
@@ -114,6 +118,7 @@ export class Book {
     constructor(json: bkper.Book);
     audit(): void;
     batchCreateTransactions(transactions: Transaction[]): Promise<Transaction[]>;
+    batchTrashTransactions(transactions: Transaction[]): Promise<void>;
     // (undocumented)
     configureTransactions_(transactions: Transaction[]): Transaction[];
     continueTransactionIterator(query: string, continuationToken: string): TransactionIterator;
@@ -224,6 +229,8 @@ export class Connection {
     // (undocumented)
     getAgentId(): string;
     // (undocumented)
+    getEmail(): string;
+    // (undocumented)
     getId(): string;
     // (undocumented)
     getIntegrations(): Promise<Integration[]>;
@@ -320,6 +327,8 @@ export class Group {
 export class Integration {
     constructor(json: bkper.Integration);
     deleteProperty(key: string): Integration;
+    // (undocumented)
+    getBookId(): string;
     // (undocumented)
     getId(): string;
     // (undocumented)
