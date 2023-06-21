@@ -114,8 +114,9 @@ export class HttpApiRequest {
         }
       })
     } catch (e) {
-      if (HttpApiRequest.config.requestErrorHandler) {
-        throw HttpApiRequest.config.requestErrorHandler(e)
+      const customError = HttpApiRequest.config.requestErrorHandler ? HttpApiRequest.config.requestErrorHandler(e) : undefined;
+      if (customError) {
+        throw customError
       } else {
         //Default error handler
         let error: HttpError = e.response.data?.error
