@@ -159,8 +159,10 @@ async function getAccessToken() {
     token = await getOAuthToken();
   }
 
-  token = token.replace('Bearer ', '')
-  token = token.replace('bearer ', '')
+  if (token) {
+    token = token.replace('Bearer ', '')
+    token = token.replace('bearer ', '')
+  }
 
   return token;
 }
