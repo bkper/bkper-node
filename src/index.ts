@@ -19,6 +19,7 @@ export { TransactionIterator } from './model/TransactionIterator'
 export { User } from './model/User'
 export { Integration } from './model/Integration'
 export { Connection } from './model/Connection'
+export { Config } from './model/Config'
 export { 
   Periodicity, 
   AccountType,
