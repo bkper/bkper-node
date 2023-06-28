@@ -435,12 +435,24 @@ export class Book {
     BookService.audit(this.getId());
   }
 
+  /**
+   * Gets the existing [[Integrations]] in the Book.
+   * 
+   * @returns The existing Integration objects
+   */
   public async getIntegrations(): Promise<Integration[]> {
-      const integrationsPlain = await IntegrationService.listIntegrations(this.getId());
-      const integrations = integrationsPlain.map(i => new Integration(i));
-      return integrations;
+    const integrationsPlain = await IntegrationService.listIntegrations(this.getId());
+    const integrations = integrationsPlain.map(i => new Integration(i));
+    return integrations;
   }
 
+  /**
+   * Creates a new [[Integration]] in the Book.
+   * 
+   * @param integration - The Integration object or wrapped plain json
+   * 
+   * @returns The created Integration object
+   */
   public async createIntegration(integration: bkper.Integration | Integration): Promise<Integration> {
     if (integration instanceof Integration) {
       integration = await IntegrationService.createIntegration(this.getId(), integration.json())
@@ -450,6 +462,13 @@ export class Book {
     return new Integration(integration);
   }
 
+  /**
+   * Updates an existing [[Integration]] in the Book.
+   * 
+   * @param integration - The Integration wrapped plain json
+   * 
+   * @returns The updated Integration object
+   */
   public async updateIntegration(integration: bkper.Integration): Promise<Integration> {
     if (integration instanceof Integration) {
       integration = await IntegrationService.updateIntegration(this.getId(), integration.json())
@@ -458,7 +477,6 @@ export class Book {
     }
     return new Integration(integration);
   }
-
 
   /**
    * Resumes a transaction iteration using a continuation token from a previous iterator.

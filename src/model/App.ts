@@ -3,7 +3,7 @@ import { createApp, patchApp, updateApp } from "../service/app-service";
 /**
  * Defines an App on Bkper.
  * 
- * Apps can be installed on Books by users.s
+ * Apps can be installed on Books by users.
  * 
  * @public
  */

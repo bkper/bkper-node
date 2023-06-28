@@ -15,7 +15,7 @@ export interface Config {
    */
   apiKeyProvider?: () => Promise<string>;
 
-  /*
+  /**
    * Issue a valid OAuth2 access token with **https://www.googleapis.com/auth/userinfo.email** scope authorized.
    */
   oauthTokenProvider?: () => Promise<string>;
@@ -25,7 +25,7 @@ export interface Config {
    */
   requestHeadersProvider?: () => Promise<{ [key: string]: string }>;
 
-  /*
+  /**
    * Custom request error handler
    */
   requestErrorHandler?: (error: any) => any;

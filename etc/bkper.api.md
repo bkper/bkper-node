@@ -105,10 +105,10 @@ export class App {
 export class Bkper {
     static getBook(id: string): Promise<Book>;
     static getUser(): Promise<User>;
-    // @deprecated (undocumented)
+    // @deprecated
     static setApiKey(key: string): App;
     static setConfig(config: Config): void;
-    // @deprecated (undocumented)
+    // @deprecated
     static setOAuthTokenProvider(oauthTokenProvider: () => Promise<string>): Promise<void>;
 }
 
@@ -121,7 +121,6 @@ export class Book {
     // (undocumented)
     configureTransactions_(transactions: Transaction[]): Transaction[];
     continueTransactionIterator(query: string, continuationToken: string): TransactionIterator;
-    // (undocumented)
     createIntegration(integration: bkper.Integration | Integration): Promise<Integration>;
     formatDate(date: Date, timeZone?: string): string;
     formatValue(value: Amount | number | null | undefined): string;
@@ -143,7 +142,6 @@ export class Book {
     getGroups(): Promise<Group[]>;
     getGroupsByAccount(accountIdOrName: string): Promise<Group[]>;
     getId(): string;
-    // (undocumented)
     getIntegrations(): Promise<Integration[]>;
     // (undocumented)
     getLastUpdateMs(): number;
@@ -203,7 +201,6 @@ export class Book {
     update(): Promise<Book>;
     // @internal (undocumented)
     updateGroupCache(group: Group): void;
-    // (undocumented)
     updateIntegration(integration: bkper.Integration): Promise<Integration>;
     }
 
@@ -223,9 +220,7 @@ export class Collection {
 export interface Config {
     apiBaseUrl?: string;
     apiKeyProvider?: () => Promise<string>;
-    // (undocumented)
     oauthTokenProvider?: () => Promise<string>;
-    // (undocumented)
     requestErrorHandler?: (error: any) => any;
     requestHeadersProvider?: () => Promise<{
         [key: string]: string;
@@ -238,26 +233,18 @@ export class Connection {
     clearTokenProperties(): void;
     create(): Promise<Connection>;
     deleteProperty(key: string): Connection;
-    // (undocumented)
     getAgentId(): string;
-    // (undocumented)
     getEmail(): string;
-    // (undocumented)
     getId(): string;
-    // (undocumented)
     getIntegrations(): Promise<Integration[]>;
-    // (undocumented)
     getName(): string;
     getProperties(): {
         [key: string]: string;
     };
     getProperty(...keys: string[]): string;
     getPropertyKeys(): string[];
-    // (undocumented)
     getType(): "APP" | "BANK";
-    // (undocumented)
     getUUID(): string;
-    // (undocumented)
     json(): bkper.Connection;
     setAgentId(agentId: string): Connection;
     setName(name: string): Connection;
@@ -339,17 +326,13 @@ export class Group {
 export class Integration {
     constructor(json: bkper.Integration);
     deleteProperty(key: string): Integration;
-    // (undocumented)
     getBookId(): string;
-    // (undocumented)
     getId(): string;
-    // (undocumented)
     getName(): string;
     getProperties(): {
         [key: string]: string;
     };
     getProperty(...keys: string[]): string;
-    // (undocumented)
     json(): bkper.Integration;
     setProperties(properties: {
         [key: string]: string;
@@ -477,15 +460,10 @@ export class TransactionIterator {
 // @public
 export class User {
     constructor(wrapped: bkper.User);
-    // (undocumented)
     getConnection(id: string): Promise<Connection>;
-    // (undocumented)
     getConnections(): Promise<Connection[]>;
-    // (undocumented)
     getFullName(): string;
-    // (undocumented)
     getId(): string;
-    // (undocumented)
     getName(): string;
     }
 
