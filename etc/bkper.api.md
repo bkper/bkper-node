@@ -107,7 +107,6 @@ export class Bkper {
     static getUser(): Promise<User>;
     // @deprecated (undocumented)
     static setApiKey(key: string): App;
-    // Warning: (ae-forgotten-export) The symbol "Config" needs to be exported by the entry point index.d.ts
     static setConfig(config: Config): void;
     // @deprecated (undocumented)
     static setOAuthTokenProvider(oauthTokenProvider: () => Promise<string>): Promise<void>;
@@ -219,6 +218,19 @@ export class Collection {
     // (undocumented)
     getName(): string;
     }
+
+// @public
+export interface Config {
+    apiBaseUrl?: string;
+    apiKeyProvider?: () => Promise<string>;
+    // (undocumented)
+    oauthTokenProvider?: () => Promise<string>;
+    // (undocumented)
+    requestErrorHandler?: (error: any) => any;
+    requestHeadersProvider?: () => Promise<{
+        [key: string]: string;
+    }>;
+}
 
 // @public
 export class Connection {
