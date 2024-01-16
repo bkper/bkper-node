@@ -428,6 +428,7 @@ export class Transaction {
     remove(): Promise<Transaction>;
     restore(): Promise<Transaction>;
     setAmount(amount: Amount | number | string): Transaction;
+    setChecked(checked: boolean): Transaction;
     setCreditAccount(account: Account | bkper.Account): Transaction;
     setDate(date: string | Date): Transaction;
     setDebitAccount(account: Account | bkper.Account): Transaction;
