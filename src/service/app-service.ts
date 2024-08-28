@@ -1,4 +1,4 @@
-import { HttpApiRequest } from "./HttpApiRequest";
+import { HttpApiRequest } from "./http-api-request";
 
 export async function createApp(app: bkper.App): Promise<bkper.App> {
   var response = await new HttpApiRequest(`v5/apps`).setMethod('POST').setPayload(app).fetch();

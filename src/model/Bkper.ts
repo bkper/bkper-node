@@ -2,7 +2,7 @@ import { Book } from "./Book";
 import { App } from "./App";
 import * as BookService from '../service/book-service';
 import * as UserService from '../service/user-service';
-import { HttpApiRequest } from '../service/HttpApiRequest';
+import { HttpApiRequest } from '../service/http-api-request';
 import { User } from "./User";
 import { Config } from "./Config";
 

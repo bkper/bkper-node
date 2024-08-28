@@ -1,4 +1,4 @@
-import { HttpBooksApiV5Request } from "./HttpApiRequest";
+import { HttpBooksApiV5Request } from "./http-api-request";
 
 export async function loadBook(bookId: string): Promise<bkper.Book> {
 

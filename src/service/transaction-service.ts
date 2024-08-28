@@ -1,4 +1,4 @@
-import { HttpBooksApiV5Request } from "./HttpApiRequest";
+import { HttpBooksApiV5Request } from "./http-api-request";
 
 export async function createTransaction(bookId: string, transaction: bkper.Transaction): Promise<bkper.TransactionOperation> {
   var response = await new HttpBooksApiV5Request(`${bookId}/transactions`).setMethod('POST').setPayload(transaction).fetch();

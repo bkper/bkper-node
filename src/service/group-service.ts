@@ -1,4 +1,4 @@
-import { HttpBooksApiV5Request } from "./HttpApiRequest";
+import { HttpBooksApiV5Request } from "./http-api-request";
 
 export async function createGroup(bookId: string, group: bkper.Group): Promise<bkper.Group> {
   var response = await new HttpBooksApiV5Request(`${bookId}/groups`).setMethod('POST').setPayload(group).fetch();

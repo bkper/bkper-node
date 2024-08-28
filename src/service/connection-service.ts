@@ -1,4 +1,4 @@
-import { HttpApiV5Request } from "./HttpApiRequest";
+import { HttpApiV5Request } from "./http-api-request";
 
 export async function getConnection(id: string): Promise<bkper.Connection> {
   const res = await new HttpApiV5Request(`user/connections/${id}`)

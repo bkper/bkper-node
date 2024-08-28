@@ -108,7 +108,7 @@ export class HttpApiRequest {
         retryConfig: {
           httpMethodsToRetry: ['GET', 'PUT', 'POST', 'PATCH', 'HEAD', 'OPTIONS', 'DELETE'],
           statusCodesToRetry: [[100, 199], [429, 429], [500, 599]],
-          retry: process.env.NODE_ENV == NODE_ENV_DEV ? 0 : 6,
+          retry: process.env.NODE_ENV == NODE_ENV_DEV ? 0 : 3,
           onRetryAttempt: (err: GaxiosError) => { console.log(`${err.message} - Retrying... `) },
           retryDelay: 1000
         }
