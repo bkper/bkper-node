@@ -1,6 +1,6 @@
 {
   "name": "bkper",
-  "version": "2.7.1",
+  "version": "2.7.2",
   "description": "Node.js client for Bkper REST API",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -28,11 +28,11 @@
     "build:clean-dist": "rimraf dist",
     "watch": "tsc -w",
     "upgrade:api": "bun upgrade @bkper/bkper-api-types --latest",
-    "patch": "bun version --patch",
-    "minor": "bun version --minor",
-    "major": "bun version --major",
-    "preversion": "bun build",
-    "postversion": "git push --tags && bun publish --new-version $npm_package_version && git push && echo \"Successfully released version $npm_package_version!\""
+    "patch": "yarn version --patch",
+    "minor": "yarn version --minor",
+    "major": "yarn version --major",
+    "preversion": "bun run build",
+    "postversion": "git push --tags && yarn publish --new-version $npm_package_version && git push && echo \"Successfully released version $npm_package_version!\""
   },
   "dependencies": {
     "@google-cloud/local-auth": "^1.0.0",
