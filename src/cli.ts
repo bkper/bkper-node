@@ -1,14 +1,11 @@
 #!/usr/bin/env node
 
 import program from 'commander';
-import { login, logout } from './auth/local-auth-service';
-import { Bkper } from './model/Bkper';
-import { NODE_ENV_DEV } from './utils';
-import { App } from './model/App';
+import { getOAuthToken, login, logout } from './auth/local-auth-service';
+import { App, Bkper } from 'bkper-js';
 var fs = require('fs');
 require('dotenv').config();
 
-process.env.NODE_ENV=NODE_ENV_DEV;
 
 program
   .command('login')
@@ -32,9 +29,12 @@ program
   .action(async (options) => {
 
     try {
-       Bkper.setConfig({apiKeyProvider: async () => process.env.BKPER_API_KEY})
-       let app = new App()
-       app.setJson(JSON.parse(fs.readFileSync('./bkperapp.json', 'utf8')))
+       Bkper.setConfig({
+        apiKeyProvider: async () => process.env.BKPER_API_KEY,
+        oauthTokenProvider: () => getOAuthToken()
+      })
+       const json: bkper.App = JSON.parse(fs.readFileSync('./bkperapp.json', 'utf8'));
+       let app = new App(json)
         .setReadme(fs.readFileSync('./README.md', 'utf8'))
         .setClientSecret(process.env.BKPER_CLIENT_SECRET)
         .setDeveloperEmail(process.env.BKPER_DEVELOPER_EMAIL)

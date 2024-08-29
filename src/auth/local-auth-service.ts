@@ -25,7 +25,7 @@ export async function login() {
 
 export function logout() {
   if (fs.existsSync(storedCredentialsPath)) {
-    fs.unlinkSync(storedCredentialsPath);
+    fs.rmSync(storedCredentialsPath);
   }
   console.log('Bkper logged out.');
 }

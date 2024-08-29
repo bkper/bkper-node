@@ -1,21 +1,21 @@
 [Bkper REST API]: https://bkper.com/docs/#rest-apis
 
-[![npm](https://img.shields.io/npm/v/bkper?color=%235889e4)](https://www.npmjs.com/package/bkper)
-
-Bkper Node.js client provides a simple and secure way to access the [Bkper REST API] on [Node.js](https://nodejs.dev/)
-
-It also provide a **command line** utility to create and update [Bkper Apps and Bots](https://bkper.com/docs/)
+A **command line** utility to create and update [Bkper Apps and Bots](https://bkper.com/docs/)
 
 ## Instalation
 
 ### Add the package:
 
 ```
-npm i -S bkper
+npm i bkper --save-dev
 ```
 or
 ```
-yarn add bkper
+yarn add bkper --dev
+```
+or
+```
+bun add bkper --dev
 ```
 
 ## Commands
@@ -34,7 +34,7 @@ yarn bkper login
 ```
 
 ### Environment Variables
-The following environment variable is necessary in order to communicate with the Bkper REST API:
+The following environment variable is necessary in order to communicate with the [Bkper REST API]:
 
 ```
 BKPER_API_KEY=XXXX

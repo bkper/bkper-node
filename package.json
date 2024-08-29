@@ -1,12 +1,7 @@
 {
   "name": "bkper",
   "version": "2.7.2",
-  "description": "Node.js client for Bkper REST API",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
-  "files": [
-    "lib/**/*"
-  ],
+  "description": "Node.js command line client for Bkper",
   "bin": {
     "bkper": "./lib/cli.js"
   },
@@ -16,18 +11,13 @@
   "license": "Apache-2.0",
   "private": false,
   "scripts": {
-    "test": "env TS_NODE_COMPILER_OPTIONS='{\"rootDir\": \".\" }' mocha -r ts-node/register 'test/**/*.ts'",
-    "clean": "gts clean",
+    "clean": "rm -rf ./lib & rm -rf ./node_modules & wait",
     "build": "run-s build:*",
-    "build:clean": "bun clean",
-    "build:test": "bun run test",
+    "build:clean": "gts clean",
     "build:compile": "tsc",
-    "build:api": "api-extractor run --local",
     "build:cleanup": "rimraf lib/**/*.map lib/*.map lib/**/*.d.ts lib/*.d.ts",
-    "build:dts": "cp dist/bkper-public.d.ts lib/index.d.ts",
     "build:clean-dist": "rimraf dist",
     "watch": "tsc -w",
-    "upgrade:api": "bun upgrade @bkper/bkper-api-types --latest",
     "patch": "yarn version --patch",
     "minor": "yarn version --minor",
     "major": "yarn version --major",
@@ -36,31 +26,18 @@
   },
   "dependencies": {
     "@google-cloud/local-auth": "^3.0.1",
-    "big.js": "^6.0.3",
+    "bkper-js": "^1.0.0",
     "commander": "^6.2.1",
-    "dayjs": "^1.10.3",
     "dotenv": "^8.2.0",
-    "gaxios": "^4.3.0",
-    "google-auth-library": "^9.14.0",
-    "luxon": "^1.25.0",
-    "open": "^7.3.1"
+    "google-auth-library": "^9.14.0"
   },
   "devDependencies": {
     "@bkper/bkper-api-types": "^5.9.0",
-    "@microsoft/api-extractor": "^7.12.1",
-    "@types/big.js": "^6.0.2",
-    "@types/chai": "^4.2.14",
     "@types/commander": "^2.12.2",
-    "@types/luxon": "^1.25.1",
-    "@types/mocha": "^8.2.0",
-    "@types/node": "^14.14.20",
-    "@types/node-fetch": "^2.5.8",
-    "chai": "^4.2.0",
+    "@types/node": "^22.5.1",
     "gts": "^3.0.3",
-    "mocha": "^8.2.1",
     "npm-run-all": "^4.1.5",
     "rimraf": "^3.0.2",
-    "ts-node": "^10.9.2",
     "typescript": "^5.5.4"
   }
 }
