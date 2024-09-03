@@ -1,6 +1,6 @@
 {
   "name": "bkper",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "Node.js command line client for Bkper",
   "bin": {
     "bkper": "./lib/cli.js"
@@ -16,7 +16,7 @@
   "type": "module",
   "files": [
     "lib/**/*"
-  ],  
+  ],
   "scripts": {
     "clean": "rm -rf ./lib & rm -rf ./node_modules & wait",
     "prebuild": "bun install",
