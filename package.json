@@ -14,6 +14,9 @@
   "module": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "type": "module",
+  "files": [
+    "lib/**/*"
+  ],  
   "scripts": {
     "clean": "rm -rf ./lib & rm -rf ./node_modules & wait",
     "prebuild": "bun install",
