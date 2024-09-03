@@ -3,11 +3,13 @@
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "lib",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "resolveJsonModule": true,
     "typeRoots" : ["node_modules/@bkper", "node_modules/@types" ],
-    "strict": false,
+    "strict": true,
     "esModuleInterop": true,
     "target": "es2015",
-    "resolveJsonModule": true,
     "declaration": true,
     "sourceMap": true,
     "declarationMap": true

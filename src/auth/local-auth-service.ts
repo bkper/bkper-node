@@ -2,6 +2,13 @@ import  {authenticate} from '@google-cloud/local-auth';
 import fs from 'fs';
 import { Credentials, OAuth2Client } from "google-auth-library";
 import os from 'os';
+import { createRequire } from "module";
+import { fileURLToPath } from 'url';
+import path from 'path';
+
+const require = createRequire(import.meta.url);
+const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
+const __dirname = path.dirname(__filename); // get the name of the directory
 
 const keys = require(`${__dirname}/keys.json`);
 
@@ -56,14 +63,13 @@ export async function getOAuthToken(): Promise<string> {
     localAuth.on('tokens', (tokens) => {
       if (tokens.refresh_token) {
         // store the refresh_token in my database!
-        console.log(tokens.refresh_token);
         storeCredentials(tokens)
       }
     });
     
     let token = await localAuth.getAccessToken();
 
-    return token.token;
+    return token.token || '';
     
   }
 
