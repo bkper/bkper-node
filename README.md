@@ -175,9 +175,12 @@ You can add a ```.env``` file at the root of your project with those variables a
 "menuUrl": "https://app.bkper.com/b/#transactions:bookId=${book.id}"
 ```
 
+#### Library
+
+The ```getOAuthToken``` returns a Promise that resolves to a valid OAuth token, to be used by the [```bkper-js```](https://github.com/bkper/bkper-js) library
+
 
 ## Documentation
 
 - [Developer Docs](https://bkper.com/docs)
-- [API Reference](https://bkper.com/docs/bkper-node/)
 

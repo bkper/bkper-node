@@ -41,6 +41,9 @@ export function isLoggedIn() {
   return storedCredentials != null;
 }
 
+/**
+ * @returns A promise that resolves to a valid OAuth token.
+ */
 export async function getOAuthToken(): Promise<string> {
 
     let localAuth: OAuth2Client

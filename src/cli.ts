@@ -3,8 +3,10 @@
 import { App, Bkper } from 'bkper-js';
 import program from 'commander';
 import fs from 'fs';
-import { login, logout } from './auth/local-auth-service.js';
-import { getBkperLocalConfig } from './index.js';
+import { getOAuthToken, login, logout } from './auth/local-auth-service.js';
+
+import dotenv from 'dotenv';
+dotenv.config()
 
 program
   .command('login')
@@ -28,8 +30,12 @@ program
   .action(async (options) => {
 
     try {
-       Bkper.setConfig(getBkperLocalConfig())
-       const json: bkper.App = JSON.parse(fs.readFileSync('./bkperapp.json', 'utf8'));
+      Bkper.setConfig({
+        apiKeyProvider: async () => process.env.BKPER_API_KEY || '',
+        oauthTokenProvider: () => getOAuthToken()
+      })
+
+      const json: bkper.App = JSON.parse(fs.readFileSync('./bkperapp.json', 'utf8'));
        let app = new App(json)
         .setReadme(fs.readFileSync('./README.md', 'utf8'))
         .setClientSecret(process.env.BKPER_CLIENT_SECRET)
