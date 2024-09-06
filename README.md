@@ -7,15 +7,25 @@ A **command line** utility to create and update [Bkper Apps and Bots](https://bk
 ### Add the package:
 
 ```
-npm i bkper --save-dev
+npm i bkper
 ```
 or
 ```
-yarn add bkper --dev
+yarn add bkper
 ```
 or
 ```
-bun add bkper --dev
+bun add bkper
+```
+
+Optionally, you can install it globally to be able to use the ```bkper``` command line utility:
+
+```
+npm i -g bkper
+```
+or
+```
+yarn global add bkper
 ```
 
 ## Commands
@@ -48,7 +58,8 @@ BKPER_USER_EMAILS="someone@gmail.com anotherone@altrostat.com"
 BKPER_DEVELOPER_EMAIL=somedeveloer@mycompany.com
 ```
 
-You can add a ```.env``` file at the root of your project with those variables and bkper will automatically load from it. Follow [these](https://bkper.com/docs/#rest-api-enabling) steps in order to configure a valid Bkper API key.
+You can add a ```.env``` file at the root of your project with those variables and bkper will automatically load from it. 
+Follow [these](https://bkper.com/docs/#rest-api-enabling) steps in order to configure a valid Bkper API key.
 
 > WARNING: Never upload variables to the source code repository.
 
