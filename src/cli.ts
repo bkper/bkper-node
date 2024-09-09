@@ -3,6 +3,7 @@
 import { App, Bkper } from 'bkper-js';
 import program from 'commander';
 import fs from 'fs';
+import * as YAML from 'yaml'
 import { getOAuthToken, login, logout } from './auth/local-auth-service.js';
 
 import dotenv from 'dotenv';
@@ -35,8 +36,17 @@ program
         oauthTokenProvider: () => getOAuthToken()
       })
 
-      const json: bkper.App = JSON.parse(fs.readFileSync('./bkperapp.json', 'utf8'));
-       let app = new App(json)
+      let json: bkper.App;
+
+      if (fs.existsSync('./bkperapp.json')) {
+        json = JSON.parse(fs.readFileSync('./bkperapp.json', 'utf8'));
+      } else if (fs.existsSync('./bkperapp.yaml')) {
+        json = YAML.parse(fs.readFileSync('./bkperapp.yaml', 'utf8'));
+      } else {
+        throw new Error('bkperapp.json or bkperapp.yaml not found');
+      }
+
+      let app = new App(json)
         .setReadme(fs.readFileSync('./README.md', 'utf8'))
         .setClientSecret(process.env.BKPER_CLIENT_SECRET)
         .setDeveloperEmail(process.env.BKPER_DEVELOPER_EMAIL)
