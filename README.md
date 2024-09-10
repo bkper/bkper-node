@@ -100,17 +100,6 @@ filePatterns:
   - "radiusbank*.ofx"
   - "-*.qif"
 
-# Bot configuration only when additional scopes, other than email, is needed
-# If not specified, a default valid token with the email scope is sent in the http header
-clientId: "The Client ID from GCP project Web Application OAuth Credential"
-scopes:
-  - "The Google OAuth scopes used. E.g."
-  - "https://www.googleapis.com/auth/userinfo.email"
-  - "https://www.googleapis.com/auth/script.external_request"
-
-# Google Apps Script bot configuration
-scriptId: "The Google Apps Script ID"
-deploymentId: "The Google Apps Script API Deployment ID"
 
 # Webhook bot configuration
 webhookUrl: "The production webhook url"
