@@ -82,7 +82,7 @@ logoUrl: https://static.thenounproject.com/png/2318500-200.png
 
 # CONTEXT MENU CONFIGURATION
 
-# The menu production url to open in the popup window. See accepted expressions [here](#accepted-expressions-in-menuurl-property).
+# The menu production url to open in the popup window. See accepted expressions bellow.
 menuUrl: https://script.google.com/macros/s/AKfycbxz1Fl1A_KpvAtWLSXtGh1oRaFdWibPweoJfa3yYrFRAAC6gRM/exec?bookId=${book.id}
 
 # The menu development url that will be used while developing.
@@ -100,10 +100,13 @@ menuPopupHeight: 300 # height in pixels. Default to 90% of screen height.
 # The production webhook url to be called by Bkper when an event occurs.
 webhookUrl: https://us-central1-bkper-tax-trigger.cloudfunctions.net/prod
 
-# The development webhook url to be called while developing. It will be prioritized over webhookUrl when the bot is running by the app owner or developer. Unset it when done developing.
+# The development webhook url to be called while developing. 
+# It will be prioritized over webhookUrl when the bot is running by the app owner or developer. 
+# Unset it when done developing.
 webhookUrlDev: https://9850-2804-1b2-1003-88ab-bca4-9ed8-d199-bb7f.ngrok-free.app
 
-# The events the Bot is capable of processing by the webhook. This is optional and, if not specified, no events will be processed.
+# The events the Bot is capable of processing by the webhook. 
+# This is optional and, if not specified, no events will be processed.
 events:
   - "TRANSACTION_POSTED"
   - "TRANSACTION_CHECKED"
