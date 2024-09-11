@@ -2,7 +2,7 @@
 
 A **command line** utility to create and update [Bkper Apps and Bots](https://bkper.com/docs/)
 
-## Instalation
+## Installation
 
 ### Add the package:
 
@@ -67,18 +67,43 @@ Follow [these](https://bkper.com/docs/#rest-api-enabling) steps in order to conf
 ### ```./bkperapp.yaml``` Reference
 
 ```yaml
-id: "The App agent id. It can NOT be changed after the App created."
-name: "The name of the App or Bot."
-logoUrl: "Set your logo url from public host. Best fit 200x200 px. Use https://"
 
-# Context menu configuration
-menuUrl: "The menu url to open in the popup window. See reference bellow."
-menuUrlDev: "The menu url to open in the popup window, when opened by the developer user."
-menuText: "The context menu call to action."
+# BASIC APP CONFIGURATION
+
+# The agent id of the App or Bot. It can NOT be changed after the App or Bot is created.
+id: my-custom-app
+
+# The readable name of the App or Bot.
+name: My Custom App
+
+# Set your logo url from public host. Best fit 200x200 px. Use https://
+logoUrl: https://static.thenounproject.com/png/2318500-200.png
+
+
+# CONTEXT MENU CONFIGURATION
+
+# The menu production url to open in the popup window. See accepted expressions [here](#accepted-expressions-in-menuurl-property).
+menuUrl: https://script.google.com/macros/s/AKfycbxz1Fl1A_KpvAtWLSXtGh1oRaFdWibPweoJfa3yYrFRAAC6gRM/exec?bookId=${book.id}
+
+# The menu development url that will be used while developing.
+menuUrlDev: https://script.google.com/a/bkper.com/macros/s/AKfycbwg42np5A-niYBI7Qq2yxOguhcoNgEkqqe0aRLw628/dev?bookId=${book.id}
+
+# The context menu call to action.
+menuText: Open My Custom App
+
 menuPopupWidth: 500 # width in pixels. Default to 80% of screen width.
 menuPopupHeight: 300 # height in pixels. Default to 90% of screen height.
 
-# Bot events configuration
+
+# BOT EVENTS CONFIGURATION
+
+# The production webhook url to be called by Bkper when an event occurs.
+webhookUrl: https://us-central1-bkper-tax-trigger.cloudfunctions.net/prod
+
+# The development webhook url to be called while developing. It will be prioritized over webhookUrl when the bot is running by the app owner or developer. Unset it when done developing.
+webhookUrlDev: https://9850-2804-1b2-1003-88ab-bca4-9ed8-d199-bb7f.ngrok-free.app
+
+# The events the Bot is capable of processing by the webhook. This is optional and, if not specified, no events will be processed.
 events:
   - "TRANSACTION_POSTED"
   - "TRANSACTION_CHECKED"
@@ -95,17 +120,14 @@ events:
   - "FILE_CREATED"
   - "BOOK_UPDATED"
 
+# The file patterns the Bot is capable of processing. It accepts wildcards. E.g.
 filePatterns:
-  - "The file patterns the Bot is capable of process. It accepts wildcard. E.g."
   - "radiusbank*.ofx"
   - "-*.qif"
+  - "*.csv"
 
 
-# Webhook bot configuration
-webhookUrl: "The production webhook url"
-webhookUrlDev: "The development webhook url"
-
-# Schema to provide autocompletion
+# Schema to provide autocompletion on properties editor.
 propertiesSchema:
   book:
     keys:
