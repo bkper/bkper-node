@@ -23,8 +23,9 @@
     "build": "run-s build:*",
     "build:clean": "gts clean",
     "build:compile": "tsc",
-    "prewatch": "bun run build",
-    "watch": "tsc -w",
+    "predev": "bun run build",
+    "dev": "tsc -w",
+    "upgrade:api": "bun update @bkper/bkper-api-types --latest && bun update bkper-js --latest",
     "patch": "yarn version --patch",
     "minor": "yarn version --minor",
     "major": "yarn version --major",
@@ -33,14 +34,14 @@
   },
   "dependencies": {
     "@google-cloud/local-auth": "^3.0.1",
-    "bkper-js": "^1.1.0",
+    "bkper-js": "^1.30.0",
     "commander": "^6.2.1",
     "dotenv": "^8.2.0",
     "google-auth-library": "^9.14.0",
     "yaml": "^2.5.1"
   },
   "devDependencies": {
-    "@bkper/bkper-api-types": "^5.9.0",
+    "@bkper/bkper-api-types": "^5.15.1",
     "@types/commander": "^2.12.2",
     "@types/node": "^22.5.1",
     "gts": "^3.0.3",
