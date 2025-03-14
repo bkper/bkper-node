@@ -76,8 +76,12 @@ id: my-custom-app
 # The readable name of the App or Bot.
 name: My Custom App
 
-# Set your logo url from public host. Best fit 200x200 px. Use https://
+# The logo url from public host. Best fit 200x200 px. Use https://
 logoUrl: https://static.thenounproject.com/png/2318500-200.png
+
+# The logo url to be used when in dark mode
+logoUrlDark: https://static.thenounproject.com/png/2318500-200.png
+
 
 
 # CONTEXT MENU CONFIGURATION
@@ -95,15 +99,17 @@ menuPopupWidth: 500 # width in pixels. Default to 80% of screen width.
 menuPopupHeight: 300 # height in pixels. Default to 90% of screen height.
 
 
+#ASSISTANT CONFIGURATION
+
+# The conversation url to be called by Bkper when a new conversation message is added
+conversationUrl: https://us-central1-bkper-tax-trigger.cloudfunctions.net/chat
+
+
+
 # BOT EVENTS CONFIGURATION
 
-# The production webhook url to be called by Bkper when an event occurs.
-webhookUrl: https://us-central1-bkper-tax-trigger.cloudfunctions.net/prod
-
-# The development webhook url to be called while developing. 
-# It will be prioritized over webhookUrl when the bot is running by the app owner or developer. 
-# Unset it when done developing.
-webhookUrlDev: https://9850-2804-1b2-1003-88ab-bca4-9ed8-d199-bb7f.ngrok-free.app
+# The webhook url to be called by Bkper when an event occurs.
+webhookUrl: https://us-central1-bkper-tax-trigger.cloudfunctions.net/events
 
 # The events the Bot is capable of processing by the webhook. 
 # This is optional and, if not specified, no events will be processed.
