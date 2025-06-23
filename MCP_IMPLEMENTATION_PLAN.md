@@ -1,30 +1,31 @@
-# MCP Server Integration Plan
+# MCP Server Integration Plan - Minimal First Version
 
-## 1. MCP Server Infrastructure
-- Create `src/mcp/` directory structure
-- Implement core MCP server with TypeScript
-- Add MCP protocol handlers and request processing
-- Set up proper error handling and logging
+## 1. Single Tool Implementation
+- Create basic MCP server with one tool: `list_books`
+- Tool functionality:
+  - List all books in the authenticated user's Bkper account
+  - Allow selection of a specific book by ID or name
+  - Return book details (name, ID, basic info)
 
-## 2. CLI Integration
-- Add new `mcp` command to `src/cli.ts` using Commander.js
-- Implement subcommands like `start`, `stop`, `status`
-- Integrate with existing authentication system (`getOAuthToken()`)
-- Add environment variable configuration for MCP server
+## 2. Minimal CLI Integration
+- Add simple `mcp` command to `src/cli.ts`
+- Single subcommand: `start` (starts MCP server)
+- Use existing authentication system (`getOAuthToken()`)
+- Basic error handling only
 
-## 3. Build System Updates
+## 3. Core MCP Implementation
+- Create `src/mcp/server.ts` - minimal MCP server
+- Implement single tool handler for book listing
+- Use bkper-js library for book operations
+- Standard MCP protocol compliance
+
+## 4. Build Integration
 - Update TypeScript compilation to include MCP files
-- Add MCP-specific build scripts if needed
-- Ensure proper ES module exports for MCP components
+- Ensure ES module compatibility
+- No additional build scripts needed
 
-## 4. Documentation Updates
-- Extend root `CLAUDE.md` with MCP server section
-- Document MCP commands and configuration
-- Add MCP architecture details alongside existing CLI docs
-- Include MCP-specific environment variables and setup
-
-## 5. Testing & Validation
-- Test MCP server functionality
-- Verify CLI integration works properly
-- Ensure build process includes all MCP components
-- Test authentication integration with MCP server
+## Future Enhancements (after v1)
+- Add more tools (create transactions, manage accounts, etc.)
+- Enhanced CLI commands (stop, status, config)
+- Advanced error handling and logging
+- Comprehensive documentation
