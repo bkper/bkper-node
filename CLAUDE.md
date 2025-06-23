@@ -103,13 +103,40 @@ The `getOAuthToken()` function from `local-auth-service.ts` handles:
 #### TypeScript Types Reference
 **IMPORTANT**: When writing code that uses bkper-js, you MUST refer to and respect the official TypeScript type definitions. These provide the authoritative interface contracts for all classes and methods.
 
-- **TypeScript Types**: https://raw.githubusercontent.com/bkper/bkper-js/refs/heads/main/lib/index.d.ts
+- **bkper-js Types**: https://raw.githubusercontent.com/bkper/bkper-js/refs/heads/main/lib/index.d.ts
+- **bkper-api-types**: https://raw.githubusercontent.com/bkper/bkper-api-types/master/index.d.ts
 
 Key principles:
 - Always use the exact method signatures defined in the TypeScript types
 - Respect the enum values (AccountType, Permission, Visibility)
 - Follow the proper class hierarchy (Bkper → Book → Account/Transaction)
 - Use the correct property names and types as defined in the interfaces
+- **For MCP responses**: Use the raw API types from bkper-api-types (especially Book interface)
+- **For implementation**: Use the high-level bkper-js library wrapper for auth and endpoints
+
+#### MCP Implementation Details
+
+##### MCP Tool Response Format
+
+list_books tool should return all bkper.Book properties from bkper-api-types:
+
+
+
+// Get books using high-level wrapper
+```typescript
+const books = await Bkper.getBooks();
+// Return raw API format (bkper.Book[]) for MCP response
+return books.map(book => book.toJSON()); // Should match bkper-api-types bkper.Book interface
+```
+
+##### Local Testing Strategy
+```bash
+# Start MCP server locally
+bun run build && node lib/cli.js mcp start
+
+# Test with MCP client or manual protocol testing
+# (Implementation details to be determined during development)
+```
 
 #### External Resources
 - [bkper-js GitHub Repository](https://github.com/bkper/bkper-js)
