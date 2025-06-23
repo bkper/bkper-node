@@ -35,6 +35,7 @@ This is the Bkper Node.js command line client - a CLI tool for creating and upda
 - `login` - Authenticate with Bkper and store credentials
 - `logout` - Remove stored credentials
 - `app -c/-u` - Create or update Bkper apps based on bkperapp.yaml/json config
+- `mcp` - Start Bkper MCP server for Model Context Protocol integration
 
 #### Authentication (`src/auth/local-auth-service.ts`)
 - Uses Google OAuth2 with local auth flow
@@ -55,6 +56,69 @@ This is the Bkper Node.js command line client - a CLI tool for creating and upda
 - `commander` - CLI framework
 - `@google-cloud/local-auth` - Google OAuth authentication
 - `yaml` - YAML configuration parsing
+
+### Bkper-JS Library Usage
+
+#### Authentication & Initialization
+```typescript
+import { App, Bkper } from 'bkper-js';
+import { getOAuthToken } from './auth/local-auth-service.js';
+
+// Configure Bkper with API key and OAuth token providers
+Bkper.setConfig({
+  apiKeyProvider: async () => process.env.BKPER_API_KEY || '',
+  oauthTokenProvider: () => getOAuthToken()
+});
+```
+
+#### Key Concepts
+- **Apps**: Bkper applications/bots that extend functionality
+- **Books**: Top-level containers for accounting data (like individual company ledgers)
+- **Accounts**: Categories within books (assets, liabilities, income, expenses)
+- **Transactions**: Financial entries that move money between accounts
+- **Collections**: Groups of related books for multi-currency/multi-entity operations
+
+#### Common Usage Patterns
+```typescript
+// Create/Update Apps (from CLI implementation)
+const appConfig = JSON.parse(fs.readFileSync('./bkperapp.json', 'utf8'));
+const app = new App(appConfig)
+  .setReadme(fs.readFileSync('./README.md', 'utf8'))
+  .setClientSecret(process.env.BKPER_CLIENT_SECRET)
+  .setDeveloperEmail(process.env.BKPER_DEVELOPER_EMAIL)
+  .setUserEmails(process.env.BKPER_USER_EMAILS);
+
+// Create or update the app
+const createdApp = await app.create();
+const updatedApp = await app.update();
+```
+
+#### Authentication Flow
+The `getOAuthToken()` function from `local-auth-service.ts` handles:
+1. Google OAuth2 flow with local authentication
+2. Credential storage in `~/.bkper-credentials.json`
+3. Token refresh and management
+4. Returns valid access tokens for Bkper API calls
+
+#### TypeScript Types Reference
+**IMPORTANT**: When writing code that uses bkper-js, you MUST refer to and respect the official TypeScript type definitions. These provide the authoritative interface contracts for all classes and methods.
+
+- **TypeScript Types**: https://raw.githubusercontent.com/bkper/bkper-js/refs/heads/main/lib/index.d.ts
+
+Key principles:
+- Always use the exact method signatures defined in the TypeScript types
+- Respect the enum values (AccountType, Permission, Visibility)
+- Follow the proper class hierarchy (Bkper → Book → Account/Transaction)
+- Use the correct property names and types as defined in the interfaces
+
+#### External Resources
+- [bkper-js GitHub Repository](https://github.com/bkper/bkper-js)
+- [Bkper API Documentation](https://help.bkper.com/en/articles/4208937-bkper-api-reference)
+- [Bkper Developer Hub](https://developers.bkper.com/)
+- Example bot implementations:
+  - [Tax Bot](https://github.com/bkper/bkper-tax-bot)
+  - [Exchange Bot](https://github.com/bkper/bkper-exchange-bot)
+  - [Portfolio Bot](https://github.com/bkper/bkper-portfolio-bot)
 
 ### TypeScript Configuration
 - Extends Google TypeScript style (gts)
