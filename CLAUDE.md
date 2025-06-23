@@ -126,7 +126,7 @@ list_books tool should return all bkper.Book properties from bkper-api-types:
 ```typescript
 const books = await Bkper.getBooks();
 // Return raw API format (bkper.Book[]) for MCP response
-return books.map(book => book.toJSON()); // Should match bkper-api-types bkper.Book interface
+return books.map(book => book.json()); // Should match bkper-api-types bkper.Book interface
 ```
 
 ##### Local Testing Strategy

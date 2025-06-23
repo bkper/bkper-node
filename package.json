@@ -25,6 +25,7 @@
     "build:compile": "tsc",
     "predev": "bun run build",
     "dev": "tsc -w",
+    "mcp": "bun run build && node lib/cli.js mcp start",
     "upgrade:api": "bun update @bkper/bkper-api-types --latest && bun update bkper-js --latest",
     "patch": "yarn version --patch",
     "minor": "yarn version --minor",
@@ -34,6 +35,7 @@
   },
   "dependencies": {
     "@google-cloud/local-auth": "^3.0.1",
+    "@modelcontextprotocol/sdk": "^1.13.1",
     "bkper-js": "^1.30.0",
     "commander": "^6.2.1",
     "dotenv": "^8.2.0",
