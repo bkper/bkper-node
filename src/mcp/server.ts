@@ -72,14 +72,29 @@ class BkperMcpServer {
       // Get books using high-level wrapper
       const books = await Bkper.getBooks();
       
-      // Return raw API format (bkper.Book[]) for MCP response
-      const booksData = books.map(book => book.json());
+      // Calculate optimal limit: 10 books = ~1000 bytes, target ~50KB max response
+      // Each book entry averages ~100 bytes, so ~200 books should fit comfortably
+      const OPTIMAL_BOOK_LIMIT = 200;
+      const bookCount = books.length;
+      const limitedBooks = Math.min(OPTIMAL_BOOK_LIMIT, bookCount);
+      
+      const essentialBooksData = books.slice(0, limitedBooks).map(book => {
+        const fullData = book.json();
+        return {
+          id: fullData.id,
+          name: fullData.name
+        };
+      });
 
       return {
         content: [
           {
             type: 'text',
-            text: JSON.stringify(booksData, null, 2),
+            text: JSON.stringify({
+              total: bookCount,
+              showing: `First ${limitedBooks} of ${bookCount} books`,
+              books: essentialBooksData
+            }, null, 2),
           },
         ],
       };
