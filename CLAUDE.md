@@ -13,6 +13,10 @@ This is the Bkper Node.js command line client - a CLI tool for creating and upda
 - `bun run build:clean` - Clean build artifacts using gts
 - `bun run build:compile` - Compile TypeScript only
 
+### Testing
+- `bun test` - Run all tests with Mocha
+- `test/` - Test directory with simple JavaScript tests for TDD
+
 ### Package Management
 - `bun install` - Install dependencies (used automatically in prebuild)
 - `bun run upgrade:api` - Update Bkper API types and bkper-js to latest versions
@@ -27,7 +31,11 @@ This is the Bkper Node.js command line client - a CLI tool for creating and upda
   - `cli.ts` - Main CLI entry point with Commander.js commands
   - `index.ts` - Library export (only exports getOAuthToken function)
   - `auth/local-auth-service.ts` - OAuth authentication handling
+  - `mcp/server.ts` - MCP server implementation
 - `lib/` - Compiled JavaScript output (ES modules with source maps)
+- `test/` - Test files for TDD development
+  - `fixtures/` - Test data fixtures
+  - `mcp-server.test.js` - MCP tool tests
 
 ### Core Components
 
@@ -56,6 +64,8 @@ This is the Bkper Node.js command line client - a CLI tool for creating and upda
 - `commander` - CLI framework
 - `@google-cloud/local-auth` - Google OAuth authentication
 - `yaml` - YAML configuration parsing
+- `@modelcontextprotocol/sdk` - MCP server implementation
+- `mocha` + `chai` - Testing framework for TDD
 
 ### Bkper-JS Library Usage
 
@@ -157,5 +167,40 @@ bun run build && node lib/cli.js mcp start
 - Uses Bun as package manager and runtime
 - ES modules throughout (type: "module" in package.json)
 - Google TypeScript Style (gts) for linting and formatting
-- No test framework currently configured
+- **Test-Driven Development (TDD)**: Use `bun test` for rapid feedback during development
 - **NEVER modify any files inside `node_modules/` directory** - these are managed dependencies
+
+## Test-Driven Development (TDD) Workflow
+
+### Running Tests
+```bash
+bun test                    # Run all tests
+bun test --watch           # Run tests in watch mode for TDD
+```
+
+### Test Structure
+- **Simple approach**: Plain JavaScript tests (no TypeScript compilation needed)
+- **Mocking strategy**: Mock `bkper-js` and `local-auth-service` dependencies
+- **Fixtures**: Use `test/fixtures/` for sample data (e.g., `sample-books.json`)
+- **Focus on logic**: Test core functionality without external dependencies
+
+### Adding New MCP Tool Tests
+1. Create test data in `test/fixtures/`
+2. Add test cases in `test/mcp-server.test.js`
+3. Mock any external dependencies (Bkper API, auth)
+4. Test the core business logic and response format
+5. Ensure MCP protocol compliance
+
+### Example Test Pattern
+```javascript
+it('should handle new_tool correctly', async function() {
+  // Arrange: Set up test data and mocks
+  const mockData = require('./fixtures/sample-data.json');
+  
+  // Act: Execute the logic being tested
+  const result = await toolLogic(mockData);
+  
+  // Assert: Verify expected behavior
+  expect(result).to.have.property('expectedField');
+});
+```

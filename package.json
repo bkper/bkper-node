@@ -26,6 +26,7 @@
     "predev": "bun run build",
     "dev": "tsc -w",
     "mcp": "bun run build && node lib/cli.js mcp start",
+    "test": "mocha test/**/*.test.js",
     "upgrade:api": "bun update @bkper/bkper-api-types --latest && bun update bkper-js --latest",
     "patch": "yarn version --patch",
     "minor": "yarn version --minor",
@@ -44,9 +45,13 @@
   },
   "devDependencies": {
     "@bkper/bkper-api-types": "^5.15.1",
+    "@types/chai": "^4.3.0",
     "@types/commander": "^2.12.2",
+    "@types/mocha": "^10.0.0",
     "@types/node": "^22.5.1",
+    "chai": "^4.3.0",
     "gts": "^3.0.3",
+    "mocha": "^10.0.0",
     "npm-run-all": "^4.1.5",
     "rimraf": "^3.0.2",
     "typescript": "^5.5.4"

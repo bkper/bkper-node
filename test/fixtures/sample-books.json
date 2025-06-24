@@ -1,0 +1,32 @@
+[
+  {
+    "id": "book-1",
+    "name": "Test Company Ltd",
+    "collection": null,
+    "ownership": "OWNER",
+    "permission": "OWNER",
+    "visibility": "PRIVATE",
+    "datePattern": "dd/MM/yyyy",
+    "decimalSeparator": ".",
+    "fractionDigits": 2,
+    "currency": "USD",
+    "timeZone": "America/New_York",
+    "timeZoneOffset": "-05:00",
+    "locale": "en"
+  },
+  {
+    "id": "book-2", 
+    "name": "Personal Finance",
+    "collection": null,
+    "ownership": "OWNER",
+    "permission": "OWNER",
+    "visibility": "PRIVATE",
+    "datePattern": "MM/dd/yyyy",
+    "decimalSeparator": ".",
+    "fractionDigits": 2,
+    "currency": "USD",
+    "timeZone": "America/Los_Angeles",
+    "timeZoneOffset": "-08:00",
+    "locale": "en"
+  }
+]
