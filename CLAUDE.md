@@ -158,3 +158,4 @@ bun run build && node lib/cli.js mcp start
 - ES modules throughout (type: "module" in package.json)
 - Google TypeScript Style (gts) for linting and formatting
 - No test framework currently configured
+- **NEVER modify any files inside `node_modules/` directory** - these are managed dependencies
