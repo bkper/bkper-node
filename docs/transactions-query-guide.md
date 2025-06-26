@@ -22,7 +22,6 @@ Bkper queries use a simple text-based syntax with operators and keywords to filt
 | `on:` | Transactions on a specific date | `on:2024-01-15` |
 | `after:` | Transactions after a date | `after:2024-01-01` |
 | `before:` | Transactions before a date | `before:2024-12-31` |
-| `between:` | Transactions between two dates | `between:2024-01-01 and 2024-01-31` |
 
 #### Date Variables
 
@@ -37,10 +36,10 @@ Bkper queries use a simple text-based syntax with operators and keywords to filt
 | Operator | Description | Example |
 |----------|-------------|---------|
 | `amount:` | Exact amount | `amount:1000` |
-| `>` | Greater than | `amount:>500` |
-| `<` | Less than | `amount:<1000` |
-| `>=` | Greater than or equal | `amount:>=100` |
-| `<=` | Less than or equal | `amount:<=5000` |
+| `amount>` | Greater than | `amount>500` |
+| `amount<` | Less than | `amount<1000` |
+| `amount>=` | Greater than or equal | `amount>=100` |
+| `amount<=` | Less than or equal | `amount<=5000` |
 
 ### Description and Properties
 
@@ -99,13 +98,13 @@ on:$y
 
 ```
 # Large transactions over $5,000
-amount:>5000
+amount>5000
 
 # Small transactions under $100
-amount:<100
+amount<100
 
 # Transactions between $1,000 and $5,000
-amount:>=1000 AND amount:<=5000
+amount>=1000 AND amount<=5000
 
 # Exact amount
 amount:2500.50
@@ -125,13 +124,13 @@ property:invoice_number="INV-2024-001"
 
 ```
 # Large cash transactions this month
-account:'Cash' AND amount:>1000 AND on:$m
+account:'Cash' AND amount>1000 AND on:$m
 
 # All revenue transactions from Q1 2024
 group:'Revenue' AND after:2024-01-01 AND before:2024-04-01
 
 # Cash or bank transactions over $500
-(account:'Cash' OR account:'Bank') AND amount:>500
+(account:'Cash' OR account:'Bank') AND amount>500
 
 # Office expenses excluding rent
 group:'Operating Expenses' AND NOT description:'rent'
@@ -183,7 +182,7 @@ NOT (group:'Assets' AND group:'Assets')
 
 2. **Filter by account first** - Account filters are typically faster
    ```
-   account:'Cash' AND amount:>1000
+   account:'Cash' AND amount>1000
    ```
 
 3. **Use date ranges** - Date filters help narrow results effectively
@@ -240,7 +239,7 @@ account:'Cash'
 #### Reconciliation
 ```
 # Recent large transactions for audit
-after:$d-30 AND amount:>5000
+after:$d-30 AND amount>5000
 
 # Transactions with missing documentation
 NOT property:receipt_number
@@ -260,14 +259,14 @@ When using queries with the `list_transactions` tool:
 // First page with query
 {
   "bookId": "book-123",
-  "query": "account:'Cash' AND amount:>1000 AND after:2024-01-01",
+  "query": "account:'Cash' AND amount>1000 AND after:2024-01-01",
   "limit": 50
 }
 
 // Next page using cursor (query is preserved)
 {
   "bookId": "book-123", 
-  "query": "account:'Cash' AND amount:>1000 AND after:2024-01-01",
+  "query": "account:'Cash' AND amount>1000 AND after:2024-01-01",
   "limit": 50,
   "cursor": "eyJvZmZzZXQiOjUwfQ=="
 }

@@ -88,7 +88,7 @@ const mockBkperJs: MockBkper = {
             filteredTransactions = currentMockTransactions.filter(t => 
               t.creditAccount.name === 'Cash' || t.debitAccount.name === 'Cash'
             );
-          } else if (query.includes('amount:>1000')) {
+          } else if (query.includes('amount>1000')) {
             filteredTransactions = currentMockTransactions.filter(t => t.amount > 1000);
           } else if (query.includes('after:2024-01-20')) {
             filteredTransactions = currentMockTransactions.filter(t => t.date > '2024-01-20');
@@ -273,7 +273,7 @@ describe('MCP Server - list_transactions query examples', function() {
     const bookId = 'book-1';
     const book = await mockBkperJs.getBook(bookId);
     
-    const iterator = await book.listTransactions('amount:>1000');
+    const iterator = await book.listTransactions('amount>1000');
     const transactions = iterator.next();
     const transactionsData = transactions.map(txn => txn.json());
     
@@ -366,7 +366,7 @@ describe('MCP Server - list_transactions API cursor pagination', function() {
     const book = await mockBkperJs.getBook(bookId);
     
     // First page with query
-    const firstIterator = await book.listTransactions('amount:>1000', 25);
+    const firstIterator = await book.listTransactions('amount>1000', 25);
     const firstTransactions = firstIterator.next();
     const firstCursor = firstIterator.getCursor();
     
@@ -377,7 +377,7 @@ describe('MCP Server - list_transactions API cursor pagination', function() {
 
     if (firstCursor) {
       // Second page with same query
-      const secondIterator = await book.listTransactions('amount:>1000', 25, firstCursor);
+      const secondIterator = await book.listTransactions('amount>1000', 25, firstCursor);
       const secondTransactions = secondIterator.next();
       
       // Verify second page also respects query
@@ -402,7 +402,7 @@ describe('MCP Server - list_transactions tool schema', function() {
           },
           query: {
             type: 'string',
-            description: 'Bkper query to filter transactions (e.g., "account:\'Cash\' amount:>1000 after:2024-01-01")'
+            description: 'Bkper query to filter transactions (e.g., "account:\'Cash\' amount>1000 after:2024-01-01")'
           },
           limit: {
             type: 'number',

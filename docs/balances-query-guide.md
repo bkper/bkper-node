@@ -74,7 +74,7 @@ group:'Revenue' after:2024-01-01 before:2024-12-31
 
 **Note:** Balances queries do NOT support the following operations that are available in transaction queries:
 
-- Amount filtering (`amount:`, `>`, `<`, etc.)
+- Amount filtering (`amount>`, `amount<`, etc.)
 - Description filtering (`description:`)
 - Property filtering (`property:`)
 - Complex logical operators (`AND`, `OR`, `NOT`)
@@ -206,7 +206,7 @@ account:'Cash'
 ### Unsupported Operations
 ```
 # Error: Amount filtering not supported
-account:'Cash' amount:>1000
+account:'Cash' amount>1000
 
 # Fix: Use account/group/date filters only
 account:'Cash' on:2024-01-31
