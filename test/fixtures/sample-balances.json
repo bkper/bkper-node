@@ -1,0 +1,142 @@
+[
+  {
+    "account": {
+      "id": "account-1",
+      "name": "Cash",
+      "type": "ASSET"
+    },
+    "balance": 15000.50,
+    "normalizedBalance": 15000.50,
+    "cumulative": 15000.50,
+    "group": {
+      "id": "group-current-assets",
+      "name": "Current Assets"
+    }
+  },
+  {
+    "account": {
+      "id": "account-2",
+      "name": "Accounts Receivable", 
+      "type": "ASSET"
+    },
+    "balance": 8500.00,
+    "normalizedBalance": 8500.00,
+    "cumulative": 23500.50,
+    "group": {
+      "id": "group-current-assets",
+      "name": "Current Assets"
+    }
+  },
+  {
+    "account": {
+      "id": "account-3",
+      "name": "Equipment",
+      "type": "ASSET"
+    },
+    "balance": 25000.00,
+    "normalizedBalance": 25000.00,
+    "cumulative": 48500.50,
+    "group": {
+      "id": "group-fixed-assets",
+      "name": "Fixed Assets"
+    }
+  },
+  {
+    "account": {
+      "id": "account-4",
+      "name": "Accounts Payable",
+      "type": "LIABILITY"
+    },
+    "balance": -5200.75,
+    "normalizedBalance": 5200.75,
+    "cumulative": 5200.75,
+    "group": {
+      "id": "group-current-liabilities",
+      "name": "Current Liabilities"
+    }
+  },
+  {
+    "account": {
+      "id": "account-5",
+      "name": "Bank Loan",
+      "type": "LIABILITY"
+    },
+    "balance": -12000.00,
+    "normalizedBalance": 12000.00,
+    "cumulative": 17200.75,
+    "group": {
+      "id": "group-long-term-liabilities",
+      "name": "Long-term Liabilities"
+    }
+  },
+  {
+    "account": {
+      "id": "account-6",
+      "name": "Owner's Equity",
+      "type": "EQUITY"
+    },
+    "balance": -25000.00,
+    "normalizedBalance": 25000.00,
+    "cumulative": 25000.00,
+    "group": {
+      "id": "group-equity",
+      "name": "Equity"
+    }
+  },
+  {
+    "account": {
+      "id": "account-7",
+      "name": "Service Revenue",
+      "type": "INCOME"
+    },
+    "balance": -18500.25,
+    "normalizedBalance": 18500.25,
+    "cumulative": 18500.25,
+    "group": {
+      "id": "group-revenue",
+      "name": "Revenue"
+    }
+  },
+  {
+    "account": {
+      "id": "account-8",
+      "name": "Office Rent",
+      "type": "OUTGOING"
+    },
+    "balance": 3600.00,
+    "normalizedBalance": 3600.00,
+    "cumulative": 3600.00,
+    "group": {
+      "id": "group-operating-expenses",
+      "name": "Operating Expenses"
+    }
+  },
+  {
+    "account": {
+      "id": "account-9",
+      "name": "Utilities",
+      "type": "OUTGOING"
+    },
+    "balance": 450.30,
+    "normalizedBalance": 450.30,
+    "cumulative": 4050.30,
+    "group": {
+      "id": "group-operating-expenses",
+      "name": "Operating Expenses"
+    }
+  },
+  {
+    "account": {
+      "id": "account-10",
+      "name": "Depreciation - Equipment",
+      "type": "OUTGOING"
+    },
+    "balance": 2083.33,
+    "normalizedBalance": 2083.33,
+    "cumulative": 6133.63,
+    "group": {
+      "id": "group-operating-expenses",
+      "name": "Operating Expenses"
+    }
+  }
+]

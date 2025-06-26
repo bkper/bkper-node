@@ -1,0 +1,157 @@
+[
+  {
+    "id": "account-1",
+    "name": "Cash",
+    "type": "ASSET",
+    "balance": 15000.50,
+    "normalizedBalance": 15000.50,
+    "group": {
+      "id": "group-current-assets",
+      "name": "Current Assets"
+    },
+    "properties": {
+      "bank": "Bank of America",
+      "account_number": "****1234"
+    },
+    "archived": false,
+    "permanent": false
+  },
+  {
+    "id": "account-2", 
+    "name": "Accounts Receivable",
+    "type": "ASSET",
+    "balance": 8500.00,
+    "normalizedBalance": 8500.00,
+    "group": {
+      "id": "group-current-assets",
+      "name": "Current Assets"
+    },
+    "properties": {},
+    "archived": false,
+    "permanent": false
+  },
+  {
+    "id": "account-3",
+    "name": "Equipment",
+    "type": "ASSET", 
+    "balance": 25000.00,
+    "normalizedBalance": 25000.00,
+    "group": {
+      "id": "group-fixed-assets",
+      "name": "Fixed Assets"
+    },
+    "properties": {
+      "depreciation_method": "straight_line"
+    },
+    "archived": false,
+    "permanent": false
+  },
+  {
+    "id": "account-4",
+    "name": "Accounts Payable",
+    "type": "LIABILITY",
+    "balance": -5200.75,
+    "normalizedBalance": 5200.75,
+    "group": {
+      "id": "group-current-liabilities", 
+      "name": "Current Liabilities"
+    },
+    "properties": {},
+    "archived": false,
+    "permanent": false
+  },
+  {
+    "id": "account-5",
+    "name": "Bank Loan",
+    "type": "LIABILITY",
+    "balance": -12000.00,
+    "normalizedBalance": 12000.00,
+    "group": {
+      "id": "group-long-term-liabilities",
+      "name": "Long-term Liabilities"
+    },
+    "properties": {
+      "interest_rate": "5.5%",
+      "maturity_date": "2025-12-31"
+    },
+    "archived": false,
+    "permanent": false
+  },
+  {
+    "id": "account-6",
+    "name": "Owner's Equity",
+    "type": "EQUITY",
+    "balance": -25000.00,
+    "normalizedBalance": 25000.00,
+    "group": {
+      "id": "group-equity",
+      "name": "Equity"
+    },
+    "properties": {},
+    "archived": false,
+    "permanent": true
+  },
+  {
+    "id": "account-7",
+    "name": "Service Revenue",
+    "type": "INCOME",
+    "balance": -18500.25,
+    "normalizedBalance": 18500.25,
+    "group": {
+      "id": "group-revenue",
+      "name": "Revenue"
+    },
+    "properties": {
+      "tax_category": "operating_income"
+    },
+    "archived": false,
+    "permanent": false
+  },
+  {
+    "id": "account-8",
+    "name": "Office Rent",
+    "type": "OUTGOING",
+    "balance": 3600.00,
+    "normalizedBalance": 3600.00,
+    "group": {
+      "id": "group-operating-expenses",
+      "name": "Operating Expenses"
+    },
+    "properties": {
+      "payment_frequency": "monthly",
+      "amount": "1200"
+    },
+    "archived": false,
+    "permanent": false
+  },
+  {
+    "id": "account-9",
+    "name": "Utilities",
+    "type": "OUTGOING",
+    "balance": 450.30,
+    "normalizedBalance": 450.30,
+    "group": {
+      "id": "group-operating-expenses",
+      "name": "Operating Expenses"
+    },
+    "properties": {},
+    "archived": false,
+    "permanent": false
+  },
+  {
+    "id": "account-10",
+    "name": "Depreciation - Equipment",
+    "type": "OUTGOING",
+    "balance": 2083.33,
+    "normalizedBalance": 2083.33,
+    "group": {
+      "id": "group-operating-expenses",
+      "name": "Operating Expenses"
+    },
+    "properties": {
+      "related_asset": "account-3"
+    },
+    "archived": false,
+    "permanent": false
+  }
+]

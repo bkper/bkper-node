@@ -65,3 +65,4 @@ tests/
 3. Ensure all pagination strategies are consistent and efficient
 4. **For `list_transactions`**: Include comprehensive query documentation and examples based on [Bkper Query Guide](https://help.bkper.com/en/articles/2569178-bkper-query-guide)
 5. **Ultrathink** before implementing any code
+6. **Do NOT commit any code**
