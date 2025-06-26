@@ -1,11 +1,13 @@
 {
   "extends": "./node_modules/gts/tsconfig-google.json",
   "compilerOptions": {
+    "rootDir": "src",
     "outDir": "lib",
     "module": "ESNext",
     "moduleResolution": "Node",
     "resolveJsonModule": true,
     "typeRoots" : ["node_modules/@bkper", "node_modules/@types" ],
+    "skipLibCheck": true,
     "strict": true,
     "esModuleInterop": true,
     "target": "es2015",
@@ -15,10 +17,10 @@
   },
   "include": [
     "src/**/*.json",
-    "src/**/*.ts",
-    "test/**/*.ts"
+    "src/**/*.ts"
   ],
   "exclude": [
+    "./test/",
     "./node_modules/",
     "./lib/"
   ]
