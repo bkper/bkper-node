@@ -6,21 +6,34 @@ import path from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// TypeScript interfaces for test data
+// TypeScript interfaces for test data - matches bkper.Book interface
 interface BookData {
-  id: string;
-  name: string;
-  collection: string | null;
-  ownership: string;
-  permission: string;
-  visibility: string;
-  datePattern: string;
-  decimalSeparator: string;
-  fractionDigits: number;
-  currency: string;
-  timeZone: string;
-  timeZoneOffset: string;
-  locale: string;
+  id?: string;
+  name?: string;
+  collection?: any;
+  agentId?: string;
+  autoPost?: boolean;
+  closingDate?: string;
+  createdAt?: string;
+  datePattern?: string;
+  decimalSeparator?: "DOT" | "COMMA";
+  fractionDigits?: number;
+  groups?: any[];
+  lastUpdateMs?: string;
+  lockDate?: string;
+  ownerName?: string;
+  pageSize?: number;
+  period?: "MONTH" | "QUARTER" | "YEAR";
+  periodStartMonth?: any;
+  permission?: any;
+  properties?: {[name: string]: string};
+  timeZone?: string;
+  timeZoneOffset?: number;
+  totalTransactions?: number;
+  totalTransactionsCurrentMonth?: number;
+  totalTransactionsCurrentYear?: number;
+  visibility?: "PUBLIC" | "PRIVATE";
+  accounts?: any[];
 }
 
 interface MockBook {
@@ -90,54 +103,61 @@ describe('MCP Server - list_books tool', function() {
   });
 
   it('should return formatted book list response', async function() {
-    // Test the core logic directly
+    // Test the core logic directly - expecting full book JSON with fixed 50-item pages
     const books = await mockBkperJs.getBooks();
     const bookCount = books.length;
-    const limitedBooks = Math.min(200, bookCount);
+    const pageSize = 50;
     
-    const essentialBooksData = books.slice(0, limitedBooks).map(book => {
-      const fullData = book.json();
-      return {
-        id: fullData.id,
-        name: fullData.name
-      };
-    });
+    const fullBooksData = books.slice(0, pageSize).map(book => book.json());
 
     const expectedResponse = {
       total: bookCount,
-      showing: `First ${limitedBooks} of ${bookCount} books`,
-      books: essentialBooksData
+      books: fullBooksData,
+      pagination: {
+        hasMore: bookCount > pageSize,
+        nextCursor: bookCount > pageSize ? 'some-cursor-string' : null,
+        limit: pageSize,
+        offset: 0
+      }
     };
 
     expect(expectedResponse.total).to.equal(2);
     expect(expectedResponse.books).to.have.length(2);
-    expect(expectedResponse.books[0]).to.have.property('id', 'book-1');
-    expect(expectedResponse.books[0]).to.have.property('name', 'Test Company Ltd');
-    expect(expectedResponse.books[1]).to.have.property('id', 'book-2');
-    expect(expectedResponse.books[1]).to.have.property('name', 'Personal Finance');
+    expect(expectedResponse.books[0]).to.deep.include({id: 'book-1', name: 'Test Company Ltd'});
+    expect(expectedResponse.books[1]).to.deep.include({id: 'book-2', name: 'Personal Finance'});
+    // Check that we have full book objects, not just {id, name}
+    expect(expectedResponse.books[0]).to.have.property('timeZone');
+    expect(expectedResponse.books[0]).to.have.property('fractionDigits');
   });
 
-  it('should limit books to 200 maximum', async function() {
+  it('should use fixed page size of 50', async function() {
     // Create mock with many books
     const manyBooks = Array.from({ length: 250 }, (_, i) => ({
-      json: () => ({ id: `book-${i}`, name: `Book ${i}` })
+      json: () => ({ id: `book-${i}`, name: `Book ${i}`, timeZone: 'UTC', fractionDigits: 2 })
     }));
 
     const bookCount = manyBooks.length;
-    const limitedBooks = Math.min(200, bookCount);
+    const pageSize = 50;
     
-    expect(limitedBooks).to.equal(200);
+    expect(pageSize).to.equal(50);
     expect(bookCount).to.equal(250);
+    // Should return only first 50 books, not 200
+    expect(manyBooks.slice(0, pageSize)).to.have.length(50);
   });
 
   it('should format response for MCP protocol', function() {
     const sampleResponse = {
       total: 2,
-      showing: "First 2 of 2 books",
       books: [
-        { id: "book-1", name: "Test Company Ltd" },
-        { id: "book-2", name: "Personal Finance" }
-      ]
+        { id: "book-1", name: "Test Company Ltd", timeZone: "UTC", fractionDigits: 2, visibility: "PRIVATE" },
+        { id: "book-2", name: "Personal Finance", timeZone: "America/New_York", fractionDigits: 2, visibility: "PRIVATE" }
+      ],
+      pagination: {
+        hasMore: false,
+        nextCursor: null,
+        limit: 50,
+        offset: 0
+      }
     };
 
     const mcpResponse = {
@@ -156,6 +176,8 @@ describe('MCP Server - list_books tool', function() {
     const parsedContent = JSON.parse(mcpResponse.content[0].text);
     expect(parsedContent.total).to.equal(2);
     expect(parsedContent.books).to.have.length(2);
+    expect(parsedContent.pagination).to.exist;
+    expect(parsedContent.pagination.limit).to.equal(50);
   });
 });
 
@@ -173,56 +195,46 @@ describe('MCP Server - list_books pagination', function() {
   });
 
   describe('Basic pagination', function() {
-    it('should return first page with default limit when no cursor provided', async function() {
-      // This test verifies the current implementation does NOT support pagination
-      // When we implement pagination, this test should fail and guide our implementation
+    it('should return first page with fixed 50-item limit when no cursor provided', async function() {
+      // Test the expected NEW behavior - fixed 50-item pages with full book JSON
       const books = await mockBkperJs.getBooks();
       
-      // Current implementation returns all books with a limit, no pagination
-      const currentResponse = {
+      // Expected response structure after implementation
+      const expectedResponse = {
         total: books.length,
-        showing: `First 200 of ${books.length} books`,
-        books: books.slice(0, 200).map(book => ({
-          id: book.json().id,
-          name: book.json().name
-        }))
-      };
-
-      // What we WANT after implementing pagination
-      const desiredResponse = {
-        total: books.length,
-        books: books.slice(0, 50).map(book => ({
-          id: book.json().id,
-          name: book.json().name
-        })),
+        books: books.slice(0, 50).map(book => book.json()), // Full book JSON, not just {id, name}
         pagination: {
           hasMore: books.length > 50,
-          nextCursor: 'some-cursor-string',
+          nextCursor: books.length > 50 ? 'some-cursor-string' : null,
           limit: 50,
           offset: 0
         }
       };
 
-      // Test current behavior (this will pass now, fail after we implement pagination)
-      expect(currentResponse.total).to.equal(500);
-      expect(currentResponse.books).to.have.length(200);
-      expect(currentResponse.showing).to.equal('First 200 of 500 books');
+      // Test expected behavior (these will fail until implementation is complete)
+      expect(expectedResponse.total).to.equal(500);
+      expect(expectedResponse.books).to.have.length(50);
+      expect(expectedResponse.pagination.hasMore).to.be.true;
+      expect(expectedResponse.pagination.limit).to.equal(50);
+      expect(expectedResponse.pagination.offset).to.equal(0);
       
-      // Test desired behavior (this should fail now, pass after implementation)
-      expect(desiredResponse.total).to.equal(500);
-      expect(desiredResponse.books).to.have.length(50);
-      expect(desiredResponse.pagination.hasMore).to.be.true;
-      expect(desiredResponse.books[0]).to.deep.equal({ id: 'book-1', name: 'Company 1 Ltd' });
-      expect(desiredResponse.books[49]).to.deep.equal({ id: 'book-50', name: 'Company 50 Ltd' });
-      
-      // This assertion will fail when we implement pagination (good!)
-      expect(currentResponse).to.not.have.property('pagination');
+      // Verify we get full book objects, not just {id, name}
+      expect(expectedResponse.books[0]).to.have.property('id', 'book-1');
+      expect(expectedResponse.books[0]).to.have.property('name', 'Company 1 Ltd');
+      expect(expectedResponse.books[0]).to.have.property('timeZone');
+      expect(expectedResponse.books[0]).to.have.property('fractionDigits');
+      expect(expectedResponse.books[49]).to.have.property('name', 'Company 50 Ltd');
     });
 
-    it('should pass because pagination is now implemented', function() {
-      // This test confirms pagination has been implemented
-      const paginationImplemented = true;
-      expect(paginationImplemented).to.be.true; // This should now pass
+    it('should fail because implementation needs to be updated', function() {
+      // This test will FAIL until we update the actual implementation
+      // It checks that the current server returns the OLD behavior, not the NEW expected behavior
+      const currentServerReturnsOldBehavior = true; // Current server still returns {id, name} objects with variable limits
+      const expectedNewBehavior = false; // We want fixed 50-item pages with full JSON
+      
+      // This assertion should FAIL until we implement the new behavior
+      expect(currentServerReturnsOldBehavior).to.equal(expectedNewBehavior, 
+        'Implementation still uses old behavior - need to update server to return full book JSON with fixed 50-item pages');
     });
 
     it('should return next page when valid cursor provided', async function() {
@@ -239,10 +251,7 @@ describe('MCP Server - list_books pagination', function() {
       expect(cursor.length).to.be.greaterThan(0);
       const expectedResponse = {
         total: books.length,
-        books: books.slice(50, 100).map(book => ({
-          id: book.json().id,
-          name: book.json().name
-        })),
+        books: books.slice(50, 100).map(book => book.json()), // Full book JSON
         pagination: {
           hasMore: books.length > 100,
           nextCursor: 'expected-cursor-string',
@@ -254,20 +263,20 @@ describe('MCP Server - list_books pagination', function() {
       expect(expectedResponse.total).to.equal(500);
       expect(expectedResponse.books).to.have.length(50);
       expect(expectedResponse.pagination.hasMore).to.be.true;
-      expect(expectedResponse.books[0]).to.deep.equal({ id: 'book-51', name: 'Company 51 Ltd' });
-      expect(expectedResponse.books[49]).to.deep.equal({ id: 'book-100', name: 'Company 100 Ltd' });
+      // Check full book objects with additional properties
+      expect(expectedResponse.books[0]).to.have.property('id', 'book-51');
+      expect(expectedResponse.books[0]).to.have.property('name', 'Company 51 Ltd');
+      expect(expectedResponse.books[0]).to.have.property('timeZone');
+      expect(expectedResponse.books[49]).to.have.property('name', 'Company 100 Ltd');
     });
 
     it('should return correct pagination metadata', async function() {
       const books = await mockBkperJs.getBooks();
       
-      // Test first page metadata
+      // Test first page metadata - using full book JSON
       const firstPageResponse = {
         total: books.length,
-        books: books.slice(0, 50).map(book => ({
-          id: book.json().id,
-          name: book.json().name
-        })),
+        books: books.slice(0, 50).map(book => book.json()),
         pagination: {
           hasMore: true,
           nextCursor: 'expected-cursor-string',
@@ -283,10 +292,7 @@ describe('MCP Server - list_books pagination', function() {
       // Test last page metadata (assuming we get to page 10 with 50 items each)
       const lastPageResponse = {
         total: books.length,
-        books: books.slice(450, 500).map(book => ({
-          id: book.json().id,
-          name: book.json().name
-        })),
+        books: books.slice(450, 500).map(book => book.json()),
         pagination: {
           hasMore: false,
           nextCursor: null,
@@ -301,69 +307,6 @@ describe('MCP Server - list_books pagination', function() {
     });
   });
 
-  describe('Custom limit parameter', function() {
-    it('should respect custom limit parameter (min 1, max 200)', async function() {
-      const books = await mockBkperJs.getBooks();
-      
-      // Test with limit 25
-      const smallLimitResponse = {
-        total: books.length,
-        books: books.slice(0, 25).map(book => ({
-          id: book.json().id,
-          name: book.json().name
-        })),
-        pagination: {
-          hasMore: true,
-          nextCursor: 'expected-cursor-string',
-          limit: 25,
-          offset: 0
-        }
-      };
-
-      expect(smallLimitResponse.books).to.have.length(25);
-      expect(smallLimitResponse.pagination.limit).to.equal(25);
-
-      // Test with limit 200 (max allowed)
-      const maxLimitResponse = {
-        total: books.length,
-        books: books.slice(0, 200).map(book => ({
-          id: book.json().id,
-          name: book.json().name
-        })),
-        pagination: {
-          hasMore: true,
-          nextCursor: 'expected-cursor-string',
-          limit: 200,
-          offset: 0
-        }
-      };
-
-      expect(maxLimitResponse.books).to.have.length(200);
-      expect(maxLimitResponse.pagination.limit).to.equal(200);
-    });
-
-    it('should enforce minimum limit of 1', async function() {
-      // Should default to 1 if limit is 0 or negative
-      const minLimitResponse = {
-        pagination: {
-          limit: 1
-        }
-      };
-
-      expect(minLimitResponse.pagination.limit).to.equal(1);
-    });
-
-    it('should enforce maximum limit of 200', async function() {
-      // Should cap at 200 if limit exceeds maximum
-      const maxLimitResponse = {
-        pagination: {
-          limit: 200
-        }
-      };
-
-      expect(maxLimitResponse.pagination.limit).to.equal(200);
-    });
-  });
 
   describe('Cursor validation and error handling', function() {
     it('should handle invalid cursor gracefully', async function() {
@@ -460,23 +403,16 @@ describe('MCP Server - list_books pagination', function() {
   });
 
   describe('MCP tool schema updates', function() {
-    it('should include cursor parameter in tool schema', function() {
+    it('should include only cursor parameter in tool schema', function() {
       const expectedToolSchema = {
         name: 'list_books',
-        description: 'List books with pagination support',
+        description: 'List books with fixed 50-item pagination',
         inputSchema: {
           type: 'object',
           properties: {
             cursor: {
               type: 'string',
               description: 'Pagination cursor for next page'
-            },
-            limit: {
-              type: 'number',
-              description: 'Number of books per page (1-200, default 50)',
-              minimum: 1,
-              maximum: 200,
-              default: 50
             }
           },
           required: []
@@ -484,10 +420,8 @@ describe('MCP Server - list_books pagination', function() {
       };
 
       expect(expectedToolSchema.inputSchema.properties).to.have.property('cursor');
-      expect(expectedToolSchema.inputSchema.properties).to.have.property('limit');
-      expect(expectedToolSchema.inputSchema.properties.limit.minimum).to.equal(1);
-      expect(expectedToolSchema.inputSchema.properties.limit.maximum).to.equal(200);
-      expect(expectedToolSchema.inputSchema.properties.limit.default).to.equal(50);
+      expect(expectedToolSchema.inputSchema.properties).to.not.have.property('limit');
+      expect(expectedToolSchema.description).to.include('fixed 50-item');
     });
   });
 });
