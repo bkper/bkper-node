@@ -10,8 +10,8 @@ Balances queries support a limited set of filtering operations focused on accoun
 
 | Operator | Description | Example |
 |----------|-------------|---------|
-| `account:` | Match balances for a specific account | `account:Cash` |
-| `group:` | Match balances for accounts in a specific group | `group:"Current Assets"` |
+| `account:` | Match balances for a specific account | `account:'Cash'` |
+| `group:` | Match balances for accounts in a specific group | `group:'Current Assets'` |
 
 ### Date Filtering
 
@@ -35,13 +35,13 @@ Balances queries support a limited set of filtering operations focused on accoun
 
 ```
 # Cash account balance
-account:Cash
+account:'Cash'
 
 # All asset account balances
-group:"Current Assets"
+group:'Current Assets'
 
 # All revenue account balances
-group:Revenue
+group:'Revenue'
 ```
 
 ### Date-Based Queries
@@ -61,13 +61,13 @@ on:$m-1
 
 ```
 # Cash balance at year end
-account:Cash on:2023-12-31
+account:'Cash' on:2023-12-31
 
 # Asset balances at month end
-group:"Current Assets" on:$m
+group:'Current Assets' on:$m
 
 # Revenue balances for the year
-group:Revenue after:2024-01-01 before:2024-12-31
+group:'Revenue' after:2024-01-01 before:2024-12-31
 ```
 
 ## Query Limitations
@@ -89,12 +89,12 @@ For more complex filtering, use the `list_transactions` tool instead.
 
 1. **Use specific accounts** - Account filters are fastest
    ```
-   account:Cash
+   account:'Cash'
    ```
 
 2. **Use group filters** - Group filters are efficient for multiple accounts
    ```
-   group:"Current Assets"
+   group:'Current Assets'
    ```
 
 3. **Specify dates** - Date filters help narrow results
@@ -104,10 +104,10 @@ For more complex filtering, use the `list_transactions` tool instead.
 
 ### Syntax Guidelines
 
-1. **Quote multi-word values** - Use quotes for names with spaces
+1. **Quote multi-word values** - Use single quotes for names with spaces
    ```
-   account:"Accounts Receivable"
-   group:"Operating Expenses"
+   account:'Accounts Receivable'
+   group:'Operating Expenses'
    ```
 
 2. **Date format** - Use YYYY-MM-DD format for dates
@@ -124,10 +124,10 @@ For more complex filtering, use the `list_transactions` tool instead.
 on:$m
 
 # Asset balances at month end
-group:Assets on:$m
+group:'Assets' on:$m
 
 # Cash position at specific date
-account:Cash on:2024-01-31
+account:'Cash' on:2024-01-31
 ```
 
 #### Year-End Reports
@@ -136,7 +136,7 @@ account:Cash on:2024-01-31
 on:2023-12-31
 
 # Equity balances
-group:Equity on:2023-12-31
+group:'Equity' on:2023-12-31
 ```
 
 #### Comparative Analysis
@@ -162,13 +162,13 @@ When using queries with the `get_balances` tool:
 // First page with query
 {
   "bookId": "book-123",
-  "query": "group:Assets on:2024-01-31"
+  "query": "group:'Assets' on:2024-01-31"
 }
 
 // Next page using cursor (query is preserved)
 {
   "bookId": "book-123", 
-  "query": "group:Assets on:2024-01-31",
+  "query": "group:'Assets' on:2024-01-31",
   "cursor": "eyJvZmZzZXQiOjUwfQ=="
 }
 ```
@@ -180,10 +180,10 @@ Common query errors and solutions:
 ### Invalid Syntax
 ```
 # Error: Unmatched quotes
-account:"Cash Balance
+account:'Cash Balance
 
 # Fix: Close quotes
-account:"Cash Balance"
+account:'Cash Balance'
 ```
 
 ### Invalid Dates
@@ -198,19 +198,19 @@ on:2024-01-15
 ### Non-existent Accounts/Groups
 ```
 # Error: Account not found
-account:NonExistentAccount
+account:'NonExistentAccount'
 
 # Fix: Use exact account name
-account:Cash
+account:'Cash'
 ```
 
 ### Unsupported Operations
 ```
 # Error: Amount filtering not supported
-account:Cash amount:>1000
+account:'Cash' amount:>1000
 
 # Fix: Use account/group/date filters only
-account:Cash on:2024-01-31
+account:'Cash' on:2024-01-31
 ```
 
 For more advanced filtering capabilities, use the `list_transactions` tool which supports the full query syntax documented in the [Transactions Query Guide](./transactions-query-guide.md).

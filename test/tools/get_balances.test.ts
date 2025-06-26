@@ -70,11 +70,11 @@ const mockBkperJs: MockBkper = {
         
         if (query) {
           // Simple query simulation for testing - only account, group, and date filters
-          if (query.includes('account:Cash')) {
+          if (query.includes("account:'Cash'")) {
             filteredBalances = currentMockBalances.filter(b => b.account.name === 'Cash');
-          } else if (query.includes('group:Assets')) {
+          } else if (query.includes("group:'Assets'")) {
             filteredBalances = currentMockBalances.filter(b => b.account.type === 'ASSET');
-          } else if (query.includes('group:Liabilities')) {
+          } else if (query.includes("group:'Liabilities'")) {
             filteredBalances = currentMockBalances.filter(b => b.account.type === 'LIABILITY');
           }
         }
@@ -186,7 +186,7 @@ describe('MCP Server - get_balances tool', function() {
     const book = await mockBkperJs.getBook(bookId);
     
     // Test with account filter
-    const cashBalanceReport = await book.getBalancesReport('account:Cash');
+    const cashBalanceReport = await book.getBalancesReport("account:'Cash'");
     const cashBalances = await cashBalanceReport.getBalances();
     const cashBalancesData = cashBalances.map(balance => balance.json());
     
@@ -196,7 +196,7 @@ describe('MCP Server - get_balances tool', function() {
     });
 
     // Test with group filter for assets
-    const assetBalanceReport = await book.getBalancesReport('group:Assets');
+    const assetBalanceReport = await book.getBalancesReport("group:'Assets'");
     const assetBalances = await assetBalanceReport.getBalances();
     const assetBalancesData = assetBalances.map(balance => balance.json());
     
@@ -374,7 +374,7 @@ describe('MCP Server - get_balances tool schema', function() {
           },
           query: {
             type: 'string',
-            description: 'Optional query to filter balances (e.g., "account:Cash", "group:Assets", "on:2024-01-31")'
+            description: 'Optional query to filter balances (e.g., "account:\'Cash\'", "group:\'Assets\'", "on:2024-01-31")'
           }
         },
         required: ['bookId']

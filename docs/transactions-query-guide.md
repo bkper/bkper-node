@@ -10,10 +10,10 @@ Bkper queries use a simple text-based syntax with operators and keywords to filt
 
 | Operator | Description | Example |
 |----------|-------------|---------|
-| `account:` | Match transactions involving a specific account | `account:Cash` |
-| `from:` | Match transactions where the specified account is the credit account | `from:Cash` |
-| `to:` | Match transactions where the specified account is the debit account | `to:Expenses` |
-| `group:` | Match transactions involving accounts in a specific group | `group:"Current Assets"` |
+| `account:` | Match transactions involving a specific account | `account:'Cash'` |
+| `from:` | Match transactions where the specified account is the credit account | `from:'Cash'` |
+| `to:` | Match transactions where the specified account is the debit account | `to:'Expenses'` |
+| `group:` | Match transactions involving accounts in a specific group | `group:'Current Assets'` |
 
 ### Date Filtering
 
@@ -65,16 +65,16 @@ Bkper queries use a simple text-based syntax with operators and keywords to filt
 
 ```
 # All Cash transactions
-account:Cash
+account:'Cash'
 
 # All transactions from Cash account (Cash as credit)
-from:Cash
+from:'Cash'
 
 # All transactions to Expenses account (Expenses as debit) 
-to:Expenses
+to:'Expenses'
 
 # All transactions involving Revenue accounts
-group:Revenue
+group:'Revenue'
 ```
 
 ### Date Range Queries
@@ -132,16 +132,16 @@ property:invoice_number="INV-2024-001"
 
 ```
 # Large cash transactions this month
-account:Cash AND amount:>1000 AND on:$m
+account:'Cash' AND amount:>1000 AND on:$m
 
 # All posted revenue transactions from Q1 2024
-group:Revenue AND posted:true AND after:2024-01-01 AND before:2024-04-01
+group:'Revenue' AND posted:true AND after:2024-01-01 AND before:2024-04-01
 
 # Cash or bank transactions over $500 (excluding pending)
-(account:Cash OR account:Bank) AND amount:>500 AND posted:true
+(account:'Cash' OR account:'Bank') AND amount:>500 AND posted:true
 
 # Office expenses excluding rent
-group:"Operating Expenses" AND NOT description:"rent"
+group:'Operating Expenses' AND NOT description:'rent'
 
 # Recent large transactions
 after:$d-7 AND amount:>2000
@@ -170,13 +170,13 @@ type:EQUITY
 
 ```
 # Transfers between Cash and Bank accounts
-(from:Cash to:Bank) OR (from:Bank to:Cash)
+(from:'Cash' to:'Bank') OR (from:'Bank' to:'Cash')
 
 # All transactions involving either Cash or Checking
-account:Cash OR account:Checking
+account:'Cash' OR account:'Checking'
 
 # Exclude internal transfers
-NOT (group:"Assets" AND group:"Assets")
+NOT (group:'Assets' AND group:'Assets')
 ```
 
 ## Query Best Practices
@@ -190,7 +190,7 @@ NOT (group:"Assets" AND group:"Assets")
 
 2. **Filter by account first** - Account filters are typically faster
    ```
-   account:Cash AND amount:>1000
+   account:'Cash' AND amount:>1000
    ```
 
 3. **Use posted status** - Filter by posted status early
@@ -200,16 +200,16 @@ NOT (group:"Assets" AND group:"Assets")
 
 ### Syntax Guidelines
 
-1. **Quote multi-word values** - Use quotes for names with spaces
+1. **Quote multi-word values** - Use single quotes for names with spaces
    ```
-   account:"Accounts Receivable"
-   description:"office supplies"
+   account:'Accounts Receivable'
+   description:'office supplies'
    ```
 
 2. **Case sensitivity** - Account names and descriptions are case-sensitive
    ```
-   account:Cash    # Correct
-   account:cash    # May not match
+   account:'Cash'    # Correct
+   account:'cash'    # May not match
    ```
 
 3. **Date format** - Use YYYY-MM-DD format for dates
@@ -226,22 +226,22 @@ NOT (group:"Assets" AND group:"Assets")
 after:2024-01-01 before:2024-02-01 AND posted:true
 
 # Revenue for the month
-group:Revenue AND on:$m AND posted:true
+group:'Revenue' AND on:$m AND posted:true
 
 # Expenses for the month  
-group:Expenses AND on:$m AND posted:true
+group:'Expenses' AND on:$m AND posted:true
 ```
 
 #### Cash Flow Analysis
 ```
 # Cash inflows (credit to Cash)
-to:Cash AND posted:true
+to:'Cash' AND posted:true
 
 # Cash outflows (debit from Cash)
-from:Cash AND posted:true
+from:'Cash' AND posted:true
 
 # Net cash flow analysis
-account:Cash AND posted:true
+account:'Cash' AND posted:true
 ```
 
 #### Reconciliation
@@ -270,14 +270,14 @@ When using queries with the `list_transactions` tool:
 // First page with query
 {
   "bookId": "book-123",
-  "query": "account:Cash AND amount:>1000 AND after:2024-01-01",
+  "query": "account:'Cash' AND amount:>1000 AND after:2024-01-01",
   "limit": 50
 }
 
 // Next page using cursor (query is preserved)
 {
   "bookId": "book-123", 
-  "query": "account:Cash AND amount:>1000 AND after:2024-01-01",
+  "query": "account:'Cash' AND amount:>1000 AND after:2024-01-01",
   "limit": 50,
   "cursor": "eyJvZmZzZXQiOjUwfQ=="
 }
@@ -290,10 +290,10 @@ Common query errors and solutions:
 ### Invalid Syntax
 ```
 # Error: Unmatched quotes
-description:"office rent
+description:'office rent
 
 # Fix: Close quotes
-description:"office rent"
+description:'office rent'
 ```
 
 ### Invalid Dates
@@ -308,10 +308,10 @@ after:2024-01-15
 ### Non-existent Accounts
 ```
 # Error: Account not found
-account:NonExistentAccount
+account:'NonExistentAccount'
 
 # Fix: Use exact account name
-account:"Cash"
+account:'Cash'
 ```
 
 For more advanced query patterns and examples, refer to the [Official Bkper Query Guide](https://help.bkper.com/en/articles/2569178-bkper-query-guide).
