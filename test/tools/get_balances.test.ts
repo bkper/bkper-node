@@ -65,14 +65,16 @@ const mockBkperJs: MockBkper = {
   getBook: async (id: string): Promise<MockBook> => {
     return {
       getBalancesReport: async (query?: string): Promise<MockBalanceReport> => {
-        // Apply basic query filtering for testing
+        // Apply basic query filtering for testing (simplified for balances)
         let filteredBalances = currentMockBalances;
         
         if (query) {
-          // Simple query simulation for testing
-          if (query.includes('type:ASSET')) {
+          // Simple query simulation for testing - only account, group, and date filters
+          if (query.includes('account:Cash')) {
+            filteredBalances = currentMockBalances.filter(b => b.account.name === 'Cash');
+          } else if (query.includes('group:Assets')) {
             filteredBalances = currentMockBalances.filter(b => b.account.type === 'ASSET');
-          } else if (query.includes('type:LIABILITY')) {
+          } else if (query.includes('group:Liabilities')) {
             filteredBalances = currentMockBalances.filter(b => b.account.type === 'LIABILITY');
           }
         }
@@ -183,24 +185,24 @@ describe('MCP Server - get_balances tool', function() {
     const bookId = 'book-1';
     const book = await mockBkperJs.getBook(bookId);
     
-    // Test with asset type filter
-    const assetBalanceReport = await book.getBalancesReport('type:ASSET');
+    // Test with account filter
+    const cashBalanceReport = await book.getBalancesReport('account:Cash');
+    const cashBalances = await cashBalanceReport.getBalances();
+    const cashBalancesData = cashBalances.map(balance => balance.json());
+    
+    // Verify all returned balances are for Cash account
+    cashBalancesData.forEach(balance => {
+      expect(balance.account.name).to.equal('Cash');
+    });
+
+    // Test with group filter for assets
+    const assetBalanceReport = await book.getBalancesReport('group:Assets');
     const assetBalances = await assetBalanceReport.getBalances();
     const assetBalancesData = assetBalances.map(balance => balance.json());
     
     // Verify all returned balances are ASSET type
     assetBalancesData.forEach(balance => {
       expect(balance.account.type).to.equal('ASSET');
-    });
-
-    // Test with liability type filter
-    const liabilityBalanceReport = await book.getBalancesReport('type:LIABILITY');
-    const liabilityBalances = await liabilityBalanceReport.getBalances();
-    const liabilityBalancesData = liabilityBalances.map(balance => balance.json());
-    
-    // Verify all returned balances are LIABILITY type
-    liabilityBalancesData.forEach(balance => {
-      expect(balance.account.type).to.equal('LIABILITY');
     });
   });
 
@@ -372,7 +374,7 @@ describe('MCP Server - get_balances tool schema', function() {
           },
           query: {
             type: 'string',
-            description: 'Optional Bkper query to filter balances (e.g., "type:ASSET")'
+            description: 'Optional query to filter balances (e.g., "account:Cash", "group:Assets", "on:2024-01-31")'
           }
         },
         required: ['bookId']

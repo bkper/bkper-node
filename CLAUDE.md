@@ -170,6 +170,9 @@ bun run build && node lib/cli.js mcp start
 - **Test-Driven Development (TDD)**: Use `bun test` for rapid feedback during development
 - **NEVER modify any files inside `node_modules/` directory** - these are managed dependencies
 
+## Code Commit Guidelines
+- Never commit code automatically after implementing a feature or a test.
+
 ## Test-Driven Development (TDD) Workflow
 
 ### Running Tests
@@ -216,3 +219,4 @@ it('should handle new_tool correctly', async function() {
   5. Review the implementation
   6. Commit the implementation
   7. Refactor if necessary, maintaining test coverage
+```

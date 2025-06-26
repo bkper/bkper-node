@@ -63,6 +63,6 @@ tests/
 1. Start with Phase 1 (testing) completely before moving to Phase 2
 2. Maintain the same high-quality patterns established in `list_books`
 3. Ensure all pagination strategies are consistent and efficient
-4. **For `list_transactions`**: Include comprehensive query documentation and examples based on [Bkper Query Guide](https://help.bkper.com/en/articles/2569178-bkper-query-guide)
+4. **For `list_transactions`**: Include comprehensive query documentation and examples based on [Transactions Query Guide](./transactions-query-guide.md) and [Balances Query Guide](./balances-query-guide.md)
 5. **Ultrathink** before implementing any code
 6. **Do NOT commit any code**

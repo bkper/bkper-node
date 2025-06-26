@@ -1,4 +1,4 @@
-# Bkper Query Guide for list_transactions Tool
+# Transactions Query Guide for list_transactions Tool
 
 This guide provides comprehensive documentation for the query syntax used in the `list_transactions` MCP tool.
 
