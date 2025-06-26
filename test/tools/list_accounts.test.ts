@@ -1,120 +1,30 @@
-import { expect } from 'chai';
-import fs from 'fs';
-import { fileURLToPath } from 'url';
-import path from 'path';
+import { expect, setupTestEnvironment, getTestPaths } from '../helpers/test-setup.js';
+import { BkperMcpServerType, AccountData } from '../helpers/mock-interfaces.js';
+import { setupMocks, createMockBkperForBook, setMockBkper } from '../helpers/mock-factory.js';
+import { loadAccounts, generateLargeAccounts } from '../helpers/fixture-loader.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const { __dirname } = getTestPaths(import.meta.url);
 
-// TypeScript interfaces for test data
-interface AccountData {
-  id: string;
-  name: string;
-  type: "ASSET" | "LIABILITY" | "EQUITY" | "INCOME" | "OUTGOING";
-  balance: number;
-  normalizedBalance: number;
-  group?: {
-    id: string;
-    name: string;
-  };
-  properties: {[name: string]: string};
-  archived: boolean;
-  permanent: boolean;
-}
-
-interface MockAccount {
-  json(): AccountData;
-}
-
-interface MockBook {
-  getAccounts(): Promise<MockAccount[]>;
-}
-
-interface MockBkper {
-  setConfig: (config: any) => void;
-  getBook: (id: string) => Promise<MockBook>;
-}
-
-// Mock account data from fixtures
-const mockAccounts: AccountData[] = JSON.parse(fs.readFileSync(path.join(__dirname, '../fixtures', 'sample-accounts.json'), 'utf8'));
-
-// Create a large dataset for pagination testing (100+ accounts)
-const largeMockAccounts: AccountData[] = Array.from({ length: 150 }, (_, i) => ({
-  id: `account-${i + 1}`,
-  name: `Account ${i + 1}`,
-  type: ["ASSET", "LIABILITY", "EQUITY", "INCOME", "OUTGOING"][i % 5] as any,
-  balance: Math.floor(Math.random() * 10000),
-  normalizedBalance: Math.floor(Math.random() * 10000),
-  group: {
-    id: `group-${Math.floor(i / 10)}`,
-    name: `Group ${Math.floor(i / 10)}`
-  },
-  properties: {},
-  archived: false,
-  permanent: false
-}));
+// Load test data
+const mockAccounts: AccountData[] = loadAccounts(__dirname);
+const largeMockAccounts: AccountData[] = generateLargeAccounts(150);
 
 let currentMockAccounts: AccountData[] = mockAccounts;
 
-const mockBkperJs: MockBkper = {
-  setConfig: () => {},
-  getBook: async (id: string): Promise<MockBook> => {
-    return {
-      getAccounts: async (): Promise<MockAccount[]> => currentMockAccounts.map((accountData: AccountData) => ({
-        json: (): AccountData => accountData
-      }))
-    };
-  }
-};
-
-// Mock auth service
-const mockGetOAuthToken = async (): Promise<string> => 'mock-token';
-
-// Setup module mocking
-async function setupMocks() {
-  const originalImport = await import('module');
-  const ModuleClass = originalImport.Module as any;
-  const originalResolveFilename = ModuleClass._resolveFilename;
-  const originalLoad = ModuleClass.load;
-
-  ModuleClass._resolveFilename = function(request: string, parent: any, isMain?: boolean) {
-    if (request === 'bkper-js') {
-      return 'mocked-bkper-js';
-    }
-    if (request.includes('local-auth-service.js')) {
-      return 'mocked-auth-service';
-    }
-    return originalResolveFilename.call(this, request, parent, isMain);
-  };
-
-  ModuleClass.load = function(filename: string) {
-    if (filename === 'mocked-bkper-js') {
-      (this as any).exports = { Bkper: mockBkperJs };
-      return;
-    }
-    if (filename === 'mocked-auth-service') {
-      (this as any).exports = { getOAuthToken: mockGetOAuthToken };
-      return;
-    }
-    return originalLoad.call(this, filename);
-  };
-}
-
-// Initialize mocks
+// Setup mocks and import server
 setupMocks();
 
-// Import the actual MCP server after mocks are set up
 const { BkperMcpServer } = await import('../../src/mcp/server.js');
-
-// Type for the server instance
-type BkperMcpServerType = InstanceType<typeof BkperMcpServer>;
 
 describe('MCP Server - list_accounts Tool Registration', function() {
   let server: BkperMcpServerType;
 
   beforeEach(function() {
-    process.env.BKPER_API_KEY = 'test-api-key';
+    setupTestEnvironment();
     currentMockAccounts = mockAccounts;
+    // Create mock with books + accounts support
+    const mockBkper = createMockBkperForBook([], currentMockAccounts);
+    setMockBkper(mockBkper);
     server = new BkperMcpServer();
   });
 
@@ -167,8 +77,11 @@ describe('MCP Server - list_accounts Tool Calls', function() {
   let server: BkperMcpServerType;
 
   beforeEach(function() {
-    process.env.BKPER_API_KEY = 'test-api-key';
+    setupTestEnvironment();
     currentMockAccounts = mockAccounts;
+    // Create mock with books + accounts support
+    const mockBkper = createMockBkperForBook([], currentMockAccounts);
+    setMockBkper(mockBkper);
     server = new BkperMcpServer();
   });
 

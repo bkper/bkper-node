@@ -1,135 +1,21 @@
-import { expect } from 'chai';
-import fs from 'fs';
-import { fileURLToPath } from 'url';
-import path from 'path';
+import { expect, setupTestEnvironment, getTestPaths } from '../helpers/test-setup.js';
+import { BkperMcpServerType, BalanceData } from '../helpers/mock-interfaces.js';
+import { setupMocks, createMockBkperForBook, setMockBkper } from '../helpers/mock-factory.js';
+import { loadBalances, generateLargeBalances } from '../helpers/fixture-loader.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const { __dirname } = getTestPaths(import.meta.url);
 
-// TypeScript interfaces for test data
-interface BalanceData {
-  account: {
-    id: string;
-    name: string;
-    type: "ASSET" | "LIABILITY" | "EQUITY" | "INCOME" | "OUTGOING";
-  };
-  balance: number;
-  normalizedBalance: number;
-  cumulative: number;
-  group?: {
-    id: string;
-    name: string;
-  };
-}
-
-interface MockBalanceReport {
-  getBalances(): Promise<MockBalance[]>;
-}
-
-interface MockBalance {
-  json(): BalanceData;
-}
-
-interface MockBook {
-  getBalancesReport(query?: string): Promise<MockBalanceReport>;
-}
-
-interface MockBkper {
-  setConfig: (config: any) => void;
-  getBook: (id: string) => Promise<MockBook>;
-}
-
-// Mock balance data from fixtures
-const mockBalances: BalanceData[] = JSON.parse(fs.readFileSync(path.join(__dirname, '../fixtures', 'sample-balances.json'), 'utf8'));
-
-// Create a large dataset for pagination testing (100+ balances)
-const largeMockBalances: BalanceData[] = Array.from({ length: 150 }, (_, i) => ({
-  account: {
-    id: `account-${i + 1}`,
-    name: `Account ${i + 1}`,
-    type: ["ASSET", "LIABILITY", "EQUITY", "INCOME", "OUTGOING"][i % 5] as any
-  },
-  balance: Math.floor(Math.random() * 10000) - 5000, // Can be positive or negative
-  normalizedBalance: Math.abs(Math.floor(Math.random() * 10000)),
-  cumulative: Math.floor(Math.random() * 50000),
-  group: {
-    id: `group-${Math.floor(i / 10)}`,
-    name: `Group ${Math.floor(i / 10)}`
-  }
-}));
+// Load test data
+const mockBalances: BalanceData[] = loadBalances(__dirname);
+const largeMockBalances: BalanceData[] = generateLargeBalances(150);
 
 let currentMockBalances: BalanceData[] = mockBalances;
 
-const mockBkperJs: MockBkper = {
-  setConfig: () => {},
-  getBook: async (id: string): Promise<MockBook> => {
-    return {
-      getBalancesReport: async (query?: string): Promise<MockBalanceReport> => {
-        // Apply basic query filtering for testing (simplified for balances)
-        let filteredBalances = currentMockBalances;
-        
-        if (query) {
-          // Simple query simulation for testing - only account, group, and date filters
-          if (query.includes("account:'Cash'")) {
-            filteredBalances = currentMockBalances.filter(b => b.account.name === 'Cash');
-          } else if (query.includes("group:'Assets'")) {
-            filteredBalances = currentMockBalances.filter(b => b.account.type === 'ASSET');
-          } else if (query.includes("group:'Liabilities'")) {
-            filteredBalances = currentMockBalances.filter(b => b.account.type === 'LIABILITY');
-          }
-        }
-        
-        return {
-          getBalances: async (): Promise<MockBalance[]> => filteredBalances.map((balanceData: BalanceData) => ({
-            json: (): BalanceData => balanceData
-          }))
-        };
-      }
-    };
-  }
-};
-
-// Mock auth service
-const mockGetOAuthToken = async (): Promise<string> => 'mock-token';
-
-// Setup module mocking
-async function setupMocks() {
-  const originalImport = await import('module');
-  const ModuleClass = originalImport.Module as any;
-  const originalResolveFilename = ModuleClass._resolveFilename;
-  const originalLoad = ModuleClass.load;
-
-  ModuleClass._resolveFilename = function(request: string, parent: any, isMain?: boolean) {
-    if (request === 'bkper-js') {
-      return 'mocked-bkper-js';
-    }
-    if (request.includes('local-auth-service.js')) {
-      return 'mocked-auth-service';
-    }
-    return originalResolveFilename.call(this, request, parent, isMain);
-  };
-
-  ModuleClass.load = function(filename: string) {
-    if (filename === 'mocked-bkper-js') {
-      (this as any).exports = { Bkper: mockBkperJs };
-      return;
-    }
-    if (filename === 'mocked-auth-service') {
-      (this as any).exports = { getOAuthToken: mockGetOAuthToken };
-      return;
-    }
-    return originalLoad.call(this, filename);
-  };
-}
-
-// Initialize mocks
+// Setup mocks and import server
 setupMocks();
+// We'll set up the mock in beforeEach since balances require book+balances setup
 
-// Import the actual MCP server after mocks are set up
 const { BkperMcpServer } = await import('../../src/mcp/server.js');
-
-// Type for the server instance
-type BkperMcpServerType = InstanceType<typeof BkperMcpServer>;
 
 describe('MCP Server - get_balances Tool Registration', function() {
   let server: BkperMcpServerType;

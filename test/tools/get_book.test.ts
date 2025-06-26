@@ -1,113 +1,26 @@
-import { expect } from 'chai';
-import fs from 'fs';
-import { fileURLToPath } from 'url';
-import path from 'path';
+import { expect, setupTestEnvironment, getTestPaths } from '../helpers/test-setup.js';
+import { BkperMcpServerType, BookData } from '../helpers/mock-interfaces.js';
+import { setupMocks, createMockBkperForBook, setMockBkper } from '../helpers/mock-factory.js';
+import { loadBooks } from '../helpers/fixture-loader.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const { __dirname } = getTestPaths(import.meta.url);
 
-// TypeScript interfaces for test data
-interface BookData {
-  id?: string;
-  name?: string;
-  collection?: any;
-  agentId?: string;
-  autoPost?: boolean;
-  closingDate?: string;
-  createdAt?: string;
-  datePattern?: string;
-  decimalSeparator?: "DOT" | "COMMA";
-  fractionDigits?: number;
-  groups?: any[];
-  lastUpdateMs?: string;
-  lockDate?: string;
-  ownerName?: string;
-  pageSize?: number;
-  period?: "MONTH" | "QUARTER" | "YEAR";
-  periodStartMonth?: any;
-  permission?: any;
-  properties?: {[name: string]: string};
-  timeZone?: string;
-  timeZoneOffset?: number;
-  totalTransactions?: number;
-  totalTransactionsCurrentMonth?: number;
-  totalTransactionsCurrentYear?: number;
-  visibility?: "PUBLIC" | "PRIVATE";
-  accounts?: any[];
-}
+// Load test data
+const mockBooks: BookData[] = loadBooks(__dirname);
 
-interface MockBook {
-  json(): BookData;
-}
-
-interface MockBkper {
-  setConfig: (config: any) => void;
-  getBook: (id: string) => Promise<MockBook>;
-}
-
-// Mock book data from fixtures
-const mockBooks: BookData[] = JSON.parse(fs.readFileSync(path.join(__dirname, '../fixtures', 'sample-books.json'), 'utf8'));
-
-const mockBkperJs: MockBkper = {
-  setConfig: () => {},
-  getBook: async (id: string): Promise<MockBook> => {
-    const book = mockBooks.find(b => b.id === id);
-    if (!book) {
-      throw new Error(`Book not found: ${id}`);
-    }
-    return {
-      json: (): BookData => book
-    };
-  }
-};
-
-// Mock auth service
-const mockGetOAuthToken = async (): Promise<string> => 'mock-token';
-
-// Setup module mocking (same pattern as main test file)
-async function setupMocks() {
-  const originalImport = await import('module');
-  const ModuleClass = originalImport.Module as any;
-  const originalResolveFilename = ModuleClass._resolveFilename;
-  const originalLoad = ModuleClass.load;
-
-  ModuleClass._resolveFilename = function(request: string, parent: any, isMain?: boolean) {
-    if (request === 'bkper-js') {
-      return 'mocked-bkper-js';
-    }
-    if (request.includes('local-auth-service.js')) {
-      return 'mocked-auth-service';
-    }
-    return originalResolveFilename.call(this, request, parent, isMain);
-  };
-
-  ModuleClass.load = function(filename: string) {
-    if (filename === 'mocked-bkper-js') {
-      (this as any).exports = { Bkper: mockBkperJs };
-      return;
-    }
-    if (filename === 'mocked-auth-service') {
-      (this as any).exports = { getOAuthToken: mockGetOAuthToken };
-      return;
-    }
-    return originalLoad.call(this, filename);
-  };
-}
-
-// Initialize mocks
+// Setup mocks and import server
 setupMocks();
+setMockBkper(createMockBkperForBook(mockBooks));
 
-// Import the actual MCP server after mocks are set up
 const { BkperMcpServer } = await import('../../src/mcp/server.js');
-
-// Type for the server instance
-type BkperMcpServerType = InstanceType<typeof BkperMcpServer>;
 
 describe('MCP Server - get_book Tool Registration', function() {
   let server: BkperMcpServerType;
 
   beforeEach(function() {
-    process.env.BKPER_API_KEY = 'test-api-key';
+    setupTestEnvironment();
+    const mockBkper = createMockBkperForBook(mockBooks);
+    setMockBkper(mockBkper);
     server = new BkperMcpServer();
   });
 
@@ -155,7 +68,9 @@ describe('MCP Server - get_book Tool Calls', function() {
   let server: BkperMcpServerType;
 
   beforeEach(function() {
-    process.env.BKPER_API_KEY = 'test-api-key';
+    setupTestEnvironment();
+    const mockBkper = createMockBkperForBook(mockBooks);
+    setMockBkper(mockBkper);
     server = new BkperMcpServer();
   });
 

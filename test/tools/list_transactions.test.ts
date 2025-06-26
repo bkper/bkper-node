@@ -1,180 +1,30 @@
-import { expect } from 'chai';
-import fs from 'fs';
-import { fileURLToPath } from 'url';
-import path from 'path';
+import { expect, setupTestEnvironment, getTestPaths } from '../helpers/test-setup.js';
+import { BkperMcpServerType, TransactionData } from '../helpers/mock-interfaces.js';
+import { setupMocks, createMockBkperForBook, setMockBkper } from '../helpers/mock-factory.js';
+import { loadTransactions, generateLargeTransactions } from '../helpers/fixture-loader.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const { __dirname } = getTestPaths(import.meta.url);
 
-// TypeScript interfaces for test data
-interface TransactionData {
-  id: string;
-  date: string;
-  dateValue: number;
-  amount: number;
-  description: string;
-  posted: boolean;
-  creditAccount: {
-    id: string;
-    name: string;
-    type: "ASSET" | "LIABILITY" | "EQUITY" | "INCOME" | "OUTGOING";
-  };
-  debitAccount: {
-    id: string;
-    name: string;
-    type: "ASSET" | "LIABILITY" | "EQUITY" | "INCOME" | "OUTGOING";
-  };
-  properties: {[name: string]: string};
-  urls: string[];
-}
-
-interface MockTransactionIterator {
-  hasNext(): boolean;
-  next(): MockTransaction[];
-  getCursor(): string | undefined;
-}
-
-interface MockTransaction {
-  json(): TransactionData;
-}
-
-interface MockBook {
-  listTransactions(query?: string, limit?: number, cursor?: string): Promise<MockTransactionIterator>;
-}
-
-interface MockBkper {
-  setConfig: (config: any) => void;
-  getBook: (id: string) => Promise<MockBook>;
-}
-
-// Mock transaction data from fixtures
-const mockTransactions: TransactionData[] = JSON.parse(fs.readFileSync(path.join(__dirname, '../fixtures', 'sample-transactions.json'), 'utf8'));
-
-// Create a large dataset for API cursor pagination testing
-const largeMockTransactions: TransactionData[] = Array.from({ length: 500 }, (_, i) => ({
-  id: `txn-${i + 1}`,
-  date: `2024-01-${String((i % 30) + 1).padStart(2, '0')}`,
-  dateValue: Date.now() + (i * 24 * 60 * 60 * 1000),
-  amount: Math.floor(Math.random() * 5000) + 100,
-  description: `Transaction ${i + 1} - ${['Service payment', 'Equipment purchase', 'Utility bill', 'Office rent', 'Consulting fee'][i % 5]}`,
-  posted: Math.random() > 0.1, // 90% posted
-  creditAccount: {
-    id: `account-${(i % 10) + 1}`,
-    name: `Account ${(i % 10) + 1}`,
-    type: ["ASSET", "LIABILITY", "EQUITY", "INCOME", "OUTGOING"][i % 5] as any
-  },
-  debitAccount: {
-    id: `account-${((i + 1) % 10) + 1}`,
-    name: `Account ${((i + 1) % 10) + 1}`,
-    type: ["ASSET", "LIABILITY", "EQUITY", "INCOME", "OUTGOING"][(i + 1) % 5] as any
-  },
-  properties: { batch: String(Math.floor(i / 50)) },
-  urls: []
-}));
+// Load test data
+const mockTransactions: TransactionData[] = loadTransactions(__dirname);
+const largeMockTransactions: TransactionData[] = generateLargeTransactions(500);
 
 let currentMockTransactions: TransactionData[] = mockTransactions;
 
-const mockBkperJs: MockBkper = {
-  setConfig: () => {},
-  getBook: async (id: string): Promise<MockBook> => {
-    return {
-      listTransactions: async (query?: string, limit?: number, cursor?: string): Promise<MockTransactionIterator> => {
-        // Apply query filtering for testing
-        let filteredTransactions = currentMockTransactions;
-        
-        if (query) {
-          // Simulate Bkper query filtering
-          if (query.includes("account:'Cash'")) {
-            filteredTransactions = currentMockTransactions.filter(t => 
-              t.creditAccount.name === 'Cash' || t.debitAccount.name === 'Cash'
-            );
-          } else if (query.includes('amount>1000')) {
-            filteredTransactions = currentMockTransactions.filter(t => t.amount > 1000);
-          } else if (query.includes('after:2024-01-20')) {
-            filteredTransactions = currentMockTransactions.filter(t => t.date > '2024-01-20');
-          } else if (query.includes('before:2024-01-25')) {
-            filteredTransactions = currentMockTransactions.filter(t => t.date < '2024-01-25');
-          }
-        }
-
-        // Handle cursor-based pagination (simulating API behavior)
-        const pageSize = limit || 25; // Default API page size
-        let startIndex = 0;
-        
-        if (cursor) {
-          try {
-            const cursorData = JSON.parse(Buffer.from(cursor, 'base64').toString());
-            startIndex = cursorData.offset || 0;
-          } catch {
-            startIndex = 0;
-          }
-        }
-
-        const endIndex = Math.min(startIndex + pageSize, filteredTransactions.length);
-        const pageTransactions = filteredTransactions.slice(startIndex, endIndex);
-        const hasMore = endIndex < filteredTransactions.length;
-
-        return {
-          hasNext: () => hasMore,
-          next: (): MockTransaction[] => pageTransactions.map((txnData: TransactionData) => ({
-            json: (): TransactionData => txnData
-          })),
-          getCursor: (): string | undefined => hasMore ? 
-            Buffer.from(JSON.stringify({ offset: endIndex })).toString('base64') : undefined
-        };
-      }
-    };
-  }
-};
-
-// Mock auth service
-const mockGetOAuthToken = async (): Promise<string> => 'mock-token';
-
-// Setup module mocking
-async function setupMocks() {
-  const originalImport = await import('module');
-  const ModuleClass = originalImport.Module as any;
-  const originalResolveFilename = ModuleClass._resolveFilename;
-  const originalLoad = ModuleClass.load;
-
-  ModuleClass._resolveFilename = function(request: string, parent: any, isMain?: boolean) {
-    if (request === 'bkper-js') {
-      return 'mocked-bkper-js';
-    }
-    if (request.includes('local-auth-service.js')) {
-      return 'mocked-auth-service';
-    }
-    return originalResolveFilename.call(this, request, parent, isMain);
-  };
-
-  ModuleClass.load = function(filename: string) {
-    if (filename === 'mocked-bkper-js') {
-      (this as any).exports = { Bkper: mockBkperJs };
-      return;
-    }
-    if (filename === 'mocked-auth-service') {
-      (this as any).exports = { getOAuthToken: mockGetOAuthToken };
-      return;
-    }
-    return originalLoad.call(this, filename);
-  };
-}
-
-// Initialize mocks
+// Setup mocks and import server
 setupMocks();
 
-// Import the actual MCP server after mocks are set up
 const { BkperMcpServer } = await import('../../src/mcp/server.js');
-
-// Type for the server instance
-type BkperMcpServerType = InstanceType<typeof BkperMcpServer>;
 
 describe('MCP Server - list_transactions Tool Registration', function() {
   let server: BkperMcpServerType;
 
   beforeEach(function() {
-    process.env.BKPER_API_KEY = 'test-api-key';
+    setupTestEnvironment();
     currentMockTransactions = mockTransactions;
+    // Create mock with books + transactions support
+    const mockBkper = createMockBkperForBook([], undefined, currentMockTransactions);
+    setMockBkper(mockBkper);
     server = new BkperMcpServer();
   });
 
