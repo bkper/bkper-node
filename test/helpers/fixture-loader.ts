@@ -4,7 +4,9 @@ import {
   BookData,
   AccountData,
   TransactionData,
-  BalanceData
+  BalanceData,
+  AccountBalanceData,
+  Group
 } from './mock-interfaces.js';
 
 // Centralized fixture loading
@@ -42,21 +44,31 @@ export function loadBalances(testDir: string): BalanceData[] {
   return loadFixture<BalanceData>(testDir, 'sample-balances.json');
 }
 
+export function loadAccountBalances(testDir: string): AccountBalanceData[] {
+  return loadFixture<AccountBalanceData>(testDir, 'sample-account-balances.json');
+}
+
 // Large dataset generators for pagination testing
 export function generateLargeAccounts(count: number = 150): AccountData[] {
   return Array.from({ length: count }, (_, i) => ({
     id: `account-${i + 1}`,
     name: `Account ${i + 1}`,
-    type: ["ASSET", "LIABILITY", "EQUITY", "INCOME", "OUTGOING"][i % 5] as any,
-    balance: Math.floor(Math.random() * 10000),
-    normalizedBalance: Math.floor(Math.random() * 10000),
-    group: {
+    normalizedName: `account_${i + 1}`,
+    type: ["ASSET", "LIABILITY", "INCOMING", "OUTGOING"][i % 4] as any,
+    balance: (Math.floor(Math.random() * 10000)).toString(),
+    credit: ["LIABILITY", "INCOMING"].includes(["ASSET", "LIABILITY", "INCOMING", "OUTGOING"][i % 4]),
+    groups: [{
       id: `group-${Math.floor(i / 10)}`,
-      name: `Group ${Math.floor(i / 10)}`
-    },
+      name: `Group ${Math.floor(i / 10)}`,
+      hidden: false,
+      properties: {}
+    }],
     properties: {},
     archived: false,
-    permanent: false
+    permanent: false,
+    hasTransactionPosted: Math.random() > 0.3,
+    agentId: "agent-123",
+    createdAt: "1640995200000"
   }));
 }
 
@@ -65,37 +77,56 @@ export function generateLargeTransactions(count: number = 500): TransactionData[
     id: `txn-${i + 1}`,
     date: `2024-01-${String((i % 30) + 1).padStart(2, '0')}`,
     dateValue: Date.now() + (i * 24 * 60 * 60 * 1000),
-    amount: Math.floor(Math.random() * 5000) + 100,
+    amount: (Math.floor(Math.random() * 5000) + 100).toString(),
     description: `Transaction ${i + 1} - ${['Service payment', 'Equipment purchase', 'Utility bill', 'Office rent', 'Consulting fee'][i % 5]}`,
     posted: Math.random() > 0.1, // 90% posted
+    checked: Math.random() > 0.5,
+    trashed: false,
+    agentId: "agent-123",
+    createdAt: (Date.now() + (i * 24 * 60 * 60 * 1000)).toString(),
+    createdBy: "test@example.com",
     creditAccount: {
       id: `account-${(i % 10) + 1}`,
       name: `Account ${(i % 10) + 1}`,
-      type: ["ASSET", "LIABILITY", "EQUITY", "INCOME", "OUTGOING"][i % 5] as any
+      type: ["ASSET", "LIABILITY", "INCOMING", "OUTGOING"][i % 4] as any
     },
     debitAccount: {
       id: `account-${((i + 1) % 10) + 1}`,
       name: `Account ${((i + 1) % 10) + 1}`,
-      type: ["ASSET", "LIABILITY", "EQUITY", "INCOME", "OUTGOING"][(i + 1) % 5] as any
+      type: ["ASSET", "LIABILITY", "INCOMING", "OUTGOING"][(i + 1) % 4] as any
     },
     properties: { batch: String(Math.floor(i / 50)) },
-    urls: []
+    tags: ['generated', 'test'],
+    urls: [],
+    remoteIds: []
   }));
 }
 
 export function generateLargeBalances(count: number = 150): BalanceData[] {
   return Array.from({ length: count }, (_, i) => ({
+    year: 2024,
+    month: Math.floor(i / 31) + 1,
+    day: (i % 31) + 1,
+    fuzzyDate: 20240000 + ((Math.floor(i / 31) + 1) * 100) + ((i % 31) + 1),
+    periodBalance: (Math.floor(Math.random() * 2000) - 1000).toString(),
+    periodCredit: Math.floor(Math.random() * 1500).toString(),
+    periodDebit: Math.floor(Math.random() * 1500).toString(),
+    cumulativeBalance: (Math.floor(Math.random() * 10000) - 5000).toString(),
+    cumulativeCredit: Math.floor(Math.random() * 15000).toString(),
+    cumulativeDebit: Math.floor(Math.random() * 10000).toString()
+  }));
+}
+
+export function generateLargeAccountBalances(count: number = 150): AccountBalanceData[] {
+  return Array.from({ length: count }, (_, i) => ({
     account: {
       id: `account-${i + 1}`,
       name: `Account ${i + 1}`,
-      type: ["ASSET", "LIABILITY", "EQUITY", "INCOME", "OUTGOING"][i % 5] as any
+      type: ["ASSET", "LIABILITY", "INCOMING", "OUTGOING"][i % 4] as any,
+      balance: (Math.floor(Math.random() * 10000) - 5000).toString(),
+      credit: ["LIABILITY", "INCOMING"].includes(["ASSET", "LIABILITY", "INCOMING", "OUTGOING"][i % 4])
     },
-    balance: Math.floor(Math.random() * 10000) - 5000, // Can be positive or negative
-    normalizedBalance: Math.abs(Math.floor(Math.random() * 10000)),
-    cumulative: Math.floor(Math.random() * 50000),
-    group: {
-      id: `group-${Math.floor(i / 10)}`,
-      name: `Group ${Math.floor(i / 10)}`
-    }
+    balance: (Math.floor(Math.random() * 10000) - 5000).toString(),
+    cumulative: Math.abs(Math.floor(Math.random() * 10000)).toString()
   }));
 }

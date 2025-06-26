@@ -1,142 +1,122 @@
 [
   {
-    "account": {
-      "id": "account-1",
-      "name": "Cash",
-      "type": "ASSET"
-    },
-    "balance": 15000.50,
-    "normalizedBalance": 15000.50,
-    "cumulative": 15000.50,
-    "group": {
-      "id": "group-current-assets",
-      "name": "Current Assets"
-    }
+    "year": 2024,
+    "month": 1,
+    "day": 1,
+    "fuzzyDate": 20240101,
+    "periodBalance": "5000.00",
+    "periodCredit": "5000.00",
+    "periodDebit": "0.00",
+    "cumulativeBalance": "5000.00",
+    "cumulativeCredit": "5000.00",
+    "cumulativeDebit": "0.00"
   },
   {
-    "account": {
-      "id": "account-2",
-      "name": "Accounts Receivable", 
-      "type": "ASSET"
-    },
-    "balance": 8500.00,
-    "normalizedBalance": 8500.00,
-    "cumulative": 23500.50,
-    "group": {
-      "id": "group-current-assets",
-      "name": "Current Assets"
-    }
+    "year": 2024,
+    "month": 1,
+    "day": 2,
+    "fuzzyDate": 20240102,
+    "periodBalance": "1200.00",
+    "periodCredit": "1200.00",
+    "periodDebit": "0.00",
+    "cumulativeBalance": "6200.00",
+    "cumulativeCredit": "6200.00",
+    "cumulativeDebit": "0.00"
   },
   {
-    "account": {
-      "id": "account-3",
-      "name": "Equipment",
-      "type": "ASSET"
-    },
-    "balance": 25000.00,
-    "normalizedBalance": 25000.00,
-    "cumulative": 48500.50,
-    "group": {
-      "id": "group-fixed-assets",
-      "name": "Fixed Assets"
-    }
+    "year": 2024,
+    "month": 1,
+    "day": 3,
+    "fuzzyDate": 20240103,
+    "periodBalance": "-300.00",
+    "periodCredit": "0.00",
+    "periodDebit": "300.00",
+    "cumulativeBalance": "5900.00",
+    "cumulativeCredit": "6200.00",
+    "cumulativeDebit": "300.00"
   },
   {
-    "account": {
-      "id": "account-4",
-      "name": "Accounts Payable",
-      "type": "LIABILITY"
-    },
-    "balance": -5200.75,
-    "normalizedBalance": 5200.75,
-    "cumulative": 5200.75,
-    "group": {
-      "id": "group-current-liabilities",
-      "name": "Current Liabilities"
-    }
+    "year": 2024,
+    "month": 1,
+    "day": 4,
+    "fuzzyDate": 20240104,
+    "periodBalance": "2500.00",
+    "periodCredit": "2500.00",
+    "periodDebit": "0.00",
+    "cumulativeBalance": "8400.00",
+    "cumulativeCredit": "8700.00",
+    "cumulativeDebit": "300.00"
   },
   {
-    "account": {
-      "id": "account-5",
-      "name": "Bank Loan",
-      "type": "LIABILITY"
-    },
-    "balance": -12000.00,
-    "normalizedBalance": 12000.00,
-    "cumulative": 17200.75,
-    "group": {
-      "id": "group-long-term-liabilities",
-      "name": "Long-term Liabilities"
-    }
+    "year": 2024,
+    "month": 1,
+    "day": 5,
+    "fuzzyDate": 20240105,
+    "periodBalance": "-150.00",
+    "periodCredit": "0.00",
+    "periodDebit": "150.00",
+    "cumulativeBalance": "8250.00",
+    "cumulativeCredit": "8700.00",
+    "cumulativeDebit": "450.00"
   },
   {
-    "account": {
-      "id": "account-6",
-      "name": "Owner's Equity",
-      "type": "EQUITY"
-    },
-    "balance": -25000.00,
-    "normalizedBalance": 25000.00,
-    "cumulative": 25000.00,
-    "group": {
-      "id": "group-equity",
-      "name": "Equity"
-    }
+    "year": 2024,
+    "month": 1,
+    "day": 10,
+    "fuzzyDate": 20240110,
+    "periodBalance": "-500.00",
+    "periodCredit": "0.00",
+    "periodDebit": "500.00",
+    "cumulativeBalance": "7750.00",
+    "cumulativeCredit": "8700.00",
+    "cumulativeDebit": "950.00"
   },
   {
-    "account": {
-      "id": "account-7",
-      "name": "Service Revenue",
-      "type": "INCOME"
-    },
-    "balance": -18500.25,
-    "normalizedBalance": 18500.25,
-    "cumulative": 18500.25,
-    "group": {
-      "id": "group-revenue",
-      "name": "Revenue"
-    }
+    "year": 2024,
+    "month": 1,
+    "day": 15,
+    "fuzzyDate": 20240115,
+    "periodBalance": "3500.00",
+    "periodCredit": "3500.00",
+    "periodDebit": "0.00",
+    "cumulativeBalance": "11250.00",
+    "cumulativeCredit": "12200.00",
+    "cumulativeDebit": "950.00"
   },
   {
-    "account": {
-      "id": "account-8",
-      "name": "Office Rent",
-      "type": "OUTGOING"
-    },
-    "balance": 3600.00,
-    "normalizedBalance": 3600.00,
-    "cumulative": 3600.00,
-    "group": {
-      "id": "group-operating-expenses",
-      "name": "Operating Expenses"
-    }
+    "year": 2024,
+    "month": 1,
+    "day": 20,
+    "fuzzyDate": 20240120,
+    "periodBalance": "-800.00",
+    "periodCredit": "0.00",
+    "periodDebit": "800.00",
+    "cumulativeBalance": "10450.00",
+    "cumulativeCredit": "12200.00",
+    "cumulativeDebit": "1750.00"
   },
   {
-    "account": {
-      "id": "account-9",
-      "name": "Utilities",
-      "type": "OUTGOING"
-    },
-    "balance": 450.30,
-    "normalizedBalance": 450.30,
-    "cumulative": 4050.30,
-    "group": {
-      "id": "group-operating-expenses",
-      "name": "Operating Expenses"
-    }
+    "year": 2024,
+    "month": 1,
+    "day": 25,
+    "fuzzyDate": 20240125,
+    "periodBalance": "1000.00",
+    "periodCredit": "1000.00",
+    "periodDebit": "0.00",
+    "cumulativeBalance": "11450.00",
+    "cumulativeCredit": "13200.00",
+    "cumulativeDebit": "1750.00"
   },
   {
-    "account": {
-      "id": "account-10",
-      "name": "Depreciation - Equipment",
-      "type": "OUTGOING"
-    },
-    "balance": 2083.33,
-    "normalizedBalance": 2083.33,
-    "cumulative": 6133.63,
-    "group": {
-      "id": "group-operating-expenses",
-      "name": "Operating Expenses"
-    }
+    "year": 2024,
+    "month": 1,
+    "day": 31,
+    "fuzzyDate": 20240131,
+    "periodBalance": "-200.00",
+    "periodCredit": "0.00",
+    "periodDebit": "200.00",
+    "cumulativeBalance": "11250.00",
+    "cumulativeCredit": "13200.00",
+    "cumulativeDebit": "1950.00"
   }
 ]

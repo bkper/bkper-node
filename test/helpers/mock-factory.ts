@@ -4,10 +4,12 @@ import {
   MockAccount,
   MockTransaction,
   MockBalance,
+  MockAccountBalance,
   BookData,
   AccountData,
   TransactionData,
-  BalanceData
+  BalanceData,
+  AccountBalanceData
 } from './mock-interfaces.js';
 
 // Mock auth service
@@ -61,7 +63,7 @@ export function createMockBkperForBook(
   books: BookData[], 
   accounts?: AccountData[], 
   transactions?: TransactionData[], 
-  balances?: BalanceData[]
+  accountBalances?: AccountBalanceData[]
 ): MockBkper {
   return {
     setConfig: () => {},
@@ -80,24 +82,24 @@ export function createMockBkperForBook(
             json: (): AccountData => accountData
           })) : undefined,
         
-        // Balances support
-        getBalancesReport: balances ? async (query?: string): Promise<any> => {
-          let filteredBalances = balances;
+        // Account Balances support
+        getBalancesReport: accountBalances ? async (query?: string): Promise<any> => {
+          let filteredBalances = accountBalances;
           
           if (query) {
             // Simple query simulation for testing
             if (query.includes("account:'Cash'")) {
-              filteredBalances = balances.filter(b => b.account.name === 'Cash');
+              filteredBalances = accountBalances.filter(b => b.account.name === 'Cash');
             } else if (query.includes("group:'Assets'")) {
-              filteredBalances = balances.filter(b => b.account.type === 'ASSET');
+              filteredBalances = accountBalances.filter(b => b.account.type === 'ASSET');
             } else if (query.includes("group:'Liabilities'")) {
-              filteredBalances = balances.filter(b => b.account.type === 'LIABILITY');
+              filteredBalances = accountBalances.filter(b => b.account.type === 'LIABILITY');
             }
           }
           
           return {
-            getBalances: async (): Promise<MockBalance[]> => filteredBalances.map((balanceData: BalanceData) => ({
-              json: (): BalanceData => balanceData
+            getBalances: async (): Promise<MockAccountBalance[]> => filteredBalances.map((balanceData: AccountBalanceData) => ({
+              json: (): AccountBalanceData => balanceData
             }))
           };
         } : undefined,
@@ -114,7 +116,7 @@ export function createMockBkperForBook(
               filteredTransactions = transactions.filter(t => t.posted === false);
             } else if (query.includes("account:'Cash'")) {
               filteredTransactions = transactions.filter(t => 
-                t.creditAccount.name === 'Cash' || t.debitAccount.name === 'Cash'
+                t.creditAccount?.name === 'Cash' || t.debitAccount?.name === 'Cash'
               );
             }
           }

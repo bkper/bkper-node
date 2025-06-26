@@ -3,13 +3,18 @@
     "id": "txn-1",
     "date": "2024-01-15",
     "dateValue": 1705276800000,
-    "amount": 5000.00,
+    "amount": "5000.00",
     "description": "Client payment for consulting services",
     "posted": true,
+    "checked": false,
+    "trashed": false,
+    "agentId": "agent-123",
+    "createdAt": "1705276800000",
+    "createdBy": "test@example.com",
     "creditAccount": {
       "id": "account-7",
       "name": "Service Revenue",
-      "type": "INCOME"
+      "type": "INCOMING"
     },
     "debitAccount": {
       "id": "account-1", 
@@ -20,15 +25,22 @@
       "invoice_number": "INV-2024-001",
       "client": "ABC Corp"
     },
-    "urls": []
+    "tags": ["consulting", "revenue"],
+    "urls": [],
+    "remoteIds": []
   },
   {
     "id": "txn-2",
     "date": "2024-01-16",
     "dateValue": 1705363200000,
-    "amount": 1200.00,
+    "amount": "1200.00",
     "description": "Monthly office rent payment",
     "posted": true,
+    "checked": true,
+    "trashed": false,
+    "agentId": "agent-123",
+    "createdAt": "1705363200000",
+    "createdBy": "test@example.com",
     "creditAccount": {
       "id": "account-1",
       "name": "Cash",
@@ -43,15 +55,22 @@
       "payment_method": "check",
       "check_number": "1001"
     },
-    "urls": []
+    "tags": ["rent", "monthly"],
+    "urls": [],
+    "remoteIds": []
   },
   {
     "id": "txn-3",
     "date": "2024-01-18", 
     "dateValue": 1705536000000,
-    "amount": 150.25,
+    "amount": "150.25",
     "description": "Electric bill payment",
     "posted": true,
+    "checked": true,
+    "trashed": false,
+    "agentId": "agent-123",
+    "createdAt": "1705536000000",
+    "createdBy": "test@example.com",
     "creditAccount": {
       "id": "account-1",
       "name": "Cash",
@@ -66,15 +85,22 @@
       "utility_type": "electricity",
       "account_number": "E123456"
     },
-    "urls": []
+    "tags": ["utilities", "monthly"],
+    "urls": [],
+    "remoteIds": []
   },
   {
     "id": "txn-4",
     "date": "2024-01-20",
     "dateValue": 1705708800000,
-    "amount": 3500.00,
+    "amount": "3500.00",
     "description": "Purchase of new computer equipment",
     "posted": true,
+    "checked": false,
+    "trashed": false,
+    "agentId": "agent-123",
+    "createdAt": "1705708800000",
+    "createdBy": "test@example.com",
     "creditAccount": {
       "id": "account-1",
       "name": "Cash", 
@@ -89,19 +115,26 @@
       "vendor": "Tech Solutions Inc",
       "asset_tag": "COMP-2024-001"
     },
-    "urls": []
+    "tags": ["equipment", "asset"],
+    "urls": [],
+    "remoteIds": []
   },
   {
     "id": "txn-5",
     "date": "2024-01-22",
     "dateValue": 1705881600000,
-    "amount": 2500.00,
+    "amount": "2500.00",
     "description": "Invoice sent to XYZ Company",
     "posted": true,
+    "checked": false,
+    "trashed": false,
+    "agentId": "agent-123",
+    "createdAt": "1705881600000",
+    "createdBy": "test@example.com",
     "creditAccount": {
       "id": "account-7",
       "name": "Service Revenue",
-      "type": "INCOME"
+      "type": "INCOMING"
     },
     "debitAccount": {
       "id": "account-2",
@@ -113,15 +146,22 @@
       "client": "XYZ Company",
       "terms": "Net 30"
     },
-    "urls": []
+    "tags": ["consulting", "revenue", "receivable"],
+    "urls": [],
+    "remoteIds": []
   },
   {
     "id": "txn-6",
     "date": "2024-01-25",
     "dateValue": 1706140800000,
-    "amount": 500.00,
+    "amount": "500.00",
     "description": "Bank loan monthly payment",
     "posted": true,
+    "checked": true,
+    "trashed": false,
+    "agentId": "agent-123",
+    "createdAt": "1706140800000",
+    "createdBy": "test@example.com",
     "creditAccount": {
       "id": "account-1",
       "name": "Cash",
@@ -136,15 +176,22 @@
       "payment_type": "principal_and_interest",
       "loan_account": "LOAN-12345"
     },
-    "urls": []
+    "tags": ["loan", "monthly"],
+    "urls": [],
+    "remoteIds": []
   },
   {
     "id": "txn-7",
     "date": "2024-01-28",
     "dateValue": 1706400000000,
-    "amount": 300.00,
+    "amount": "300.00",
     "description": "Office supplies purchase",
     "posted": false,
+    "checked": false,
+    "trashed": false,
+    "agentId": "agent-123",
+    "createdAt": "1706400000000",
+    "createdBy": "test@example.com",
     "creditAccount": {
       "id": "account-4",
       "name": "Accounts Payable",
@@ -159,15 +206,22 @@
       "vendor": "Office Depot",
       "receipt_number": "RCP-789"
     },
-    "urls": []
+    "tags": ["office", "supplies"],
+    "urls": [],
+    "remoteIds": []
   },
   {
     "id": "txn-8",
     "date": "2024-01-30",
     "dateValue": 1706572800000,
-    "amount": 2083.33,
+    "amount": "2083.33",
     "description": "Monthly depreciation - Equipment",
     "posted": true,
+    "checked": false,
+    "trashed": false,
+    "agentId": "agent-123",
+    "createdAt": "1706572800000",
+    "createdBy": "test@example.com",
     "creditAccount": {
       "id": "account-3",
       "name": "Equipment",
@@ -182,6 +236,8 @@
       "depreciation_method": "straight_line",
       "asset_life": "60_months"
     },
-    "urls": []
+    "tags": ["depreciation", "equipment"],
+    "urls": [],
+    "remoteIds": []
   }
 ]

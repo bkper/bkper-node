@@ -2,7 +2,6 @@
   {
     "id": "book-1",
     "name": "Test Company Ltd",
-    "collection": null,
     "agentId": "agent-123",
     "autoPost": false,
     "closingDate": "2023-12-31",
@@ -10,13 +9,55 @@
     "datePattern": "dd/MM/yyyy",
     "decimalSeparator": "DOT",
     "fractionDigits": 2,
-    "groups": [],
+    "groups": [
+      {
+        "id": "group-current-assets",
+        "name": "Current Assets",
+        "hidden": false,
+        "properties": {}
+      },
+      {
+        "id": "group-fixed-assets",
+        "name": "Fixed Assets",
+        "hidden": false,
+        "properties": {}
+      },
+      {
+        "id": "group-current-liabilities",
+        "name": "Current Liabilities",
+        "hidden": false,
+        "properties": {}
+      },
+      {
+        "id": "group-long-term-liabilities",
+        "name": "Long-term Liabilities",
+        "hidden": false,
+        "properties": {}
+      },
+      {
+        "id": "group-equity",
+        "name": "Equity",
+        "hidden": false,
+        "properties": {}
+      },
+      {
+        "id": "group-revenue",
+        "name": "Revenue",
+        "hidden": false,
+        "properties": {}
+      },
+      {
+        "id": "group-operating-expenses",
+        "name": "Operating Expenses",
+        "hidden": false,
+        "properties": {}
+      }
+    ],
     "lastUpdateMs": "1672531200000",
     "lockDate": "2023-01-31",
     "ownerName": "test@example.com",
     "pageSize": 100,
     "period": "MONTH",
-    "periodStartMonth": null,
     "permission": "OWNER",
     "properties": {"category": "business"},
     "timeZone": "America/New_York",
@@ -24,27 +65,47 @@
     "totalTransactions": 150,
     "totalTransactionsCurrentMonth": 12,
     "totalTransactionsCurrentYear": 89,
-    "visibility": "PRIVATE",
-    "accounts": []
+    "visibility": "PRIVATE"
   },
   {
     "id": "book-2", 
     "name": "Personal Finance",
-    "collection": null,
     "agentId": "agent-456",
     "autoPost": true,
-    "closingDate": null,
     "createdAt": "1641081600000",
     "datePattern": "MM/dd/yyyy", 
     "decimalSeparator": "DOT",
     "fractionDigits": 2,
-    "groups": [],
+    "groups": [
+      {
+        "id": "group-assets",
+        "name": "Assets",
+        "hidden": false,
+        "properties": {}
+      },
+      {
+        "id": "group-liabilities",
+        "name": "Liabilities",
+        "hidden": false,
+        "properties": {}
+      },
+      {
+        "id": "group-income",
+        "name": "Income",
+        "hidden": false,
+        "properties": {}
+      },
+      {
+        "id": "group-expenses",
+        "name": "Expenses",
+        "hidden": false,
+        "properties": {}
+      }
+    ],
     "lastUpdateMs": "1672617600000",
-    "lockDate": null,
     "ownerName": "personal@example.com",
     "pageSize": 50,
     "period": "QUARTER",
-    "periodStartMonth": null,
     "permission": "OWNER",
     "properties": {"category": "personal", "type": "budget"},
     "timeZone": "America/Los_Angeles",
@@ -52,7 +113,6 @@
     "totalTransactions": 73,
     "totalTransactionsCurrentMonth": 8,
     "totalTransactionsCurrentYear": 45,
-    "visibility": "PRIVATE",
-    "accounts": []
+    "visibility": "PRIVATE"
   }
 ]
