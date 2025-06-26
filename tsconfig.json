@@ -1,7 +1,6 @@
 {
   "extends": "./node_modules/gts/tsconfig-google.json",
   "compilerOptions": {
-    "rootDir": "src",
     "outDir": "lib",
     "module": "ESNext",
     "moduleResolution": "Node",
@@ -20,7 +19,6 @@
     "test/**/*.ts"
   ],
   "exclude": [
-    "./test/",
     "./node_modules/",
     "./lib/"
   ]
