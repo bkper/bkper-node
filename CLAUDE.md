@@ -179,7 +179,6 @@ bun test --watch           # Run tests in watch mode for TDD
 ```
 
 ### Test Structure
-- **Simple approach**: Plain JavaScript tests (no TypeScript compilation needed)
 - **Mocking strategy**: Mock `bkper-js` and `local-auth-service` dependencies
 - **Fixtures**: Use `test/fixtures/` for sample data (e.g., `sample-books.json`)
 - **Focus on logic**: Test core functionality without external dependencies
@@ -204,3 +203,16 @@ it('should handle new_tool correctly', async function() {
   expect(result).to.have.property('expectedField');
 });
 ```
+
+## Test-Driven Development Workflow Enhancements
+
+- Ensure tests are written first, before implementation
+- Review tests and code carefully before committing
+- Follow a strict TDD workflow:
+  1. Write a failing test in TypeScript
+  2. Review the test to ensure it correctly captures the desired behavior
+  3. Commit the test separately
+  4. Implement the minimal code to make the test pass
+  5. Review the implementation
+  6. Commit the implementation
+  7. Refactor if necessary, maintaining test coverage
