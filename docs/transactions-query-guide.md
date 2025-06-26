@@ -42,12 +42,11 @@ Bkper queries use a simple text-based syntax with operators and keywords to filt
 | `>=` | Greater than or equal | `amount:>=100` |
 | `<=` | Less than or equal | `amount:<=5000` |
 
-### Status and Properties
+### Description and Properties
 
 | Operator | Description | Example |
 |----------|-------------|---------|
-| `posted:` | Posted status | `posted:true` or `posted:false` |
-| `description:` | Transaction description contains text | `description:"office rent"` |
+| `description:` | Transaction description contains text | `description:'office rent'` |
 | `property:` | Custom property value | `property:batch="2024-Q1"` |
 
 ### Logical Operators
@@ -115,14 +114,8 @@ amount:2500.50
 ### Status and Posted Queries
 
 ```
-# Only posted transactions
-posted:true
-
-# Only unposted (pending) transactions
-posted:false
-
 # Transactions containing specific text
-description:"office rent"
+description:'office rent'
 
 # Transactions with custom property
 property:invoice_number="INV-2024-001"
@@ -134,11 +127,11 @@ property:invoice_number="INV-2024-001"
 # Large cash transactions this month
 account:'Cash' AND amount:>1000 AND on:$m
 
-# All posted revenue transactions from Q1 2024
-group:'Revenue' AND posted:true AND after:2024-01-01 AND before:2024-04-01
+# All revenue transactions from Q1 2024
+group:'Revenue' AND after:2024-01-01 AND before:2024-04-01
 
-# Cash or bank transactions over $500 (excluding pending)
-(account:'Cash' OR account:'Bank') AND amount:>500 AND posted:true
+# Cash or bank transactions over $500
+(account:'Cash' OR account:'Bank') AND amount:>500
 
 # Office expenses excluding rent
 group:'Operating Expenses' AND NOT description:'rent'
@@ -193,9 +186,9 @@ NOT (group:'Assets' AND group:'Assets')
    account:'Cash' AND amount:>1000
    ```
 
-3. **Use posted status** - Filter by posted status early
+3. **Use date ranges** - Date filters help narrow results effectively
    ```
-   posted:true AND after:2024-01-01
+   after:2024-01-01 AND before:2024-12-31
    ```
 
 ### Syntax Guidelines
@@ -223,32 +216,29 @@ NOT (group:'Assets' AND group:'Assets')
 #### Monthly Reports
 ```
 # All transactions for January 2024
-after:2024-01-01 before:2024-02-01 AND posted:true
+after:2024-01-01 before:2024-02-01
 
 # Revenue for the month
-group:'Revenue' AND on:$m AND posted:true
+group:'Revenue' AND on:$m
 
 # Expenses for the month  
-group:'Expenses' AND on:$m AND posted:true
+group:'Expenses' AND on:$m
 ```
 
 #### Cash Flow Analysis
 ```
 # Cash inflows (credit to Cash)
-to:'Cash' AND posted:true
+to:'Cash'
 
 # Cash outflows (debit from Cash)
-from:'Cash' AND posted:true
+from:'Cash'
 
 # Net cash flow analysis
-account:'Cash' AND posted:true
+account:'Cash'
 ```
 
 #### Reconciliation
 ```
-# Unposted transactions needing review
-posted:false
-
 # Recent large transactions for audit
 after:$d-30 AND amount:>5000
 

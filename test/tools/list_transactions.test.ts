@@ -90,10 +90,6 @@ const mockBkperJs: MockBkper = {
             );
           } else if (query.includes('amount:>1000')) {
             filteredTransactions = currentMockTransactions.filter(t => t.amount > 1000);
-          } else if (query.includes('posted:true')) {
-            filteredTransactions = currentMockTransactions.filter(t => t.posted === true);
-          } else if (query.includes('posted:false')) {
-            filteredTransactions = currentMockTransactions.filter(t => t.posted === false);
           } else if (query.includes('after:2024-01-20')) {
             filteredTransactions = currentMockTransactions.filter(t => t.date > '2024-01-20');
           } else if (query.includes('before:2024-01-25')) {
@@ -287,28 +283,6 @@ describe('MCP Server - list_transactions query examples', function() {
     });
   });
 
-  it('should filter transactions by posted status', async function() {
-    const bookId = 'book-1';
-    const book = await mockBkperJs.getBook(bookId);
-    
-    // Test posted transactions
-    const postedIterator = await book.listTransactions('posted:true');
-    const postedTransactions = postedIterator.next();
-    const postedData = postedTransactions.map(txn => txn.json());
-    
-    postedData.forEach(txn => {
-      expect(txn.posted).to.be.true;
-    });
-
-    // Test unposted transactions
-    const unpostedIterator = await book.listTransactions('posted:false');
-    const unpostedTransactions = unpostedIterator.next();
-    const unpostedData = unpostedTransactions.map(txn => txn.json());
-    
-    unpostedData.forEach(txn => {
-      expect(txn.posted).to.be.false;
-    });
-  });
 
   it('should filter transactions by date range', async function() {
     const bookId = 'book-1';
@@ -392,23 +366,23 @@ describe('MCP Server - list_transactions API cursor pagination', function() {
     const book = await mockBkperJs.getBook(bookId);
     
     // First page with query
-    const firstIterator = await book.listTransactions('posted:true', 25);
+    const firstIterator = await book.listTransactions('amount:>1000', 25);
     const firstTransactions = firstIterator.next();
     const firstCursor = firstIterator.getCursor();
     
     // Verify first page results
     firstTransactions.forEach(txn => {
-      expect(txn.json().posted).to.be.true;
+      expect(txn.json().amount).to.be.greaterThan(1000);
     });
 
     if (firstCursor) {
       // Second page with same query
-      const secondIterator = await book.listTransactions('posted:true', 25, firstCursor);
+      const secondIterator = await book.listTransactions('amount:>1000', 25, firstCursor);
       const secondTransactions = secondIterator.next();
       
       // Verify second page also respects query
       secondTransactions.forEach(txn => {
-        expect(txn.json().posted).to.be.true;
+        expect(txn.json().amount).to.be.greaterThan(1000);
       });
     }
   });
