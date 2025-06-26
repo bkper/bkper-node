@@ -75,8 +75,8 @@ group:'Revenue' after:2024-01-01 before:2024-12-31
 **Note:** Balances queries do NOT support the following operations that are available in transaction queries:
 
 - Amount filtering (`amount>`, `amount<`, etc.)
-- Description filtering (`description:`)
-- Property filtering (`property:`)
+- Text search (`'text'`)
+- Property filtering (`propertyName:`)
 - Complex logical operators (`AND`, `OR`, `NOT`)
 - Multi-account operations (`from:`, `to:`)
 

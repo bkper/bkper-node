@@ -41,12 +41,12 @@ Bkper queries use a simple text-based syntax with operators and keywords to filt
 | `amount>=` | Greater than or equal | `amount>=100` |
 | `amount<=` | Less than or equal | `amount<=5000` |
 
-### Description and Properties
+### Text Search and Properties
 
 | Operator | Description | Example |
 |----------|-------------|---------|
-| `description:` | Transaction description contains text | `description:'office rent'` |
-| `property:` | Custom property value | `property:batch="2024-Q1"` |
+| `'text'` | Search transaction descriptions | `'office rent'` |
+| `propertyName:` | Filter by custom property (dynamic) | `invoice_number:"INV-2024-001"` |
 
 ### Logical Operators
 
@@ -114,10 +114,10 @@ amount:2500.50
 
 ```
 # Transactions containing specific text
-description:'office rent'
+'office rent'
 
 # Transactions with custom property
-property:invoice_number="INV-2024-001"
+invoice_number:"INV-2024-001"
 ```
 
 ### Complex Combined Queries
@@ -133,7 +133,7 @@ group:'Revenue' AND after:2024-01-01 AND before:2024-04-01
 (account:'Cash' OR account:'Bank') AND amount>500
 
 # Office expenses excluding rent
-group:'Operating Expenses' AND NOT description:'rent'
+group:'Operating Expenses' AND NOT 'rent'
 
 # Recent large transactions
 after:$d-7 AND amount:>2000
@@ -195,7 +195,7 @@ NOT (group:'Assets' AND group:'Assets')
 1. **Quote multi-word values** - Use single quotes for names with spaces
    ```
    account:'Accounts Receivable'
-   description:'office supplies'
+   'office supplies'
    ```
 
 2. **Case sensitivity** - Account names and descriptions are case-sensitive
@@ -242,7 +242,7 @@ account:'Cash'
 after:$d-30 AND amount>5000
 
 # Transactions with missing documentation
-NOT property:receipt_number
+NOT receipt_number:*
 ```
 
 ## API Pagination with Queries
