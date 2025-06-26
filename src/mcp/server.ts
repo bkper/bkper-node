@@ -19,7 +19,6 @@ interface CursorData {
 
 interface PaginationParams {
   cursor?: string;
-  limit?: number;
 }
 
 interface PaginationMetadata {
@@ -31,12 +30,12 @@ interface PaginationMetadata {
 
 interface PaginatedResponse {
   total: number;
-  books: Array<{ id: string; name: string }>;
+  books: Array<any>; // Full bkper.Book JSON objects
   pagination: PaginationMetadata;
 }
 
 interface CacheEntry {
-  books: Array<{ id: string; name: string }>;
+  books: Array<any>; // Full bkper.Book JSON objects
   timestamp: number;
   total: number;
 }
@@ -45,9 +44,7 @@ class BkperMcpServer {
   private server: Server;
   private booksCache: Map<string, CacheEntry> = new Map();
   private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes
-  private readonly DEFAULT_LIMIT = 50;
-  private readonly MAX_LIMIT = 200;
-  private readonly MIN_LIMIT = 1;
+  private readonly FIXED_PAGE_SIZE = 50;
 
   constructor() {
     this.server = new Server(
@@ -72,20 +69,13 @@ class BkperMcpServer {
         tools: [
           {
             name: 'list_books',
-            description: 'List books with pagination support',
+            description: 'List books with fixed 50-item pagination',
             inputSchema: {
               type: 'object',
               properties: {
                 cursor: {
                   type: 'string',
                   description: 'Pagination cursor for next page'
-                },
-                limit: {
-                  type: 'number',
-                  description: 'Number of books per page (1-200, default 50)',
-                  minimum: 1,
-                  maximum: 200,
-                  default: 50
                 }
               },
               required: [],
@@ -153,7 +143,7 @@ class BkperMcpServer {
     return cached;
   }
 
-  private setCachedBooks(books: Array<{ id: string; name: string }>, total: number): void {
+  private setCachedBooks(books: Array<any>, total: number): void {
     const cacheKey = 'books_cache';
     this.booksCache.set(cacheKey, {
       books,
@@ -162,7 +152,7 @@ class BkperMcpServer {
     });
   }
 
-  private async fetchAndCacheBooks(): Promise<{ books: Array<{ id: string; name: string }>; total: number }> {
+  private async fetchAndCacheBooks(): Promise<{ books: Array<any>; total: number }> {
     // Configure Bkper with authentication
     Bkper.setConfig({
       apiKeyProvider: async () => process.env.BKPER_API_KEY || '',
@@ -172,13 +162,8 @@ class BkperMcpServer {
     // Get books using high-level wrapper
     const bkperBooks = await Bkper.getBooks();
     
-    const books = bkperBooks.map(book => {
-      const fullData = book.json();
-      return {
-        id: fullData.id || '',
-        name: fullData.name || ''
-      };
-    }).filter(book => book.id && book.name); // Filter out books with missing data
+    // Return full book JSON data - no filtering, no transforming
+    const books = bkperBooks.map(book => book.json());
 
     const total = books.length;
     this.setCachedBooks(books, total);
@@ -188,8 +173,8 @@ class BkperMcpServer {
 
   private async handleListBooks(params: PaginationParams = {}): Promise<any> {
     try {
-      // Parse pagination parameters
-      const limit = Math.max(this.MIN_LIMIT, Math.min(this.MAX_LIMIT, params.limit || this.DEFAULT_LIMIT));
+      // Use fixed page size
+      const limit = this.FIXED_PAGE_SIZE;
       let offset = 0;
 
       // Handle cursor if provided
