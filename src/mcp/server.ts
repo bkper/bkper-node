@@ -4,9 +4,12 @@ import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import {
   CallToolRequestSchema,
+  CallToolResult,
   ErrorCode,
   ListToolsRequestSchema,
+  ListToolsResult,
   McpError,
+  Tool,
 } from '@modelcontextprotocol/sdk/types.js';
 import { Bkper } from 'bkper-js';
 import { getOAuthToken } from '../auth/local-auth-service.js';
@@ -45,8 +48,10 @@ class BkperMcpServer {
   private booksCache: Map<string, CacheEntry> = new Map();
   private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes
   private readonly FIXED_PAGE_SIZE = 50;
+  private bkperInstance: any;
 
-  constructor() {
+  constructor(bkperInstance?: any) {
+    this.bkperInstance = bkperInstance || Bkper;
     this.server = new Server(
       {
         name: 'bkper-mcp-server',
@@ -154,16 +159,16 @@ class BkperMcpServer {
 
   private async fetchAndCacheBooks(): Promise<{ books: Array<any>; total: number }> {
     // Configure Bkper with authentication
-    Bkper.setConfig({
+    this.bkperInstance.setConfig({
       apiKeyProvider: async () => process.env.BKPER_API_KEY || '',
       oauthTokenProvider: () => getOAuthToken()
     });
 
     // Get books using high-level wrapper
-    const bkperBooks = await Bkper.getBooks();
+    const bkperBooks = await this.bkperInstance.getBooks();
     
     // Return full book JSON data - no filtering, no transforming
-    const books = bkperBooks.map(book => book.json());
+    const books = bkperBooks.map((book: any) => book.json());
 
     const total = books.length;
     this.setCachedBooks(books, total);
@@ -258,7 +263,42 @@ class BkperMcpServer {
     await this.server.connect(transport);
     console.error('Bkper MCP server running on stdio');
   }
+
+  // Test helper methods for accessing MCP handlers directly
+  async testListTools(): Promise<ListToolsResult> {
+    // Call the list tools handler directly for testing
+    const requestHandlers = (this.server as any)._requestHandlers;
+    const handler = requestHandlers.get('tools/list');
+    if (!handler) throw new Error('ListTools handler not found');
+    
+    // Create proper MCP request format
+    const request = {
+      method: 'tools/list' as const,
+      params: {}
+    };
+    return await handler(request);
+  }
+
+  async testCallTool(name: string, args: Record<string, unknown> = {}): Promise<CallToolResult> {
+    // Call the call tool handler directly for testing  
+    const requestHandlers = (this.server as any)._requestHandlers;
+    const handler = requestHandlers.get('tools/call');
+    if (!handler) throw new Error('CallTool handler not found');
+    
+    // Create proper MCP request format
+    const request = {
+      method: 'tools/call' as const,
+      params: { name, arguments: args }
+    };
+    return await handler(request);
+  }
 }
 
-const server = new BkperMcpServer();
-server.run().catch(console.error);
+// Export the class for testing
+export { BkperMcpServer };
+
+// Only run the server if this file is executed directly
+if (import.meta.url === `file://${process.argv[1]}`) {
+  const server = new BkperMcpServer();
+  server.run().catch(console.error);
+}
