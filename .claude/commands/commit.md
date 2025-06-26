@@ -11,9 +11,8 @@ Steps:
 3. If there are NO staged files but there are unstaged changes, stage all modified files one by one
 4. Check recent commit messages for style reference with `git log --oneline -5`
 5. Analyze the staged changes and create a concise commit message (under 50 chars)
-6. Add short commit descriptions if necessary to keep messages clear and brief
-7. Do not include attribution to Claude in the commit message or co-author attribution
-8. Create the commit with the already staged files only
-9. Confirm that the commit was successful and display the its hash, message and description (if any) that were used
+6. Do not include attribution to Claude in the commit message or co-author attribution
+7. Create the commit with the already staged files only
+8. Confirm that the commit was successful and display nicely the its hash, message and description (if any) that were used
 
 **Important**: Do NOT push to remote repository.
