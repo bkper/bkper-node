@@ -28,26 +28,23 @@ describe('MCP Server - list_accounts Tool Registration', function() {
     server = new BkperMcpServer();
   });
 
-  it('should register list_accounts tool in MCP tools list (when implemented)', async function() {
+  it('should register list_accounts tool in MCP tools list', async function() {
     const response = await server.testListTools();
     
     const listAccountsTool = response.tools.find((tool: any) => tool.name === 'list_accounts');
     
-    if (listAccountsTool) {
-      expect(listAccountsTool.name).to.equal('list_accounts');
-      expect(listAccountsTool.description).to.include('fixed 50-item pagination');
-      expect(listAccountsTool.inputSchema).to.have.property('properties');
-      expect(listAccountsTool.inputSchema.properties).to.have.property('bookId');
-      expect(listAccountsTool.inputSchema.properties).to.have.property('cursor');
-      expect(listAccountsTool.inputSchema.properties).to.not.have.property('limit');
-      expect(listAccountsTool.inputSchema.required).to.include('bookId');
-    } else {
-      // Tool not implemented yet - expected during development
-      expect(listAccountsTool).to.be.undefined;
-    }
+    // This test will FAIL until list_accounts tool is implemented
+    expect(listAccountsTool).to.exist;
+    expect(listAccountsTool!.name).to.equal('list_accounts');
+    expect(listAccountsTool!.description).to.include('fixed 50-item pagination');
+    expect(listAccountsTool!.inputSchema).to.have.property('properties');
+    expect(listAccountsTool!.inputSchema.properties).to.have.property('bookId');
+    expect(listAccountsTool!.inputSchema.properties).to.have.property('cursor');
+    expect(listAccountsTool!.inputSchema.properties).to.not.have.property('limit');
+    expect(listAccountsTool!.inputSchema.required).to.include('bookId');
   });
 
-  it('should have proper MCP tool schema for list_accounts (when implemented)', async function() {
+  it('should have proper MCP tool schema for list_accounts', async function() {
     const response = await server.testListTools();
     const listAccountsTool = response.tools.find((tool: any) => tool.name === 'list_accounts');
     
@@ -85,125 +82,89 @@ describe('MCP Server - list_accounts Tool Calls', function() {
     server = new BkperMcpServer();
   });
 
-  it('should handle MCP list_accounts tool call without cursor (when implemented)', async function() {
-    try {
-      const response = await server.testCallTool('list_accounts', { bookId: 'book-1' });
-      
-      // Verify MCP response structure
-      expect(response).to.have.property('content');
-      expect(response.content).to.be.an('array');
-      expect(response.content).to.have.length(1);
-      expect(response.content[0]).to.have.property('type', 'text');
-      expect(response.content[0]).to.have.property('text');
-      
-      // Parse the JSON response
-      const jsonResponse = JSON.parse(response.content[0].text as string);
-      expect(jsonResponse).to.have.property('total');
-      expect(jsonResponse).to.have.property('accounts');
-      expect(jsonResponse).to.have.property('pagination');
-      
-      expect(jsonResponse.total).to.equal(10);
-      expect(jsonResponse.accounts).to.have.length(10);
-      expect(jsonResponse.pagination.limit).to.equal(50);
-      expect(jsonResponse.pagination.offset).to.equal(0);
-      expect(jsonResponse.pagination.hasMore).to.be.false;
-      
-      // Verify account structure
-      const account = jsonResponse.accounts[0];
-      expect(account).to.have.property('id');
-      expect(account).to.have.property('name');
-      expect(account).to.have.property('type');
-      expect(account).to.have.property('balance');
-      expect(account).to.have.property('group');
-      
-    } catch (error) {
-      if ((error as Error).message.includes('Unknown tool')) {
-        // Tool not implemented yet - expected during development
-        expect((error as Error).message).to.include('list_accounts');
-      } else {
-        throw error;
-      }
-    }
+  it('should handle MCP list_accounts tool call without cursor', async function() {
+    const response = await server.testCallTool('list_accounts', { bookId: 'book-1' });
+    
+    // Verify MCP response structure
+    expect(response).to.have.property('content');
+    expect(response.content).to.be.an('array');
+    expect(response.content).to.have.length(1);
+    expect(response.content[0]).to.have.property('type', 'text');
+    expect(response.content[0]).to.have.property('text');
+    
+    // Parse the JSON response
+    const jsonResponse = JSON.parse(response.content[0].text as string);
+    expect(jsonResponse).to.have.property('total');
+    expect(jsonResponse).to.have.property('accounts');
+    expect(jsonResponse).to.have.property('pagination');
+    
+    expect(jsonResponse.total).to.equal(10);
+    expect(jsonResponse.accounts).to.have.length(10);
+    expect(jsonResponse.pagination.limit).to.equal(50);
+    expect(jsonResponse.pagination.offset).to.equal(0);
+    expect(jsonResponse.pagination.hasMore).to.be.false;
+    
+    // Verify account structure
+    const account = jsonResponse.accounts[0];
+    expect(account).to.have.property('id');
+    expect(account).to.have.property('name');
+    expect(account).to.have.property('type');
+    expect(account).to.have.property('balance');
+    expect(account).to.have.property('group');
   });
 
-  it('should handle MCP list_accounts tool call with cursor (when implemented)', async function() {
-    try {
-      // Switch to large dataset
-      currentMockAccounts = largeMockAccounts;
-      server = new BkperMcpServer();
-      
-      // First call to get cursor
-      const firstResponse = await server.testCallTool('list_accounts', { bookId: 'book-1' });
-      const firstData = JSON.parse(firstResponse.content[0].text as string);
-      
-      expect(firstData.pagination.hasMore).to.be.true;
-      expect(firstData.pagination.nextCursor).to.be.a('string');
-      
-      // Second call with cursor
-      const response = await server.testCallTool('list_accounts', { 
-        bookId: 'book-1',
-        cursor: firstData.pagination.nextCursor 
-      });
-      
-      const jsonResponse = JSON.parse(response.content[0].text as string);
-      expect(jsonResponse.pagination.offset).to.equal(50);
-      expect(jsonResponse.accounts).to.have.length(50);
-      
-    } catch (error) {
-      if ((error as Error).message.includes('Unknown tool')) {
-        // Tool not implemented yet - expected during development
-        expect((error as Error).message).to.include('list_accounts');
-      } else {
-        throw error;
-      }
-    }
+  it('should handle MCP list_accounts tool call with cursor', async function() {
+    // Switch to large dataset
+    currentMockAccounts = largeMockAccounts;
+    server = new BkperMcpServer();
+    
+    // First call to get cursor
+    const firstResponse = await server.testCallTool('list_accounts', { bookId: 'book-1' });
+    const firstData = JSON.parse(firstResponse.content[0].text as string);
+    
+    expect(firstData.pagination.hasMore).to.be.true;
+    expect(firstData.pagination.nextCursor).to.be.a('string');
+    
+    // Second call with cursor
+    const response = await server.testCallTool('list_accounts', { 
+      bookId: 'book-1',
+      cursor: firstData.pagination.nextCursor 
+    });
+    
+    const jsonResponse = JSON.parse(response.content[0].text as string);
+    expect(jsonResponse.pagination.offset).to.equal(50);
+    expect(jsonResponse.accounts).to.have.length(50);
   });
 
-  it('should handle MCP error for missing bookId parameter (when implemented)', async function() {
+  it('should handle MCP error for missing bookId parameter', async function() {
     try {
       await server.testCallTool('list_accounts', {});
       expect.fail('Should have thrown an error for missing bookId');
     } catch (error) {
-      if ((error as Error).message.includes('Unknown tool')) {
-        // Tool not implemented yet - expected during development
-        expect((error as Error).message).to.include('list_accounts');
-      } else {
-        // When implemented, should return proper validation error
-        expect(error).to.be.an('error');
-      }
+      expect(error).to.be.an('error');
     }
   });
 
-  it('should handle account type organization via MCP (when implemented)', async function() {
-    try {
-      // Switch to large dataset with different account types
-      currentMockAccounts = largeMockAccounts;
-      server = new BkperMcpServer();
-      
-      const response = await server.testCallTool('list_accounts', { bookId: 'book-1' });
-      const jsonResponse = JSON.parse(response.content[0].text as string);
-      
-      // Verify we have different account types
-      const accounts = jsonResponse.accounts;
-      const assetAccounts = accounts.filter((acc: any) => acc.type === 'ASSET');
-      const liabilityAccounts = accounts.filter((acc: any) => acc.type === 'LIABILITY');
-      const equityAccounts = accounts.filter((acc: any) => acc.type === 'EQUITY');
-      const incomeAccounts = accounts.filter((acc: any) => acc.type === 'INCOME');
-      const outgoingAccounts = accounts.filter((acc: any) => acc.type === 'OUTGOING');
+  it('should handle account type organization via MCP', async function() {
+    // Switch to large dataset with different account types
+    currentMockAccounts = largeMockAccounts;
+    server = new BkperMcpServer();
+    
+    const response = await server.testCallTool('list_accounts', { bookId: 'book-1' });
+    const jsonResponse = JSON.parse(response.content[0].text as string);
+    
+    // Verify we have different account types
+    const accounts = jsonResponse.accounts;
+    const assetAccounts = accounts.filter((acc: any) => acc.type === 'ASSET');
+    const liabilityAccounts = accounts.filter((acc: any) => acc.type === 'LIABILITY');
+    const equityAccounts = accounts.filter((acc: any) => acc.type === 'EQUITY');
+    const incomeAccounts = accounts.filter((acc: any) => acc.type === 'INCOME');
+    const outgoingAccounts = accounts.filter((acc: any) => acc.type === 'OUTGOING');
 
-      expect(assetAccounts.length).to.be.greaterThan(0);
-      expect(liabilityAccounts.length).to.be.greaterThan(0);
-      expect(equityAccounts.length).to.be.greaterThan(0);
-      expect(incomeAccounts.length).to.be.greaterThan(0);
-      expect(outgoingAccounts.length).to.be.greaterThan(0);
-      
-    } catch (error) {
-      if ((error as Error).message.includes('Unknown tool')) {
-        // Tool not implemented yet - expected during development
-        expect((error as Error).message).to.include('list_accounts');
-      } else {
-        throw error;
-      }
-    }
+    expect(assetAccounts.length).to.be.greaterThan(0);
+    expect(liabilityAccounts.length).to.be.greaterThan(0);
+    expect(equityAccounts.length).to.be.greaterThan(0);
+    expect(incomeAccounts.length).to.be.greaterThan(0);
+    expect(outgoingAccounts.length).to.be.greaterThan(0);
   });
 });

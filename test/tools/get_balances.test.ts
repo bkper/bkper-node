@@ -26,53 +26,47 @@ describe('MCP Server - get_balances Tool Registration', function() {
     server = new BkperMcpServer();
   });
 
-  it('should register get_balances tool in MCP tools list (when implemented)', async function() {
+  it('should register get_balances tool in MCP tools list', async function() {
     const response = await server.testListTools();
     
     const getBalancesTool = response.tools.find((tool: any) => tool.name === 'get_balances');
     
-    if (getBalancesTool) {
-      expect(getBalancesTool.name).to.equal('get_balances');
-      expect(getBalancesTool.description).to.include('fixed 50-item pagination');
-      expect(getBalancesTool.inputSchema).to.have.property('properties');
-      expect(getBalancesTool.inputSchema.properties).to.have.property('bookId');
-      expect(getBalancesTool.inputSchema.properties).to.have.property('cursor');
-      expect(getBalancesTool.inputSchema.properties).to.have.property('query');
-      expect(getBalancesTool.inputSchema.properties).to.not.have.property('limit');
-      expect(getBalancesTool.inputSchema.required).to.include('bookId');
-    } else {
-      // Tool not implemented yet - expected during development
-      expect(getBalancesTool).to.be.undefined;
-    }
+    // This test will FAIL until get_balances tool is implemented
+    expect(getBalancesTool).to.exist;
+    expect(getBalancesTool!.name).to.equal('get_balances');
+    expect(getBalancesTool!.description).to.include('fixed 50-item pagination');
+    expect(getBalancesTool!.inputSchema).to.have.property('properties');
+    expect(getBalancesTool!.inputSchema.properties).to.have.property('bookId');
+    expect(getBalancesTool!.inputSchema.properties).to.have.property('cursor');
+    expect(getBalancesTool!.inputSchema.properties).to.have.property('query');
+    expect(getBalancesTool!.inputSchema.properties).to.not.have.property('limit');
+    expect(getBalancesTool!.inputSchema.required).to.include('bookId');
   });
 
-  it('should have proper MCP tool schema for get_balances (when implemented)', async function() {
+  it('should have proper MCP tool schema for get_balances', async function() {
     const response = await server.testListTools();
     const getBalancesTool = response.tools.find((tool: any) => tool.name === 'get_balances');
     
-    if (getBalancesTool) {
-      expect(getBalancesTool.inputSchema).to.deep.equal({
-        type: 'object',
-        properties: {
-          bookId: {
-            type: 'string',
-            description: 'The unique identifier of the book'
-          },
-          cursor: {
-            type: 'string',
-            description: 'Pagination cursor for next page'
-          },
-          query: {
-            type: 'string',
-            description: 'Optional query to filter balances (e.g., "account:\'Cash\'", "group:\'Assets\'", "on:2024-01-31")'
-          }
+    // This test will FAIL until get_balances tool is implemented
+    expect(getBalancesTool).to.exist;
+    expect(getBalancesTool!.inputSchema).to.deep.equal({
+      type: 'object',
+      properties: {
+        bookId: {
+          type: 'string',
+          description: 'The unique identifier of the book'
         },
-        required: ['bookId']
-      });
-    } else {
-      // Expected during development
-      expect(getBalancesTool).to.be.undefined;
-    }
+        cursor: {
+          type: 'string',
+          description: 'Pagination cursor for next page'
+        },
+        query: {
+          type: 'string',
+          description: 'Optional query to filter balances (e.g., "account:\'Cash\'", "group:\'Assets\'", "on:2024-01-31")'
+        }
+      },
+      required: ['bookId']
+    });
   });
 });
 
@@ -85,155 +79,109 @@ describe('MCP Server - get_balances Tool Calls', function() {
     server = new BkperMcpServer();
   });
 
-  it('should handle MCP get_balances tool call without query (when implemented)', async function() {
-    try {
-      const response = await server.testCallTool('get_balances', { bookId: 'book-1' });
-      
-      // Verify MCP response structure
-      expect(response).to.have.property('content');
-      expect(response.content).to.be.an('array');
-      expect(response.content).to.have.length(1);
-      expect(response.content[0]).to.have.property('type', 'text');
-      expect(response.content[0]).to.have.property('text');
-      
-      // Parse the JSON response
-      const jsonResponse = JSON.parse(response.content[0].text as string);
-      expect(jsonResponse).to.have.property('total');
-      expect(jsonResponse).to.have.property('balances');
-      expect(jsonResponse).to.have.property('pagination');
-      
-      expect(jsonResponse.total).to.equal(10);
-      expect(jsonResponse.balances).to.have.length(10);
-      expect(jsonResponse.pagination.limit).to.equal(50);
-      expect(jsonResponse.pagination.offset).to.equal(0);
-      expect(jsonResponse.pagination.hasMore).to.be.false;
-      
-      // Verify balance structure
-      const balance = jsonResponse.balances[0];
-      expect(balance).to.have.property('account');
-      expect(balance).to.have.property('balance');
-      expect(balance).to.have.property('normalizedBalance');
-      expect(balance).to.have.property('cumulative');
-      expect(balance.account).to.have.property('id');
-      expect(balance.account).to.have.property('name');
-      expect(balance.account).to.have.property('type');
-      
-    } catch (error) {
-      if ((error as Error).message.includes('Unknown tool')) {
-        // Tool not implemented yet - expected during development
-        expect((error as Error).message).to.include('get_balances');
-      } else {
-        throw error;
-      }
-    }
+  it('should handle MCP get_balances tool call without query', async function() {
+    const response = await server.testCallTool('get_balances', { bookId: 'book-1' });
+    
+    // Verify MCP response structure
+    expect(response).to.have.property('content');
+    expect(response.content).to.be.an('array');
+    expect(response.content).to.have.length(1);
+    expect(response.content[0]).to.have.property('type', 'text');
+    expect(response.content[0]).to.have.property('text');
+    
+    // Parse the JSON response
+    const jsonResponse = JSON.parse(response.content[0].text as string);
+    expect(jsonResponse).to.have.property('total');
+    expect(jsonResponse).to.have.property('balances');
+    expect(jsonResponse).to.have.property('pagination');
+    
+    expect(jsonResponse.total).to.equal(10);
+    expect(jsonResponse.balances).to.have.length(10);
+    expect(jsonResponse.pagination.limit).to.equal(50);
+    expect(jsonResponse.pagination.offset).to.equal(0);
+    expect(jsonResponse.pagination.hasMore).to.be.false;
+    
+    // Verify balance structure
+    const balance = jsonResponse.balances[0];
+    expect(balance).to.have.property('account');
+    expect(balance).to.have.property('balance');
+    expect(balance).to.have.property('normalizedBalance');
+    expect(balance).to.have.property('cumulative');
+    expect(balance.account).to.have.property('id');
+    expect(balance.account).to.have.property('name');
+    expect(balance.account).to.have.property('type');
   });
 
-  it('should handle MCP get_balances tool call with query filter (when implemented)', async function() {
-    try {
-      const response = await server.testCallTool('get_balances', { 
-        bookId: 'book-1',
-        query: "account:'Cash'"
-      });
-      
-      const jsonResponse = JSON.parse(response.content[0].text as string);
-      
-      // Verify all returned balances are for Cash account
-      jsonResponse.balances.forEach((balance: any) => {
-        expect(balance.account.name).to.equal('Cash');
-      });
-      
-    } catch (error) {
-      if ((error as Error).message.includes('Unknown tool')) {
-        // Tool not implemented yet - expected during development
-        expect((error as Error).message).to.include('get_balances');
-      } else {
-        throw error;
-      }
-    }
+  it('should handle MCP get_balances tool call with query filter', async function() {
+    const response = await server.testCallTool('get_balances', { 
+      bookId: 'book-1',
+      query: "account:'Cash'"
+    });
+    
+    const jsonResponse = JSON.parse(response.content[0].text as string);
+    
+    // Verify all returned balances are for Cash account
+    jsonResponse.balances.forEach((balance: any) => {
+      expect(balance.account.name).to.equal('Cash');
+    });
   });
 
-  it('should handle MCP get_balances tool call with pagination (when implemented)', async function() {
-    try {
-      // Switch to large dataset
-      currentMockBalances = largeMockBalances;
-      server = new BkperMcpServer();
-      
-      // First call to get cursor
-      const firstResponse = await server.testCallTool('get_balances', { bookId: 'book-1' });
-      const firstData = JSON.parse(firstResponse.content[0].text as string);
-      
-      expect(firstData.pagination.hasMore).to.be.true;
-      expect(firstData.pagination.nextCursor).to.be.a('string');
-      
-      // Second call with cursor
-      const response = await server.testCallTool('get_balances', { 
-        bookId: 'book-1',
-        cursor: firstData.pagination.nextCursor 
-      });
-      
-      const jsonResponse = JSON.parse(response.content[0].text as string);
-      expect(jsonResponse.pagination.offset).to.equal(50);
-      expect(jsonResponse.balances).to.have.length(50);
-      
-    } catch (error) {
-      if ((error as Error).message.includes('Unknown tool')) {
-        // Tool not implemented yet - expected during development
-        expect((error as Error).message).to.include('get_balances');
-      } else {
-        throw error;
-      }
-    }
+  it('should handle MCP get_balances tool call with pagination', async function() {
+    // Switch to large dataset
+    currentMockBalances = largeMockBalances;
+    server = new BkperMcpServer();
+    
+    // First call to get cursor
+    const firstResponse = await server.testCallTool('get_balances', { bookId: 'book-1' });
+    const firstData = JSON.parse(firstResponse.content[0].text as string);
+    
+    expect(firstData.pagination.hasMore).to.be.true;
+    expect(firstData.pagination.nextCursor).to.be.a('string');
+    
+    // Second call with cursor
+    const response = await server.testCallTool('get_balances', { 
+      bookId: 'book-1',
+      cursor: firstData.pagination.nextCursor 
+    });
+    
+    const jsonResponse = JSON.parse(response.content[0].text as string);
+    expect(jsonResponse.pagination.offset).to.equal(50);
+    expect(jsonResponse.balances).to.have.length(50);
   });
 
-  it('should handle MCP error for missing bookId parameter (when implemented)', async function() {
+  it('should handle MCP error for missing bookId parameter', async function() {
     try {
       await server.testCallTool('get_balances', {});
       expect.fail('Should have thrown an error for missing bookId');
     } catch (error) {
-      if ((error as Error).message.includes('Unknown tool')) {
-        // Tool not implemented yet - expected during development
-        expect((error as Error).message).to.include('get_balances');
-      } else {
-        // When implemented, should return proper validation error
-        expect(error).to.be.an('error');
-      }
+      expect(error).to.be.an('error');
     }
   });
 
-  it('should handle balance query examples via MCP (when implemented)', async function() {
-    try {
-      // Test different query patterns
-      const accountQuery = await server.testCallTool('get_balances', { 
-        bookId: 'book-1',
-        query: "account:'Cash'"
-      });
-      
-      const groupQuery = await server.testCallTool('get_balances', { 
-        bookId: 'book-1',
-        query: "group:'Assets'"
-      });
-      
-      const dateQuery = await server.testCallTool('get_balances', { 
-        bookId: 'book-1',
-        query: "on:2024-01-31"
-      });
-      
-      // All should return valid MCP responses
-      [accountQuery, groupQuery, dateQuery].forEach(response => {
-        expect(response).to.have.property('content');
-        expect(response.content[0]).to.have.property('type', 'text');
-        const data = JSON.parse(response.content[0].text as string);
-        expect(data).to.have.property('balances');
-        expect(data).to.have.property('pagination');
-      });
-      
-    } catch (error) {
-      if ((error as Error).message.includes('Unknown tool')) {
-        // Tool not implemented yet - expected during development
-        expect((error as Error).message).to.include('get_balances');
-      } else {
-        throw error;
-      }
-    }
+  it('should handle balance query examples via MCP', async function() {
+    // Test different query patterns
+    const accountQuery = await server.testCallTool('get_balances', { 
+      bookId: 'book-1',
+      query: "account:'Cash'"
+    });
+    
+    const groupQuery = await server.testCallTool('get_balances', { 
+      bookId: 'book-1',
+      query: "group:'Assets'"
+    });
+    
+    const dateQuery = await server.testCallTool('get_balances', { 
+      bookId: 'book-1',
+      query: "on:2024-01-31"
+    });
+    
+    // All should return valid MCP responses
+    [accountQuery, groupQuery, dateQuery].forEach(response => {
+      expect(response).to.have.property('content');
+      expect(response.content[0]).to.have.property('type', 'text');
+      const data = JSON.parse(response.content[0].text as string);
+      expect(data).to.have.property('balances');
+      expect(data).to.have.property('pagination');
+    });
   });
 });

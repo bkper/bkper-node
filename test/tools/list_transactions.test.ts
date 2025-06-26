@@ -28,68 +28,55 @@ describe('MCP Server - list_transactions Tool Registration', function() {
     server = new BkperMcpServer();
   });
 
-  it('should register list_transactions tool in MCP tools list (when implemented)', async function() {
+  it('should register list_transactions tool in MCP tools list', async function() {
     const response = await server.testListTools();
     
     const listTransactionsTool = response.tools.find((tool: any) => tool.name === 'list_transactions');
     
-    if (listTransactionsTool) {
-      expect(listTransactionsTool.name).to.equal('list_transactions');
-      expect(listTransactionsTool.description).to.include('API cursor-based pagination');
-      expect(listTransactionsTool.description).to.include('query support');
-      expect(listTransactionsTool.inputSchema).to.have.property('properties');
-      expect(listTransactionsTool.inputSchema.properties).to.have.property('bookId');
-      expect(listTransactionsTool.inputSchema.properties).to.have.property('query');
-      expect(listTransactionsTool.inputSchema.properties).to.have.property('limit');
-      expect(listTransactionsTool.inputSchema.properties).to.have.property('cursor');
-      expect(listTransactionsTool.inputSchema.required).to.include('bookId');
-    } else {
-      // Tool not implemented yet - expected during development
-      expect(listTransactionsTool).to.be.undefined;
-    }
+    // This test will FAIL until list_transactions tool is implemented
+    expect(listTransactionsTool).to.exist;
+    expect(listTransactionsTool!.name).to.equal('list_transactions');
+    expect(listTransactionsTool!.description).to.include('API cursor-based pagination');
+    expect(listTransactionsTool!.description).to.include('query support');
+    expect(listTransactionsTool!.inputSchema).to.have.property('properties');
+    expect(listTransactionsTool!.inputSchema.properties).to.have.property('bookId');
+    expect(listTransactionsTool!.inputSchema.properties).to.have.property('query');
+    expect(listTransactionsTool!.inputSchema.properties).to.have.property('limit');
+    expect(listTransactionsTool!.inputSchema.properties).to.have.property('cursor');
+    expect(listTransactionsTool!.inputSchema.required).to.include('bookId');
   });
 
-  it('should handle MCP list_transactions tool call (when implemented)', async function() {
-    try {
-      const response = await server.testCallTool('list_transactions', { 
-        bookId: 'book-1',
-        query: "account:'Cash'",
-        limit: 25
-      });
-      
-      // Verify MCP response structure
-      expect(response).to.have.property('content');
-      expect(response.content).to.be.an('array');
-      expect(response.content).to.have.length(1);
-      expect(response.content[0]).to.have.property('type', 'text');
-      expect(response.content[0]).to.have.property('text');
-      
-      // Parse the JSON response  
-      const jsonResponse = JSON.parse(response.content[0].text as string);
-      expect(jsonResponse).to.have.property('transactions');
-      expect(jsonResponse).to.have.property('hasMore');
-      expect(jsonResponse).to.have.property('cursor');
-      
-      // Verify transaction structure
-      if (jsonResponse.transactions.length > 0) {
-        const transaction = jsonResponse.transactions[0];
-        expect(transaction).to.have.property('id');
-        expect(transaction).to.have.property('date');
-        expect(transaction).to.have.property('amount');
-        expect(transaction).to.have.property('description');
-        expect(transaction).to.have.property('posted');
-        expect(transaction).to.have.property('creditAccount');
-        expect(transaction).to.have.property('debitAccount');
-        expect(transaction).to.have.property('properties');
-      }
-      
-    } catch (error) {
-      if ((error as Error).message.includes('Unknown tool')) {
-        // Tool not implemented yet - expected during development
-        expect((error as Error).message).to.include('list_transactions');
-      } else {
-        throw error;
-      }
+  it('should handle MCP list_transactions tool call', async function() {
+    const response = await server.testCallTool('list_transactions', { 
+      bookId: 'book-1',
+      query: "account:'Cash'",
+      limit: 25
+    });
+    
+    // Verify MCP response structure
+    expect(response).to.have.property('content');
+    expect(response.content).to.be.an('array');
+    expect(response.content).to.have.length(1);
+    expect(response.content[0]).to.have.property('type', 'text');
+    expect(response.content[0]).to.have.property('text');
+    
+    // Parse the JSON response  
+    const jsonResponse = JSON.parse(response.content[0].text as string);
+    expect(jsonResponse).to.have.property('transactions');
+    expect(jsonResponse).to.have.property('hasMore');
+    expect(jsonResponse).to.have.property('cursor');
+    
+    // Verify transaction structure
+    if (jsonResponse.transactions.length > 0) {
+      const transaction = jsonResponse.transactions[0];
+      expect(transaction).to.have.property('id');
+      expect(transaction).to.have.property('date');
+      expect(transaction).to.have.property('amount');
+      expect(transaction).to.have.property('description');
+      expect(transaction).to.have.property('posted');
+      expect(transaction).to.have.property('creditAccount');
+      expect(transaction).to.have.property('debitAccount');
+      expect(transaction).to.have.property('properties');
     }
   });
 });
