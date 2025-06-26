@@ -123,6 +123,10 @@ Key principles:
 - Use the correct property names and types as defined in the interfaces
 - **For MCP responses**: Use the raw API types from bkper-api-types (especially Book interface)
 - **For implementation**: Use the high-level bkper-js library wrapper for auth and endpoints
+- **NEVER use `as any`** - Always use proper type casting or type guards
+    - Prefer type assertions with specific interfaces
+    - Use type guards to narrow down types safely
+    - If a type is not correctly inferred, fix the type definition or add proper type annotations
 
 #### MCP Implementation Details
 
