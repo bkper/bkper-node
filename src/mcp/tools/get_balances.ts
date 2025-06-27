@@ -1,5 +1,5 @@
 import { CallToolResult, ErrorCode, McpError } from '@modelcontextprotocol/sdk/types.js';
-import { getOAuthToken } from '../../auth/local-auth-service.js';
+import { getBkperInstance } from '../bkper-factory.js';
 
 // Pagination interfaces
 interface CursorData {
@@ -103,14 +103,9 @@ function decodeCursor(cursor: string): CursorData | null {
   }
 }
 
-async function fetchAndCacheBalances(bookId: string, query: string | undefined, bkperInstance: any): Promise<{ balances: Array<any>; total: number }> {
-  // Configure Bkper with authentication (only if not mocked)
-  if (bkperInstance.setConfig) {
-    bkperInstance.setConfig({
-      apiKeyProvider: async () => process.env.BKPER_API_KEY || '',
-      oauthTokenProvider: () => getOAuthToken()
-    });
-  }
+async function fetchAndCacheBalances(bookId: string, query: string | undefined): Promise<{ balances: Array<any>; total: number }> {
+  // Get configured Bkper instance
+  const bkperInstance = getBkperInstance();
 
   // Get the book first
   const book = await bkperInstance.getBook(bookId);
@@ -134,7 +129,7 @@ async function fetchAndCacheBalances(bookId: string, query: string | undefined, 
   return { balances, total };
 }
 
-export async function handleGetBalances(params: GetBalancesParams, bkperInstance: any): Promise<CallToolResult> {
+export async function handleGetBalances(params: GetBalancesParams): Promise<CallToolResult> {
   try {
     // Validate required parameters
     if (!params.bookId) {
@@ -160,7 +155,7 @@ export async function handleGetBalances(params: GetBalancesParams, bkperInstance
     // Get balances from cache or fetch fresh
     let cachedData = balancesCache.getCachedBalances(params.bookId, params.query);
     if (!cachedData) {
-      const freshData = await fetchAndCacheBalances(params.bookId, params.query, bkperInstance);
+      const freshData = await fetchAndCacheBalances(params.bookId, params.query);
       cachedData = {
         balances: freshData.balances,
         total: freshData.total,

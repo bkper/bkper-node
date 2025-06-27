@@ -24,7 +24,7 @@ describe('MCP Server - list_books Tool Registration', function() {
     currentMockBooks = mockBooks;
     const mockBkper = createMockBkperForBooks(currentMockBooks);
     setMockBkper(mockBkper);
-    server = new BkperMcpServer(mockBkper);
+    server = new BkperMcpServer();
   });
 
   it('should register list_books tool in MCP tools list', async function() {
@@ -67,7 +67,7 @@ describe('MCP Server - list_books Tool Calls', function() {
     currentMockBooks = mockBooks;
     const mockBkper = createMockBkperForBooks(currentMockBooks);
     setMockBkper(mockBkper);
-    server = new BkperMcpServer(mockBkper);
+    server = new BkperMcpServer();
   });
 
   it('should handle MCP list_books tool call without cursor', async function() {
@@ -98,7 +98,7 @@ describe('MCP Server - list_books Tool Calls', function() {
     currentMockBooks = largeMockBooks;
     const mockBkper = createMockBkperForBooks(currentMockBooks);
     setMockBkper(mockBkper);
-    server = new BkperMcpServer(mockBkper);
+    server = new BkperMcpServer();
     
     // First call to get cursor
     const firstResponse = await server.testCallTool('list_books');
@@ -136,7 +136,7 @@ describe('MCP Server - list_books Pagination Edge Cases', function() {
     currentMockBooks = largeMockBooks;
     const mockBkper = createMockBkperForBooks(currentMockBooks);
     setMockBkper(mockBkper);
-    server = new BkperMcpServer(mockBkper);
+    server = new BkperMcpServer();
   });
 
   afterEach(function() {

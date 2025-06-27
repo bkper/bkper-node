@@ -1,5 +1,5 @@
 import { CallToolResult, ErrorCode, McpError } from '@modelcontextprotocol/sdk/types.js';
-import { getOAuthToken } from '../../auth/local-auth-service.js';
+import { getBkperInstance } from '../bkper-factory.js';
 
 // Pagination interfaces
 interface CursorData {
@@ -94,14 +94,9 @@ function decodeCursor(cursor: string): CursorData | null {
   }
 }
 
-async function fetchAndCacheBooks(bkperInstance: any): Promise<{ books: Array<any>; total: number }> {
-  // Configure Bkper with authentication (only if not mocked)
-  if (bkperInstance.setConfig) {
-    bkperInstance.setConfig({
-      apiKeyProvider: async () => process.env.BKPER_API_KEY || '',
-      oauthTokenProvider: () => getOAuthToken()
-    });
-  }
+async function fetchAndCacheBooks(): Promise<{ books: Array<any>; total: number }> {
+  // Get configured Bkper instance
+  const bkperInstance = getBkperInstance();
 
   // Get books using high-level wrapper
   const bkperBooks = await bkperInstance.getBooks();
@@ -115,7 +110,7 @@ async function fetchAndCacheBooks(bkperInstance: any): Promise<{ books: Array<an
   return { books, total };
 }
 
-export async function handleListBooks(params: ListBooksParams, bkperInstance: any): Promise<CallToolResult> {
+export async function handleListBooks(params: ListBooksParams): Promise<CallToolResult> {
   try {
     // Use fixed page size
     const limit = 50;
@@ -133,7 +128,7 @@ export async function handleListBooks(params: ListBooksParams, bkperInstance: an
     // Get books from cache or fetch fresh
     let cachedData = booksCache.getCachedBooks();
     if (!cachedData) {
-      const freshData = await fetchAndCacheBooks(bkperInstance);
+      const freshData = await fetchAndCacheBooks();
       cachedData = {
         books: freshData.books,
         total: freshData.total,

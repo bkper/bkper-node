@@ -13,7 +13,6 @@ import {
   ListToolsResult,
   McpError,
 } from '@modelcontextprotocol/sdk/types.js';
-import { Bkper } from 'bkper-js';
 import { handleGetBook, getBookToolDefinition } from './tools/get_book.js';
 import { handleListAccounts, listAccountsToolDefinition } from './tools/list_accounts.js';
 import { handleGetBalances, getBalancesToolDefinition } from './tools/get_balances.js';
@@ -23,10 +22,8 @@ import { handleListBooks, listBooksToolDefinition } from './tools/list_books.js'
 
 class BkperMcpServer {
   private server: Server;
-  private bkperInstance: any;
 
-  constructor(bkperInstance?: any) {
-    this.bkperInstance = bkperInstance || Bkper;
+  constructor() {
     this.server = new Server(
       {
         name: 'bkper-mcp-server',
@@ -59,15 +56,15 @@ class BkperMcpServer {
     this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
       switch (request.params.name) {
         case 'list_books':
-          return await handleListBooks(request.params.arguments as any, this.bkperInstance);
+          return await handleListBooks(request.params.arguments as any);
         case 'get_book':
-          return await handleGetBook(request.params.arguments as any, this.bkperInstance);
+          return await handleGetBook(request.params.arguments as any);
         case 'list_accounts':
-          return await handleListAccounts(request.params.arguments as any, this.bkperInstance);
+          return await handleListAccounts(request.params.arguments as any);
         case 'get_balances':
-          return await handleGetBalances(request.params.arguments as any, this.bkperInstance);
+          return await handleGetBalances(request.params.arguments as any);
         case 'list_transactions':
-          return await handleListTransactions(request.params.arguments as any, this.bkperInstance);
+          return await handleListTransactions(request.params.arguments as any);
         default:
           throw new McpError(
             ErrorCode.MethodNotFound,

@@ -1,11 +1,11 @@
 import { CallToolResult, ErrorCode, McpError } from '@modelcontextprotocol/sdk/types.js';
-import { getOAuthToken } from '../../auth/local-auth-service.js';
+import { getBkperInstance } from '../bkper-factory.js';
 
 interface GetBookParams {
   bookId: string;
 }
 
-export async function handleGetBook(params: GetBookParams, bkperInstance: any): Promise<CallToolResult> {
+export async function handleGetBook(params: GetBookParams): Promise<CallToolResult> {
   try {
     // Validate required parameters
     if (!params.bookId) {
@@ -15,13 +15,8 @@ export async function handleGetBook(params: GetBookParams, bkperInstance: any): 
       );
     }
 
-    // Configure Bkper with authentication (only if not mocked)
-    if (bkperInstance.setConfig) {
-      bkperInstance.setConfig({
-        apiKeyProvider: async () => process.env.BKPER_API_KEY || '',
-        oauthTokenProvider: () => getOAuthToken()
-      });
-    }
+    // Get configured Bkper instance
+    const bkperInstance = getBkperInstance();
 
     // Get the specific book
     const book = await bkperInstance.getBook(params.bookId);

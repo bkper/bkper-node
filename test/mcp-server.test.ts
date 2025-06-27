@@ -23,7 +23,7 @@ describe('MCP Server - General Tests', function() {
     currentMockBooks = mockBooks;
     const mockBkper = createMockBkperForBooks(currentMockBooks);
     setMockBkper(mockBkper);
-    server = new BkperMcpServer(mockBkper);
+    server = new BkperMcpServer();
   });
 
   it('should return proper MCP error for unknown tool', async function() {
