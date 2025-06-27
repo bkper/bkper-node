@@ -13,6 +13,10 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 import { Bkper } from 'bkper-js';
 import { getOAuthToken } from '../auth/local-auth-service.js';
+import { handleGetBook, getBookToolDefinition } from './tools/get_book.js';
+import { handleListAccounts, listAccountsToolDefinition } from './tools/list_accounts.js';
+import { handleGetBalances, getBalancesToolDefinition } from './tools/get_balances.js';
+import { handleListTransactions, listTransactionsToolDefinition } from './tools/list_transactions.js';
 
 // Pagination interfaces
 interface CursorData {
@@ -86,6 +90,10 @@ class BkperMcpServer {
               required: [],
             },
           },
+          getBookToolDefinition,
+          listAccountsToolDefinition,
+          getBalancesToolDefinition,
+          listTransactionsToolDefinition,
         ],
       };
     });
@@ -95,6 +103,14 @@ class BkperMcpServer {
         case 'list_books':
           const params = request.params.arguments as PaginationParams;
           return await this.handleListBooks(params);
+        case 'get_book':
+          return await handleGetBook(request.params.arguments as any, this.bkperInstance);
+        case 'list_accounts':
+          return await handleListAccounts(request.params.arguments as any, this.bkperInstance);
+        case 'get_balances':
+          return await handleGetBalances(request.params.arguments as any, this.bkperInstance);
+        case 'list_transactions':
+          return await handleListTransactions(request.params.arguments as any, this.bkperInstance);
         default:
           throw new McpError(
             ErrorCode.MethodNotFound,

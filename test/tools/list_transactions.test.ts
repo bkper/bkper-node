@@ -1,11 +1,12 @@
 import { expect, setupTestEnvironment, getTestPaths } from '../helpers/test-setup.js';
-import { BkperMcpServerType, TransactionData } from '../helpers/mock-interfaces.js';
+import { BkperMcpServerType, TransactionData, BookData } from '../helpers/mock-interfaces.js';
 import { setupMocks, createMockBkperForBook, setMockBkper } from '../helpers/mock-factory.js';
-import { loadTransactions, generateLargeTransactions } from '../helpers/fixture-loader.js';
+import { loadTransactions, generateLargeTransactions, loadBooks } from '../helpers/fixture-loader.js';
 
 const { __dirname } = getTestPaths(import.meta.url);
 
 // Load test data
+const mockBooks: BookData[] = loadBooks(__dirname);
 const mockTransactions: TransactionData[] = loadTransactions(__dirname);
 const largeMockTransactions: TransactionData[] = generateLargeTransactions(500);
 
@@ -23,9 +24,9 @@ describe('MCP Server - list_transactions Tool Registration', function() {
     setupTestEnvironment();
     currentMockTransactions = mockTransactions;
     // Create mock with books + transactions support
-    const mockBkper = createMockBkperForBook([], undefined, currentMockTransactions);
+    const mockBkper = createMockBkperForBook(mockBooks, undefined, currentMockTransactions);
     setMockBkper(mockBkper);
-    server = new BkperMcpServer();
+    server = new BkperMcpServer(mockBkper);
   });
 
   it('should register list_transactions tool in MCP tools list', async function() {

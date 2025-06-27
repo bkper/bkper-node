@@ -21,7 +21,7 @@ describe('MCP Server - get_book Tool Registration', function() {
     setupTestEnvironment();
     const mockBkper = createMockBkperForBook(mockBooks);
     setMockBkper(mockBkper);
-    server = new BkperMcpServer();
+    server = new BkperMcpServer(mockBkper);
   });
 
   it('should register get_book tool in MCP tools list', async function() {
@@ -64,7 +64,7 @@ describe('MCP Server - get_book Tool Calls', function() {
     setupTestEnvironment();
     const mockBkper = createMockBkperForBook(mockBooks);
     setMockBkper(mockBkper);
-    server = new BkperMcpServer();
+    server = new BkperMcpServer(mockBkper);
   });
 
   it('should handle MCP get_book tool call for valid book ID', async function() {

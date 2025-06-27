@@ -1,11 +1,12 @@
 import { expect, setupTestEnvironment, getTestPaths } from '../helpers/test-setup.js';
-import { BkperMcpServerType, AccountBalanceData } from '../helpers/mock-interfaces.js';
+import { BkperMcpServerType, AccountBalanceData, BookData } from '../helpers/mock-interfaces.js';
 import { setupMocks, createMockBkperForBook, setMockBkper } from '../helpers/mock-factory.js';
-import { loadAccountBalances, generateLargeAccountBalances } from '../helpers/fixture-loader.js';
+import { loadAccountBalances, generateLargeAccountBalances, loadBooks } from '../helpers/fixture-loader.js';
 
 const { __dirname } = getTestPaths(import.meta.url);
 
 // Load test data
+const mockBooks: BookData[] = loadBooks(__dirname);
 const mockAccountBalances: AccountBalanceData[] = loadAccountBalances(__dirname);
 const largeMockAccountBalances: AccountBalanceData[] = generateLargeAccountBalances(150);
 
@@ -23,9 +24,9 @@ describe('MCP Server - get_balances Tool Registration', function() {
     process.env.BKPER_API_KEY = 'test-api-key';
     currentMockAccountBalances = mockAccountBalances;
     // Create mock with books + account balances support
-    const mockBkper = createMockBkperForBook([], undefined, undefined, currentMockAccountBalances);
+    const mockBkper = createMockBkperForBook(mockBooks, undefined, undefined, currentMockAccountBalances);
     setMockBkper(mockBkper);
-    server = new BkperMcpServer();
+    server = new BkperMcpServer(mockBkper);
   });
 
   it('should register get_balances tool in MCP tools list', async function() {
@@ -79,9 +80,9 @@ describe('MCP Server - get_balances Tool Calls', function() {
     process.env.BKPER_API_KEY = 'test-api-key';
     currentMockAccountBalances = mockAccountBalances;
     // Create mock with books + account balances support
-    const mockBkper = createMockBkperForBook([], undefined, undefined, currentMockAccountBalances);
+    const mockBkper = createMockBkperForBook(mockBooks, undefined, undefined, currentMockAccountBalances);
     setMockBkper(mockBkper);
-    server = new BkperMcpServer();
+    server = new BkperMcpServer(mockBkper);
   });
 
   it('should handle MCP get_balances tool call without query', async function() {
@@ -133,9 +134,9 @@ describe('MCP Server - get_balances Tool Calls', function() {
   it('should handle MCP get_balances tool call with pagination', async function() {
     // Switch to large dataset
     currentMockAccountBalances = largeMockAccountBalances;
-    const mockBkper = createMockBkperForBook([], undefined, undefined, currentMockAccountBalances);
+    const mockBkper = createMockBkperForBook(mockBooks, undefined, undefined, currentMockAccountBalances);
     setMockBkper(mockBkper);
-    server = new BkperMcpServer();
+    server = new BkperMcpServer(mockBkper);
     
     // First call to get cursor
     const firstResponse = await server.testCallTool('get_balances', { bookId: 'book-1' });

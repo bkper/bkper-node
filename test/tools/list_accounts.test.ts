@@ -1,11 +1,12 @@
 import { expect, setupTestEnvironment, getTestPaths } from '../helpers/test-setup.js';
-import { BkperMcpServerType, AccountData } from '../helpers/mock-interfaces.js';
+import { BkperMcpServerType, AccountData, BookData } from '../helpers/mock-interfaces.js';
 import { setupMocks, createMockBkperForBook, setMockBkper } from '../helpers/mock-factory.js';
-import { loadAccounts, generateLargeAccounts } from '../helpers/fixture-loader.js';
+import { loadAccounts, generateLargeAccounts, loadBooks } from '../helpers/fixture-loader.js';
 
 const { __dirname } = getTestPaths(import.meta.url);
 
 // Load test data
+const mockBooks: BookData[] = loadBooks(__dirname);
 const mockAccounts: AccountData[] = loadAccounts(__dirname);
 const largeMockAccounts: AccountData[] = generateLargeAccounts(150);
 
@@ -23,9 +24,9 @@ describe('MCP Server - list_accounts Tool Registration', function() {
     setupTestEnvironment();
     currentMockAccounts = mockAccounts;
     // Create mock with books + accounts support
-    const mockBkper = createMockBkperForBook([], currentMockAccounts);
+    const mockBkper = createMockBkperForBook(mockBooks, currentMockAccounts);
     setMockBkper(mockBkper);
-    server = new BkperMcpServer();
+    server = new BkperMcpServer(mockBkper);
   });
 
   it('should register list_accounts tool in MCP tools list', async function() {
@@ -77,9 +78,9 @@ describe('MCP Server - list_accounts Tool Calls', function() {
     setupTestEnvironment();
     currentMockAccounts = mockAccounts;
     // Create mock with books + accounts support
-    const mockBkper = createMockBkperForBook([], currentMockAccounts);
+    const mockBkper = createMockBkperForBook(mockBooks, currentMockAccounts);
     setMockBkper(mockBkper);
-    server = new BkperMcpServer();
+    server = new BkperMcpServer(mockBkper);
   });
 
   it('should handle MCP list_accounts tool call without cursor', async function() {
@@ -116,7 +117,9 @@ describe('MCP Server - list_accounts Tool Calls', function() {
   it('should handle MCP list_accounts tool call with cursor', async function() {
     // Switch to large dataset
     currentMockAccounts = largeMockAccounts;
-    server = new BkperMcpServer();
+    const mockBkper = createMockBkperForBook(mockBooks, currentMockAccounts);
+    setMockBkper(mockBkper);
+    server = new BkperMcpServer(mockBkper);
     
     // First call to get cursor
     const firstResponse = await server.testCallTool('list_accounts', { bookId: 'book-1' });
@@ -148,23 +151,23 @@ describe('MCP Server - list_accounts Tool Calls', function() {
   it('should handle account type organization via MCP', async function() {
     // Switch to large dataset with different account types
     currentMockAccounts = largeMockAccounts;
-    server = new BkperMcpServer();
+    const mockBkper = createMockBkperForBook(mockBooks, currentMockAccounts);
+    setMockBkper(mockBkper);
+    server = new BkperMcpServer(mockBkper);
     
     const response = await server.testCallTool('list_accounts', { bookId: 'book-1' });
     const jsonResponse = JSON.parse(response.content[0].text as string);
     
-    // Verify we have different account types
+    // Verify we have different account types (using correct Bkper API types)
     const accounts = jsonResponse.accounts;
     const assetAccounts = accounts.filter((acc: any) => acc.type === 'ASSET');
     const liabilityAccounts = accounts.filter((acc: any) => acc.type === 'LIABILITY');
-    const equityAccounts = accounts.filter((acc: any) => acc.type === 'EQUITY');
-    const incomeAccounts = accounts.filter((acc: any) => acc.type === 'INCOME');
+    const incomingAccounts = accounts.filter((acc: any) => acc.type === 'INCOMING');
     const outgoingAccounts = accounts.filter((acc: any) => acc.type === 'OUTGOING');
 
     expect(assetAccounts.length).to.be.greaterThan(0);
     expect(liabilityAccounts.length).to.be.greaterThan(0);
-    expect(equityAccounts.length).to.be.greaterThan(0);
-    expect(incomeAccounts.length).to.be.greaterThan(0);
+    expect(incomingAccounts.length).to.be.greaterThan(0);
     expect(outgoingAccounts.length).to.be.greaterThan(0);
   });
 });
