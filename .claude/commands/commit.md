@@ -14,5 +14,14 @@ Steps:
 6. Do not include attribution to Claude in the commit message or co-author attribution
 7. Create the commit with the already staged files only
 8. Confirm that the commit was successful and display nicely the its hash, message and description (if any) that were used
+9. Confirm that the commit was successful and log its hash, message and description (if any), following this format:
+
+✅ Commit successful!
+Hash: 4f73c78b
+Message: Replace sl-input with bkper-amount in account balance adjuster
+Description:
+- Remove manual input sanitization logic
+- Leverage built-in amount parsing and formatting
+- Simplify amount change handling
 
 **Important**: Do NOT push to remote repository.
