@@ -214,14 +214,15 @@ it('should handle new_tool correctly', async function() {
 
 ## Test-Driven Development Workflow Enhancements
 
-- Ensure tests are written first, before implementation
-- Review tests and code carefully before committing
-- Follow a strict TDD workflow:
-  1. Write a failing test in TypeScript
-  2. Review the test to ensure it correctly captures the desired behavior
-  3. Commit the test separately
-  4. Implement the minimal code to make the test pass
-  5. Review the implementation
-  6. Commit the implementation
-  7. Refactor if necessary, maintaining test coverage
-```
+- **TDD Development Approach**:
+  - **IMPORTANT**: ALWAYS plan a new feature or improvement using TDD approach
+  - The plan should always be split in two phases:
+    1. First phase: Add or modify tests
+       - Write comprehensive test cases
+       - Review and validate tests
+       - Commit tests manually for review
+    2. Second phase: Implementation
+       - Implement code to pass the tests
+       - Review implementation
+       - Ensure all tests pass
+       - Refactor if necessary
