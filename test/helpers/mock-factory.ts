@@ -52,9 +52,20 @@ export async function setupMocks() {
 export function createMockBkperForBooks(books: BookData[]): MockBkper {
   return {
     setConfig: () => {},
-    getBooks: async (): Promise<MockBook[]> => books.map((bookData: BookData) => ({
-      json: (): BookData => bookData
-    }))
+    getBooks: async (query?: string): Promise<MockBook[]> => {
+      let filteredBooks = books;
+      
+      // Apply name filtering if query is provided
+      if (query && query.trim()) {
+        filteredBooks = books.filter((book: BookData) => 
+          book.name?.toLowerCase().includes(query.toLowerCase()) || false
+        );
+      }
+      
+      return filteredBooks.map((bookData: BookData) => ({
+        json: (): BookData => bookData
+      }));
+    }
   };
 }
 
