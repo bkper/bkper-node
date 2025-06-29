@@ -122,18 +122,7 @@ Key principles:
 - Respect the enum values (AccountType, Permission, Visibility)
 - Follow the proper class hierarchy (Bkper → Book → Account/Transaction)
 - Use the correct property names and types as defined in the interfaces
-- **For MCP responses**: Use the raw API types from bkper-api-types (especially Book interface)
 - **For implementation**: Use the high-level bkper-js library wrapper for auth and endpoints
-- **NEVER use `as any`** - Always use proper type casting or type guards
-    - Prefer type assertions with specific interfaces
-    - Use type guards to narrow down types safely
-    - If a type is not correctly inferred, fix the type definition or add proper type annotations
-
-#### MCP Implementation Details
-
-##### MCP Tool Response Format
-
-list_books tool should return all bkper.Book properties from bkper-api-types:
 
 
 
@@ -167,12 +156,15 @@ bun run build && node lib/cli.js mcp start
 - Compiles to ES2015 with ES modules
 - Generates declaration files and source maps
 - Custom type roots include `@bkper` types
+- **NEVER use `as any`** - Always use proper type casting or type guards
+    - Prefer type assertions with specific interfaces
+    - Use type guards to narrow down types safely
+    - If a type is not correctly inferred, fix the type definition or add proper type annotations
 
 ## Development Notes
 - Uses Bun as package manager and runtime
 - ES modules throughout (type: "module" in package.json)
 - Google TypeScript Style (gts) for linting and formatting
-- **Test-Driven Development (TDD)**: Use `bun test` for rapid feedback during development
 - **NEVER modify any files inside `node_modules/` directory** - these are managed dependencies
 
 ## Code Commit Guidelines
@@ -180,10 +172,21 @@ bun run build && node lib/cli.js mcp start
 
 ## Test-Driven Development (TDD) Workflow
 
+  - **IMPORTANT**: ALWAYS plan a new feature or improvement using TDD approach
+  - The plan should always be split in two phases:
+    1. First phase: Add or modify tests
+       - Write comprehensive test cases
+       - Review and validate tests
+       - Commit tests manually for review
+    2. Second phase: Implementation
+       - Implement code to pass the tests
+       - Review implementation
+       - Ensure all tests pass
+       - Refactor if necessary
+
 ### Running Tests
 ```bash
-bun test                    # Run all tests
-bun test --watch           # Run tests in watch mode for TDD
+bun run test                    # Run all tests
 ```
 
 ### Test Structure
@@ -212,17 +215,3 @@ it('should handle new_tool correctly', async function() {
 });
 ```
 
-## Test-Driven Development Workflow Enhancements
-
-- **TDD Development Approach**:
-  - **IMPORTANT**: ALWAYS plan a new feature or improvement using TDD approach
-  - The plan should always be split in two phases:
-    1. First phase: Add or modify tests
-       - Write comprehensive test cases
-       - Review and validate tests
-       - Commit tests manually for review
-    2. Second phase: Implementation
-       - Implement code to pass the tests
-       - Review implementation
-       - Ensure all tests pass
-       - Refactor if necessary
