@@ -9,6 +9,7 @@ interface CursorData {
 
 interface ListBooksParams {
   cursor?: string;
+  name?: string;
 }
 
 interface PaginationMetadata {
@@ -34,13 +35,17 @@ class BooksCache {
   private cache: Map<string, BooksCacheEntry> = new Map();
   private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
-  getCachedBooks(): BooksCacheEntry | null {
+  private generateCacheKey(name?: string): string {
+    return name ? `books_cache_${name}` : 'books_cache';
+  }
+
+  getCachedBooks(name?: string): BooksCacheEntry | null {
     // Disable caching in test environment to avoid conflicts
     if (process.env.NODE_ENV === 'test' || (globalThis as any).__mockBkper) {
       return null;
     }
     
-    const cacheKey = 'books_cache';
+    const cacheKey = this.generateCacheKey(name);
     const cached = this.cache.get(cacheKey);
     
     if (!cached) {
@@ -56,8 +61,8 @@ class BooksCache {
     return cached;
   }
 
-  setCachedBooks(books: Array<any>, total: number): void {
-    const cacheKey = 'books_cache';
+  setCachedBooks(books: Array<any>, total: number, name?: string): void {
+    const cacheKey = this.generateCacheKey(name);
     this.cache.set(cacheKey, {
       books,
       timestamp: Date.now(),
@@ -94,18 +99,18 @@ function decodeCursor(cursor: string): CursorData | null {
   }
 }
 
-async function fetchAndCacheBooks(): Promise<{ books: Array<any>; total: number }> {
+async function fetchAndCacheBooks(name?: string): Promise<{ books: Array<any>; total: number }> {
   // Get configured Bkper instance
   const bkperInstance = getBkperInstance();
 
-  // Get books using high-level wrapper
-  const bkperBooks = await bkperInstance.getBooks();
+  // Get books using high-level wrapper with optional name filter
+  const bkperBooks = await bkperInstance.getBooks(name);
   
   // Return full book JSON data - no filtering, no transforming
   const books = bkperBooks.map((book: any) => book.json());
 
   const total = books.length;
-  booksCache.setCachedBooks(books, total);
+  booksCache.setCachedBooks(books, total, name);
   
   return { books, total };
 }
@@ -126,9 +131,9 @@ export async function handleListBooks(params: ListBooksParams): Promise<CallTool
     }
 
     // Get books from cache or fetch fresh
-    let cachedData = booksCache.getCachedBooks();
+    let cachedData = booksCache.getCachedBooks(params.name);
     if (!cachedData) {
-      const freshData = await fetchAndCacheBooks();
+      const freshData = await fetchAndCacheBooks(params.name);
       cachedData = {
         books: freshData.books,
         total: freshData.total,
@@ -189,13 +194,17 @@ export async function handleListBooks(params: ListBooksParams): Promise<CallTool
 
 export const listBooksToolDefinition = {
   name: 'list_books',
-  description: 'List books with fixed 50-item pagination',
+  description: 'List books with fixed 50-item pagination and optional name filtering',
   inputSchema: {
     type: 'object',
     properties: {
       cursor: {
         type: 'string',
         description: 'Pagination cursor for next page'
+      },
+      name: {
+        type: 'string',
+        description: 'Optional filter to search books by name (case-insensitive substring match)'
       }
     },
     required: []
