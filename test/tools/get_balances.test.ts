@@ -26,7 +26,7 @@ describe('MCP Server - get_balances Tool Registration', function() {
     // Create mock with books + account balances support
     const mockBkper = createMockBkperForBook(mockBooks, undefined, undefined, currentMockAccountBalances);
     setMockBkper(mockBkper);
-    server = new BkperMcpServer(mockBkper);
+    server = new BkperMcpServer();
   });
 
   it('should register get_balances tool in MCP tools list', async function() {
@@ -82,7 +82,7 @@ describe('MCP Server - get_balances Tool Calls', function() {
     // Create mock with books + account balances support
     const mockBkper = createMockBkperForBook(mockBooks, undefined, undefined, currentMockAccountBalances);
     setMockBkper(mockBkper);
-    server = new BkperMcpServer(mockBkper);
+    server = new BkperMcpServer();
   });
 
   it('should handle MCP get_balances tool call without query', async function() {
@@ -136,7 +136,7 @@ describe('MCP Server - get_balances Tool Calls', function() {
     currentMockAccountBalances = largeMockAccountBalances;
     const mockBkper = createMockBkperForBook(mockBooks, undefined, undefined, currentMockAccountBalances);
     setMockBkper(mockBkper);
-    server = new BkperMcpServer(mockBkper);
+    server = new BkperMcpServer();
     
     // First call to get cursor
     const firstResponse = await server.testCallTool('get_balances', { bookId: 'book-1' });

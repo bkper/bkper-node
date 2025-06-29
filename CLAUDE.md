@@ -14,8 +14,9 @@ This is the Bkper Node.js command line client - a CLI tool for creating and upda
 - `bun run build:compile` - Compile TypeScript only
 
 ### Testing
-- `bun test` - Run all tests with Mocha
+- `bun run test` - Run all tests with Mocha
 - `test/` - Test directory with simple JavaScript tests for TDD
+- ALWAYS run the `bun run test` command when asked to run tests.
 
 ### Package Management
 - `bun install` - Install dependencies (used automatically in prebuild)

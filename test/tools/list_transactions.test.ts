@@ -26,7 +26,7 @@ describe('MCP Server - list_transactions Tool Registration', function() {
     // Create mock with books + transactions support
     const mockBkper = createMockBkperForBook(mockBooks, undefined, currentMockTransactions);
     setMockBkper(mockBkper);
-    server = new BkperMcpServer(mockBkper);
+    server = new BkperMcpServer();
   });
 
   it('should register list_transactions tool in MCP tools list', async function() {

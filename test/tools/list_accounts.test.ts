@@ -26,7 +26,7 @@ describe('MCP Server - list_accounts Tool Registration', function() {
     // Create mock with books + accounts support
     const mockBkper = createMockBkperForBook(mockBooks, currentMockAccounts);
     setMockBkper(mockBkper);
-    server = new BkperMcpServer(mockBkper);
+    server = new BkperMcpServer();
   });
 
   it('should register list_accounts tool in MCP tools list', async function() {
@@ -80,7 +80,7 @@ describe('MCP Server - list_accounts Tool Calls', function() {
     // Create mock with books + accounts support
     const mockBkper = createMockBkperForBook(mockBooks, currentMockAccounts);
     setMockBkper(mockBkper);
-    server = new BkperMcpServer(mockBkper);
+    server = new BkperMcpServer();
   });
 
   it('should handle MCP list_accounts tool call without cursor', async function() {
@@ -119,7 +119,7 @@ describe('MCP Server - list_accounts Tool Calls', function() {
     currentMockAccounts = largeMockAccounts;
     const mockBkper = createMockBkperForBook(mockBooks, currentMockAccounts);
     setMockBkper(mockBkper);
-    server = new BkperMcpServer(mockBkper);
+    server = new BkperMcpServer();
     
     // First call to get cursor
     const firstResponse = await server.testCallTool('list_accounts', { bookId: 'book-1' });
@@ -153,7 +153,7 @@ describe('MCP Server - list_accounts Tool Calls', function() {
     currentMockAccounts = largeMockAccounts;
     const mockBkper = createMockBkperForBook(mockBooks, currentMockAccounts);
     setMockBkper(mockBkper);
-    server = new BkperMcpServer(mockBkper);
+    server = new BkperMcpServer();
     
     const response = await server.testCallTool('list_accounts', { bookId: 'book-1' });
     const jsonResponse = JSON.parse(response.content[0].text as string);

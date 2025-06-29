@@ -32,7 +32,7 @@ describe('MCP Server - General Tests', function() {
       expect.fail('Should have thrown an error');
     } catch (error) {
       expect(error).to.be.an('error');
-      expect(error.message).to.include('Unknown tool');
+      expect((error as Error).message).to.include('Unknown tool');
     }
   });
 

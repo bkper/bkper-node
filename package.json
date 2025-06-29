@@ -33,7 +33,7 @@
     "predev": "bun run build",
     "dev": "tsc -w",
     "mcp": "bun run build && node lib/cli.js mcp start",
-    "test": "TS_NODE_PROJECT=tsconfig.test.json mocha test/**/*.test.ts --require ts-node/register --loader ts-node/esm",
+    "test": "TS_NODE_PROJECT=tsconfig.test.json mocha",
     "upgrade:api": "bun update @bkper/bkper-api-types --latest && bun update bkper-js --latest",
     "patch": "yarn version --patch",
     "minor": "yarn version --minor",
