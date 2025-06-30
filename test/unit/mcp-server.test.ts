@@ -13,7 +13,7 @@ let currentMockBooks: BookData[] = mockBooks;
 setupMocks();
 setMockBkper(createMockBkperForBooks(currentMockBooks));
 
-const { BkperMcpServer } = await import('../src/mcp/server.js');
+const { BkperMcpServer } = await import('../../src/mcp/server.js');
 
 describe('MCP Server - General Tests', function() {
   let server: BkperMcpServerType;

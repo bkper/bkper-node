@@ -14,7 +14,7 @@ let currentMockBooks: BookData[] = mockBooks;
 setupMocks();
 setMockBkper(createMockBkperForBooks(currentMockBooks));
 
-const { BkperMcpServer } = await import('../../src/mcp/server.js');
+const { BkperMcpServer } = await import('../../../src/mcp/server.js');
 
 describe('MCP Server - list_books Tool Registration', function() {
   let server: BkperMcpServerType;

@@ -12,12 +12,15 @@ import {
 // Centralized fixture loading
 export function loadFixture<T>(testDir: string, fixtureName: string): T[] {
   // testDir is the directory containing the test file
-  // For files in test/tools/, go up to test/ directory, then to fixtures/
-  // For files in test/ directly, go to fixtures/
+  // For files in test/unit/tools/, go up to test/unit/fixtures/
+  // For files in test/unit/, go to fixtures/
   let fixturePath: string;
-  if (testDir.includes('/tools')) {
+  if (testDir.includes('/unit/tools')) {
     fixturePath = path.join(testDir, '..', 'fixtures', fixtureName);
+  } else if (testDir.includes('/unit')) {
+    fixturePath = path.join(testDir, 'fixtures', fixtureName);
   } else {
+    // Fallback for other locations
     fixturePath = path.join(testDir, 'fixtures', fixtureName);
   }
   return JSON.parse(fs.readFileSync(fixturePath, 'utf8'));

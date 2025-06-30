@@ -15,7 +15,7 @@ let currentMockAccounts: AccountData[] = mockAccounts;
 // Setup mocks and import server
 setupMocks();
 
-const { BkperMcpServer } = await import('../../src/mcp/server.js');
+const { BkperMcpServer } = await import('../../../src/mcp/server.js');
 
 describe('MCP Server - list_accounts Tool Registration', function() {
   let server: BkperMcpServerType;

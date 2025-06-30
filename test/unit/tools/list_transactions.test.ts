@@ -15,7 +15,7 @@ let currentMockTransactions: TransactionData[] = mockTransactions;
 // Setup mocks and import server
 setupMocks();
 
-const { BkperMcpServer } = await import('../../src/mcp/server.js');
+const { BkperMcpServer } = await import('../../../src/mcp/server.js');
 
 describe('MCP Server - list_transactions Tool Registration', function() {
   let server: BkperMcpServerType;

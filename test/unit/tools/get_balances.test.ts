@@ -15,7 +15,7 @@ let currentMockAccountBalances: AccountBalanceData[] = mockAccountBalances;
 // Setup mocks and import server
 setupMocks();
 
-const { BkperMcpServer } = await import('../../src/mcp/server.js');
+const { BkperMcpServer } = await import('../../../src/mcp/server.js');
 
 describe('MCP Server - get_balances Tool Registration', function() {
   let server: BkperMcpServerType;

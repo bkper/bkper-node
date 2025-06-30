@@ -1,0 +1,9 @@
+{
+  "extension": ["ts"],
+  "spec": "test/integration/**/*.test.ts",
+  "loader": "ts-node/esm",
+  "require": "ts-node/register",
+  "timeout": 30000,
+  "slow": 5000,
+  "retries": 1
+}
