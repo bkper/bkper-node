@@ -103,7 +103,7 @@ function decodeCursor(cursor: string): CursorData | null {
   }
 }
 
-async function fetchAndCacheBalances(bookId: string, query: string | undefined): Promise<{ balances: Array<any>; total: number }> {
+async function fetchAndCacheBalances(bookId: string, query?: string): Promise<{ balances: Array<any>; total: number }> {
   // Get configured Bkper instance
   const bkperInstance = getBkperInstance();
 
@@ -116,9 +116,10 @@ async function fetchAndCacheBalances(bookId: string, query: string | undefined):
     );
   }
 
-  // Get balances from the book with optional query
-  const balancesReport = await book.getBalancesReport(query);
-  const bkperBalances = await balancesReport.getBalances();
+  // Get balances from the book with query (required by bkper-js)
+  // Use 'on:$m' as default query to get balances for current month
+  const balancesReport = await book.getBalancesReport(query || 'on:$m');
+  const bkperBalances = balancesReport.getBalancesContainers();
   
   // Return full balance JSON data
   const balances = bkperBalances.map((balance: any) => balance.json());

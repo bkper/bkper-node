@@ -97,19 +97,22 @@ export function createMockBkperForBook(
         getBalancesReport: accountBalances ? async (query?: string): Promise<any> => {
           let filteredBalances = accountBalances;
           
-          if (query) {
+          // Handle query filtering - empty/undefined queries use 'on:$m' default
+          const effectiveQuery = query || 'on:$m';
+          if (effectiveQuery && effectiveQuery.trim() && effectiveQuery !== 'on:$m') {
             // Simple query simulation for testing
-            if (query.includes("account:'Cash'")) {
+            if (effectiveQuery.includes("account:'Cash'")) {
               filteredBalances = accountBalances.filter(b => b.account.name === 'Cash');
-            } else if (query.includes("group:'Assets'")) {
+            } else if (effectiveQuery.includes("group:'Assets'")) {
               filteredBalances = accountBalances.filter(b => b.account.type === 'ASSET');
-            } else if (query.includes("group:'Liabilities'")) {
+            } else if (effectiveQuery.includes("group:'Liabilities'")) {
               filteredBalances = accountBalances.filter(b => b.account.type === 'LIABILITY');
             }
           }
+          // For 'on:$m' default or other date queries, return all balances (no filtering in mock)
           
           return {
-            getBalances: async (): Promise<MockAccountBalance[]> => filteredBalances.map((balanceData: AccountBalanceData) => ({
+            getBalancesContainers: (): MockAccountBalance[] => filteredBalances.map((balanceData: AccountBalanceData) => ({
               json: (): AccountBalanceData => balanceData
             }))
           };
