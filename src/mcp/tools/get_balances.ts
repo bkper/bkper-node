@@ -1,7 +1,6 @@
 import { CallToolResult, ErrorCode, McpError } from '@modelcontextprotocol/sdk/types.js';
 import { getBkperInstance } from '../bkper-factory.js';
 
-// Simplified interfaces without pagination
 interface GetBalancesParams {
   bookId: string;
   query?: string;
@@ -13,83 +12,7 @@ interface BalancesResponse {
   query?: string;
 }
 
-interface BalancesCacheEntry {
-  balances: Array<any>;
-  timestamp: number;
-  total: number;
-  query?: string;
-}
 
-class BalancesCache {
-  private cache: Map<string, BalancesCacheEntry> = new Map();
-  private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes
-
-  private getCacheKey(bookId: string, query?: string): string {
-    return `balances_${bookId}_${query || 'all'}`;
-  }
-
-  getCachedBalances(bookId: string, query?: string): BalancesCacheEntry | null {
-    // Disable caching in test environment to avoid conflicts
-    if (process.env.NODE_ENV === 'test' || (globalThis as any).__mockBkper) {
-      return null;
-    }
-    
-    const cacheKey = this.getCacheKey(bookId, query);
-    const cached = this.cache.get(cacheKey);
-    
-    if (!cached) {
-      return null;
-    }
-    
-    // Check if cache is expired
-    if (Date.now() - cached.timestamp > this.CACHE_TTL) {
-      this.cache.delete(cacheKey);
-      return null;
-    }
-    
-    return cached;
-  }
-
-  setCachedBalances(bookId: string, balances: Array<any>, total: number, query?: string): void {
-    const cacheKey = this.getCacheKey(bookId, query);
-    this.cache.set(cacheKey, {
-      balances,
-      timestamp: Date.now(),
-      total,
-      query
-    });
-  }
-}
-
-const balancesCache = new BalancesCache();
-
-
-async function fetchAndCacheBalances(bookId: string, query?: string): Promise<{ balances: Array<any>; total: number }> {
-  // Get configured Bkper instance
-  const bkperInstance = getBkperInstance();
-
-  // Get the book first
-  const book = await bkperInstance.getBook(bookId);
-  if (!book) {
-    throw new McpError(
-      ErrorCode.InvalidParams,
-      `Book not found: ${bookId}`
-    );
-  }
-
-  // Get balances from the book with query (required by bkper-js)
-  // Use 'on:$m' as default query to get balances for current month
-  const balancesReport = await book.getBalancesReport(query || 'on:$m');
-  const bkperBalances = balancesReport.getBalancesContainers();
-  
-  // Return full balance JSON data
-  const balances = bkperBalances.map((balance: any) => balance.json());
-  const total = balances.length;
-  
-  balancesCache.setCachedBalances(bookId, balances, total, query);
-  
-  return { balances, total };
-}
 
 export async function handleGetBalances(params: GetBalancesParams): Promise<CallToolResult> {
   try {
@@ -101,21 +24,28 @@ export async function handleGetBalances(params: GetBalancesParams): Promise<Call
       );
     }
 
-    // Get balances from cache or fetch fresh
-    let cachedData = balancesCache.getCachedBalances(params.bookId, params.query);
-    if (!cachedData) {
-      const freshData = await fetchAndCacheBalances(params.bookId, params.query);
-      cachedData = {
-        balances: freshData.balances,
-        total: freshData.total,
-        timestamp: Date.now(),
-        query: params.query
-      };
+    // Get configured Bkper instance
+    const bkperInstance = getBkperInstance();
+
+    // Get the book first
+    const book = await bkperInstance.getBook(params.bookId);
+    if (!book) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        `Book not found: ${params.bookId}`
+      );
     }
 
-    const { balances, total } = cachedData;
+    // Get balances from the book with query (required by bkper-js)
+    // Use 'on:$m' as default query to get balances for current month
+    const balancesReport = await book.getBalancesReport(params.query || 'on:$m');
+    const bkperBalances = balancesReport.getBalancesContainers();
+    
+    // Return full balance JSON data
+    const balances = bkperBalances.map((balance: any) => balance.json());
+    const total = balances.length;
 
-    // Build simplified response with all balances
+    // Build response with all balances
     const response: BalancesResponse = {
       total,
       balances
