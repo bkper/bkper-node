@@ -1,29 +1,15 @@
 import { CallToolResult, ErrorCode, McpError } from '@modelcontextprotocol/sdk/types.js';
 import { getBkperInstance } from '../bkper-factory.js';
 
-// Pagination interfaces
-interface CursorData {
-  offset: number;
-  timestamp: number;
-}
-
+// Simplified interfaces without pagination
 interface GetBalancesParams {
   bookId: string;
-  cursor?: string;
   query?: string;
 }
 
-interface PaginationMetadata {
-  hasMore: boolean;
-  nextCursor: string | null;
-  limit: number;
-  offset: number;
-}
-
-interface PaginatedBalancesResponse {
+interface BalancesResponse {
   total: number;
   balances: Array<any>;
-  pagination: PaginationMetadata;
   query?: string;
 }
 
@@ -77,31 +63,6 @@ class BalancesCache {
 
 const balancesCache = new BalancesCache();
 
-// Cursor utility functions
-function encodeCursor(data: CursorData): string {
-  return Buffer.from(JSON.stringify(data)).toString('base64');
-}
-
-function decodeCursor(cursor: string): CursorData | null {
-  try {
-    const decoded = Buffer.from(cursor, 'base64').toString();
-    const data = JSON.parse(decoded) as CursorData;
-    
-    // Validate cursor structure
-    if (typeof data.offset !== 'number' || typeof data.timestamp !== 'number') {
-      return null;
-    }
-    
-    // Check if cursor is expired (TTL)
-    if (Date.now() - data.timestamp > 5 * 60 * 1000) {
-      return null;
-    }
-    
-    return data;
-  } catch {
-    return null;
-  }
-}
 
 async function fetchAndCacheBalances(bookId: string, query?: string): Promise<{ balances: Array<any>; total: number }> {
   // Get configured Bkper instance
@@ -140,19 +101,6 @@ export async function handleGetBalances(params: GetBalancesParams): Promise<Call
       );
     }
 
-    // Use fixed page size
-    const limit = 50;
-    let offset = 0;
-
-    // Handle cursor if provided
-    if (params.cursor) {
-      const cursorData = decodeCursor(params.cursor);
-      if (cursorData) {
-        offset = cursorData.offset;
-      }
-      // If cursor is invalid/expired, we fall back to offset 0 (first page)
-    }
-
     // Get balances from cache or fetch fresh
     let cachedData = balancesCache.getCachedBalances(params.bookId, params.query);
     if (!cachedData) {
@@ -167,31 +115,10 @@ export async function handleGetBalances(params: GetBalancesParams): Promise<Call
 
     const { balances, total } = cachedData;
 
-    // Calculate pagination
-    const startIndex = offset;
-    const endIndex = Math.min(startIndex + limit, total);
-    const paginatedBalances = balances.slice(startIndex, endIndex);
-    const hasMore = endIndex < total;
-
-    // Generate next cursor
-    let nextCursor: string | null = null;
-    if (hasMore) {
-      nextCursor = encodeCursor({
-        offset: endIndex,
-        timestamp: Date.now()
-      });
-    }
-
-    // Build response
-    const response: PaginatedBalancesResponse = {
+    // Build simplified response with all balances
+    const response: BalancesResponse = {
       total,
-      balances: paginatedBalances,
-      pagination: {
-        hasMore,
-        nextCursor,
-        limit,
-        offset: startIndex
-      }
+      balances
     };
 
     // Include query in response if provided
@@ -223,7 +150,7 @@ export async function handleGetBalances(params: GetBalancesParams): Promise<Call
 
 export const getBalancesToolDefinition = {
   name: 'get_balances',
-  description: `Get account balances with fixed 50-item pagination and optional query filtering.
+  description: `Get all account balances with optional query filtering.
 
 QUERY SYNTAX:
 Balances queries support account, group, and date filtering:
@@ -254,10 +181,6 @@ Use list_transactions tool for more advanced filtering.`,
       bookId: {
         type: 'string',
         description: 'The unique identifier of the book'
-      },
-      cursor: {
-        type: 'string',
-        description: 'Pagination cursor for next page'
       },
       query: {
         type: 'string',

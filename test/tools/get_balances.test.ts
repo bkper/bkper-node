@@ -37,11 +37,11 @@ describe('MCP Server - get_balances Tool Registration', function() {
     // This test will FAIL until get_balances tool is implemented
     expect(getBalancesTool).to.exist;
     expect(getBalancesTool!.name).to.equal('get_balances');
-    expect(getBalancesTool!.description).to.include('fixed 50-item pagination');
+    expect(getBalancesTool!.description).to.include('all account balances');
     expect(getBalancesTool!.inputSchema).to.have.property('properties');
     expect(getBalancesTool!.inputSchema.properties).to.have.property('bookId');
-    expect(getBalancesTool!.inputSchema.properties).to.have.property('cursor');
     expect(getBalancesTool!.inputSchema.properties).to.have.property('query');
+    expect(getBalancesTool!.inputSchema.properties).to.not.have.property('cursor');
     expect(getBalancesTool!.inputSchema.properties).to.not.have.property('limit');
     expect(getBalancesTool!.inputSchema.required).to.include('bookId');
   });
@@ -50,7 +50,6 @@ describe('MCP Server - get_balances Tool Registration', function() {
     const response = await server.testListTools();
     const getBalancesTool = response.tools.find((tool: any) => tool.name === 'get_balances');
     
-    // This test will FAIL until get_balances tool is implemented
     expect(getBalancesTool).to.exist;
     expect(getBalancesTool!.inputSchema).to.deep.equal({
       type: 'object',
@@ -58,10 +57,6 @@ describe('MCP Server - get_balances Tool Registration', function() {
         bookId: {
           type: 'string',
           description: 'The unique identifier of the book'
-        },
-        cursor: {
-          type: 'string',
-          description: 'Pagination cursor for next page'
         },
         query: {
           type: 'string',
@@ -99,13 +94,10 @@ describe('MCP Server - get_balances Tool Calls', function() {
     const jsonResponse = JSON.parse(response.content[0].text as string);
     expect(jsonResponse).to.have.property('total');
     expect(jsonResponse).to.have.property('balances');
-    expect(jsonResponse).to.have.property('pagination');
+    expect(jsonResponse).to.not.have.property('pagination');
     
     expect(jsonResponse.total).to.equal(10);
     expect(jsonResponse.balances).to.have.length(10);
-    expect(jsonResponse.pagination.limit).to.equal(50);
-    expect(jsonResponse.pagination.offset).to.equal(0);
-    expect(jsonResponse.pagination.hasMore).to.be.false;
     
     // Verify balance structure
     const balance = jsonResponse.balances[0];
@@ -131,29 +123,20 @@ describe('MCP Server - get_balances Tool Calls', function() {
     });
   });
 
-  it('should handle MCP get_balances tool call with pagination', async function() {
+  it('should handle MCP get_balances tool call with large dataset', async function() {
     // Switch to large dataset
     currentMockAccountBalances = largeMockAccountBalances;
     const mockBkper = createMockBkperForBook(mockBooks, undefined, undefined, currentMockAccountBalances);
     setMockBkper(mockBkper);
     server = new BkperMcpServer();
     
-    // First call to get cursor
-    const firstResponse = await server.testCallTool('get_balances', { bookId: 'book-1' });
-    const firstData = JSON.parse(firstResponse.content[0].text as string);
-    
-    expect(firstData.pagination.hasMore).to.be.true;
-    expect(firstData.pagination.nextCursor).to.be.a('string');
-    
-    // Second call with cursor
-    const response = await server.testCallTool('get_balances', { 
-      bookId: 'book-1',
-      cursor: firstData.pagination.nextCursor 
-    });
-    
+    // Call to get all balances
+    const response = await server.testCallTool('get_balances', { bookId: 'book-1' });
     const jsonResponse = JSON.parse(response.content[0].text as string);
-    expect(jsonResponse.pagination.offset).to.equal(50);
-    expect(jsonResponse.balances).to.have.length(50);
+    
+    expect(jsonResponse.total).to.equal(150);
+    expect(jsonResponse.balances).to.have.length(150);
+    expect(jsonResponse).to.not.have.property('pagination');
   });
 
   it('should handle MCP error for missing bookId parameter', async function() {
@@ -188,7 +171,8 @@ describe('MCP Server - get_balances Tool Calls', function() {
       expect(response.content[0]).to.have.property('type', 'text');
       const data = JSON.parse(response.content[0].text as string);
       expect(data).to.have.property('balances');
-      expect(data).to.have.property('pagination');
+      expect(data).to.have.property('total');
+      expect(data).to.not.have.property('pagination');
     });
   });
 });
