@@ -155,8 +155,7 @@ export function createMockBkperForBook(
             undefined;
           
           return {
-            hasNext: () => hasMore,
-            next: (): MockTransaction[] => pageTransactions.map((transactionData: TransactionData) => ({
+            getItems: (): MockTransaction[] => pageTransactions.map((transactionData: TransactionData) => ({
               json: (): TransactionData => transactionData
             })),
             getCursor: () => nextCursor

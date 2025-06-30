@@ -42,15 +42,15 @@ export async function handleListTransactions(params: ListTransactionsParams): Pr
     const limit = Math.min(params.limit || 25, 100); // Default 25, max 100
 
     // Get transactions using native API pagination
-    const transactionIterator = await book.listTransactions(params.query, limit, params.cursor);
+    const transactionList = await book.listTransactions(params.query, limit, params.cursor);
     
-    // Get transactions from iterator
-    const transactionData = transactionIterator.next();
-    const transactions = transactionData.map((transaction: any) => transaction.json());
+    // Get transactions from list
+    const transactionItems = transactionList.getItems();
+    const transactions = transactionItems.map((transaction: any) => transaction.json());
     
-    // Get pagination info from iterator
-    const hasMore = transactionIterator.hasNext();
-    const nextCursor = transactionIterator.getCursor() || null;
+    // Get pagination info from list
+    const hasMore = transactionItems.length > 0;
+    const nextCursor = transactionList.getCursor() || null;
 
     // Build response
     const response: TransactionsResponse = {
@@ -98,7 +98,6 @@ Account Filtering:
 - from:'AccountName' - Transactions where account is credit (money from)
 - to:'AccountName' - Transactions where account is debit (money to)
 - group:'GroupName' - Transactions involving accounts in group
-- type:ASSET|LIABILITY|EQUITY|INCOME|OUTGOING - Filter by account type
 
 Date Filtering:
 - on:YYYY-MM-DD - Transactions on specific date
