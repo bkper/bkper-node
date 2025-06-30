@@ -5,7 +5,6 @@ import program from 'commander';
 import fs from 'fs';
 import * as YAML from 'yaml'
 import { getOAuthToken, login, logout } from './auth/local-auth-service.js';
-import { spawn } from 'child_process';
 import path from 'path';
 
 import dotenv from 'dotenv';
@@ -74,30 +73,10 @@ mcpCommand
   .description('Start Bkper MCP server')
   .action(async () => {
     try {
-      // Get the path to the compiled MCP server
-      const mcpServerPath = path.join(process.cwd(), 'lib', 'mcp', 'server.js');
-      
-      if (!fs.existsSync(mcpServerPath)) {
-        console.error('MCP server not found. Please run "bun run build" first.');
-        process.exit(1);
-      }
-
-      // Start the MCP server
-      const mcpProcess = spawn('node', [mcpServerPath], {
-        stdio: 'inherit',
-        env: process.env
-      });
-
-      mcpProcess.on('error', (error) => {
-        console.error('Failed to start MCP server:', error);
-        process.exit(1);
-      });
-
-      mcpProcess.on('exit', (code) => {
-        console.log(`MCP server exited with code ${code}`);
-        process.exit(code || 0);
-      });
-
+      // Import and start the MCP server directly
+      const { BkperMcpServer } = await import('./mcp/server.js');
+      const server = new BkperMcpServer();
+      await server.run();
     } catch (err) {
       console.error('Error starting MCP server:', err);
       process.exit(1);

@@ -31,8 +31,8 @@ class BkperMcpServer {
       },
       {
         capabilities: {
-          tools: {},
-        },
+          tools: {}
+        }
       }
     );
 
