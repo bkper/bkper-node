@@ -3,4 +3,4 @@ name: commit
 description: Commit to Git
 ---
 
-Follow the [bkper-dev/commands/commit.md](../../../bkper-dev/.claude/commands/commit.md) command to commit to Git.
+@../../../bkper-dev/.claude/commands/commit.md
