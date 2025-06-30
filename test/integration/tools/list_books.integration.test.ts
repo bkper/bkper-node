@@ -6,9 +6,10 @@ import {
   getToolDefinition,
   validateResponseStructure,
   logApiResponse,
-  withRetry
+  withRetry,
+  ExpectedStructures,
+  TestMode
 } from '../setup/test-helpers.js';
-import { ExpectedStructures, TestMode } from '../setup/test-config.js';
 import { testDataManager } from '../setup/test-data-manager.js';
 import type { IntegrationTestContext } from '../setup/test-helpers.js';
 

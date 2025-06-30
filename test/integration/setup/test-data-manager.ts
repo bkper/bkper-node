@@ -1,9 +1,9 @@
-import { getTestConfig, TestMode } from './test-config.js';
-import { withRetry } from './test-helpers.js';
+import { withRetry, TestMode } from './test-helpers.js';
 import { getBkperInstance } from '../../../src/mcp/bkper-factory.js';
 
 /**
  * Manages test data for integration tests
+ * Uses Bkper Factory configuration and simple environment variables
  */
 
 export interface TestBook {
@@ -17,7 +17,6 @@ export interface TestBook {
  * Test data manager for handling book selection and validation
  */
 export class TestDataManager {
-  private config = getTestConfig();
   private cachedBooks: TestBook[] | null = null;
   
   /**
@@ -30,13 +29,14 @@ export class TestDataManager {
       return this.cachedBooks;
     }
     
-    // Get Bkper instance
+    // Get Bkper instance (uses Bkper Factory configuration)
     const bkperInstance = getBkperInstance();
     
     // If specific test book ID is provided, use only that
-    if (this.config.testBookId) {
+    const testBookId = process.env.TEST_BOOK_ID;
+    if (testBookId) {
       try {
-        const book = await withRetry(() => bkperInstance.getBook(this.config.testBookId!));
+        const book = await withRetry(() => bkperInstance.getBook(testBookId));
         const bookData = book.json();
         
         this.cachedBooks = [{
@@ -52,7 +52,7 @@ export class TestDataManager {
         
         return this.cachedBooks;
       } catch (error) {
-        console.warn(`Failed to load specific test book ${this.config.testBookId}:`, error);
+        console.warn(`Failed to load specific test book ${testBookId}:`, error);
         console.log('Falling back to listing all available books...');
       }
     }

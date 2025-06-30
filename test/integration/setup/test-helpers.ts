@@ -1,26 +1,65 @@
 import { expect } from 'chai';
 import { BkperMcpServer } from '../../../src/mcp/server.js';
-import { getTestConfig, TestMode } from './test-config.js';
 import type { 
-  CallToolResult, 
-  ListToolsResult 
+  CallToolResult
 } from '@modelcontextprotocol/sdk/types.js';
 
 /**
- * Integration test setup utilities
+ * Simplified integration test setup utilities
+ * Uses Bkper Factory configuration (no duplicate config needed)
  */
 
 // Re-export chai expect for convenience
 export { expect };
 
 /**
+ * Test mode configuration using environment variables directly
+ */
+export const TestMode = {
+  // Whether to log API requests/responses for debugging
+  DEBUG_API: process.env.DEBUG_API === 'true',
+} as const;
+
+/**
+ * Expected API response structures for validation
+ */
+export const ExpectedStructures = {
+  // Book structure based on bkper-api-types
+  book: {
+    required: ['id', 'name'] as string[],
+    optional: ['ownerName', 'permission', 'collection', 'datePattern', 'decimalSeparator', 
+               'timeZone', 'timeZoneOffset', 'lastUpdateMs', 'fractionDigits', 'groups', 
+               'properties', 'accounts', 'paymentMethods', 'connections', 'bots', 'apps',
+               'lock', 'lockDate', 'visibility'] as string[]
+  },
+  
+  // Account structure
+  account: {
+    required: ['id', 'name', 'type'] as string[],
+    optional: ['normalizedName', 'balance', 'credit', 'groups', 'properties', 
+               'archived', 'permanent', 'hasTransactionPosted', 'agentId', 'createdAt'] as string[]
+  },
+  
+  // Transaction structure
+  transaction: {
+    required: ['id', 'date', 'amount'] as string[],
+    optional: ['dateValue', 'description', 'posted', 'checked', 'trashed', 
+               'agentId', 'createdAt', 'createdBy', 'creditAccount', 'debitAccount',
+               'properties', 'tags', 'urls', 'remoteIds', 'attachments', 'files'] as string[]
+  },
+  
+  // Balance structure
+  balance: {
+    required: ['account'] as string[],
+    optional: ['balance', 'cumulative'] as string[]
+  }
+};
+
+/**
  * Creates an MCP server instance for integration testing
+ * Uses Bkper Factory configuration automatically
  */
 export function createTestMcpServer(): BkperMcpServer {
-  // Ensure environment is properly configured
-  const config = getTestConfig();
-  
-  // Create and return server instance
   return new BkperMcpServer();
 }
 
@@ -29,13 +68,10 @@ export function createTestMcpServer(): BkperMcpServer {
  */
 export function integrationTest(
   testFn: () => Promise<void>,
-  timeout?: number
+  timeout: number = 30000
 ): () => Promise<void> {
-  const config = getTestConfig();
-  const testTimeout = timeout || config.defaultTimeout;
-  
   return async function(this: Mocha.Context) {
-    this.timeout(testTimeout);
+    this.timeout(timeout);
     
     try {
       await testFn.call(this);
@@ -54,16 +90,12 @@ export function integrationTest(
  */
 export async function withRetry<T>(
   operation: () => Promise<T>,
-  maxRetries?: number,
-  retryDelay?: number
+  maxRetries: number = 3,
+  retryDelay: number = 1000
 ): Promise<T> {
-  const config = getTestConfig();
-  const retries = maxRetries ?? config.maxRetries;
-  const delay = retryDelay ?? config.retryDelay;
-  
   let lastError: Error | undefined;
   
-  for (let attempt = 0; attempt <= retries; attempt++) {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       return await operation();
     } catch (error) {
@@ -74,11 +106,11 @@ export async function withRetry<T>(
         throw error;
       }
       
-      if (attempt < retries) {
+      if (attempt < maxRetries) {
         if (TestMode.DEBUG_API) {
-          console.log(`Retry attempt ${attempt + 1}/${retries} after ${delay}ms`);
+          console.log(`Retry attempt ${attempt + 1}/${maxRetries} after ${retryDelay}ms`);
         }
-        await sleep(delay);
+        await sleep(retryDelay);
       }
     }
   }
@@ -179,7 +211,6 @@ export async function getToolDefinition(
  */
 export interface IntegrationTestContext {
   server: BkperMcpServer;
-  config: ReturnType<typeof getTestConfig>;
   // Add more shared state as needed
 }
 
@@ -189,7 +220,6 @@ export interface IntegrationTestContext {
 export function createTestContext(): IntegrationTestContext {
   return {
     server: createTestMcpServer(),
-    config: getTestConfig(),
   };
 }
 
