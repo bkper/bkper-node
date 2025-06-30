@@ -3,4 +3,5 @@ name: changelog
 description: Update the project changelog
 ---
 
-@../../../bkper-dev/.claude/commands/changelog.md
+Follow the [bkper-dev/commands/changelog.md](../../../bkper-dev/.claude/commands/changelog.md) command to update the project changelog. 
+**important**: Do not perform any action if the above File does not exist and show error message instead.
