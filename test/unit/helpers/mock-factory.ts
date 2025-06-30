@@ -5,6 +5,7 @@ import {
   MockTransaction,
   MockBalance,
   MockAccountBalance,
+  MockGroup,
   BookData,
   AccountData,
   TransactionData,
@@ -90,7 +91,10 @@ export function createMockBkperForBook(
         // Accounts support
         getAccounts: accounts ? async (): Promise<MockAccount[]> => 
           accounts.map((accountData: AccountData) => ({
-            json: (): AccountData => accountData
+            json: (): AccountData => accountData,
+            getId: (): string => accountData.id || '',
+            getName: (): string => accountData.name || '',
+            getType: (): string => accountData.type || ''
           })) : undefined,
         
         // Account Balances support
@@ -113,7 +117,17 @@ export function createMockBkperForBook(
           
           return {
             getBalancesContainers: (): MockAccountBalance[] => filteredBalances.map((balanceData: AccountBalanceData) => ({
-              json: (): AccountBalanceData => balanceData
+              json: (): AccountBalanceData => balanceData,
+              getAccount: (): MockAccount => ({
+                json: (): AccountData => balanceData.account,
+                getId: (): string => balanceData.account.id || '',
+                getName: (): string => balanceData.account.name || '',
+                getType: (): string => balanceData.account.type || ''
+              }),
+              getGroup: (): MockGroup | null => null,
+              getName: (): string => balanceData.account.name || '',
+              getPeriodBalance: (): string => balanceData.balance,
+              getCumulativeBalance: (): string => balanceData.cumulative
             }))
           };
         } : undefined,

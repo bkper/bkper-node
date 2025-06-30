@@ -38,23 +38,33 @@ export async function handleGetBalances(params: GetBalancesParams): Promise<Call
 
     // Get balances from the book with query (required by bkper-js)
     // Use 'on:$m' as default query to get balances for current month
-    const balancesReport = await book.getBalancesReport(params.query || 'on:$m');
+    const actualQuery = params.query || 'on:$m';
+    const balancesReport = await book.getBalancesReport(actualQuery);
     const bkperBalances = balancesReport.getBalancesContainers();
     
-    // Return full balance JSON data
-    const balances = bkperBalances.map((balance: any) => balance.json());
+    // Map BalancesContainer objects to response format
+    const balances = bkperBalances.map((balanceContainer: any) => {
+      const account = balanceContainer.getAccount();
+      const group = balanceContainer.getGroup();
+      
+      return {
+        account: {
+          id: account?.getId?.() || group?.getId?.() || balanceContainer.getName(),
+          name: balanceContainer.getName(),
+          type: account?.getType?.() || undefined
+        },
+        balance: balanceContainer.getPeriodBalance()?.toString() || '0',
+        cumulative: balanceContainer.getCumulativeBalance()?.toString() || '0'
+      };
+    });
     const total = balances.length;
 
     // Build response with all balances
     const response: BalancesResponse = {
       total,
-      balances
+      balances,
+      query: actualQuery
     };
-
-    // Include query in response if provided
-    if (params.query) {
-      response.query = params.query;
-    }
 
     return {
       content: [

@@ -59,6 +59,7 @@ This is the Bkper Node.js command line client - a CLI tool for creating and upda
   - `BKPER_CLIENT_SECRET` - App operations
   - `BKPER_DEVELOPER_EMAIL` - Developer identification
   - `BKPER_USER_EMAILS` - User permissions
+  - `TEST_BOOK_ID` - Fixed book ID for consistent integration testing
 
 ### Dependencies
 - `bkper-js` - Core Bkper API client library
@@ -187,12 +188,21 @@ bun run build && node lib/cli.js mcp start
 ### Running Tests
 ```bash
 bun run test                    # Run all tests
+bun run test:unit              # Run unit tests only (mocked)
+bun run test:integration       # Run integration tests (real API)
 ```
 
 ### Test Structure
-- **Mocking strategy**: Mock `bkper-js` and `local-auth-service` dependencies
-- **Fixtures**: Use `test/fixtures/` for sample data (e.g., `sample-books.json`)
-- **Focus on logic**: Test core functionality without external dependencies
+- **Unit Tests** (`test/unit/`):
+  - **Mocking strategy**: Mock `bkper-js` and `local-auth-service` dependencies
+  - **Fixtures**: Use `test/fixtures/` for sample data (e.g., `sample-books.json`)
+  - **Focus on logic**: Test core functionality without external dependencies
+
+- **Integration Tests** (`test/integration/`):
+  - **Real API calls**: Uses actual Bkper API with `TEST_BOOK_ID`
+  - **Fixed book testing**: All integration tests use the same book ID for consistency
+  - **30-second timeout**: Generous timeout for network operations
+  - **Retry logic**: Built-in retry for network reliability
 
 ### Adding New MCP Tool Tests
 1. Create test data in `test/fixtures/`
