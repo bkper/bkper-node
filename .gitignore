@@ -7,4 +7,3 @@ lib/
 temp/
 dist/
 .env
-claude_desktop_config.json

@@ -51,11 +51,14 @@ EOF
 echo "Building the project..."
 bun run build
 
-echo "✅ Bkper MCP server configuration created successfully!"
-echo "📍 Config file: $TEMP_DIR/claude_desktop_config.json"
-echo ""
-echo "To install to Claude Desktop, copy the config file:"
-echo "cp \"$TEMP_DIR/claude_desktop_config.json\" \"$HOME/Library/Application Support/Claude/claude_desktop_config.json\""
-echo ""
-echo "Then restart Claude Desktop to load the MCP server"
+# Create Claude Desktop config directory if it doesn't exist
+CLAUDE_CONFIG_DIR="$HOME/Library/Application Support/Claude"
+mkdir -p "$CLAUDE_CONFIG_DIR"
+
+# Copy the config to Claude Desktop
+cp "$TEMP_DIR/claude_desktop_config.json" "$CLAUDE_CONFIG_DIR/claude_desktop_config.json"
+
+echo "✅ Bkper MCP server configuration installed successfully!"
+echo "📍 Config file: $CLAUDE_CONFIG_DIR/claude_desktop_config.json"
+echo "🔄 Please restart Claude Desktop to load the MCP server"
 ```
