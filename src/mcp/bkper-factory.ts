@@ -21,12 +21,17 @@ export function getBkperInstance(): Bkper {
   }
 
   // Configure Bkper with authentication
+  setupBkper();  
   // Cache the configured instance
-  configuredBkperInstance = new Bkper({
+  configuredBkperInstance = new Bkper();
+  
+  return configuredBkperInstance;
+}
+
+export function setupBkper() {
+  Bkper.setConfig({
     apiKeyProvider: async () => process.env.BKPER_API_KEY || '',
     oauthTokenProvider: () => getOAuthToken()
   });
-  
-  return configuredBkperInstance;
 }
 

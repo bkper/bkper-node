@@ -8,6 +8,7 @@ import { getOAuthToken, login, logout } from './auth/local-auth-service.js';
 import path from 'path';
 
 import dotenv from 'dotenv';
+import { setupBkper } from './mcp/bkper-factory.js';
 dotenv.config()
 
 program
@@ -32,10 +33,7 @@ program
   .action(async (options) => {
 
     try {
-      Bkper.setConfig({
-        apiKeyProvider: async () => process.env.BKPER_API_KEY || '',
-        oauthTokenProvider: () => getOAuthToken()
-      })
+      setupBkper()
 
       let json: bkper.App;
 
