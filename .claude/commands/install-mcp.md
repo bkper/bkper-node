@@ -1,5 +1,5 @@
 ---
-name: install-mcp-on-claude-desktop
+name: install-mcp
 description: Install Bkper MCP server on Claude Desktop for testing.
 ---
 
@@ -28,8 +28,12 @@ fi
 # Get the absolute path to the project
 PROJECT_PATH=$(pwd)
 
+# Create temporary directory for Claude Desktop config
+TEMP_DIR="${PROJECT_PATH}/temp"
+mkdir -p "$TEMP_DIR"
+
 # Create the Claude Desktop config
-cat > claude_desktop_config.json << EOF
+cat > "$TEMP_DIR/claude_desktop_config.json" << EOF
 {
   "mcpServers": {
     "bkper": {
@@ -47,15 +51,11 @@ EOF
 echo "Building the project..."
 bun run build
 
-# Create Claude Desktop config directory if it doesn't exist
-CLAUDE_CONFIG_DIR="$HOME/Library/Application Support/Claude"
-mkdir -p "$CLAUDE_CONFIG_DIR"
-
-# Install the config
-cp claude_desktop_config.json "$CLAUDE_CONFIG_DIR/claude_desktop_config.json"
-
-echo "✅ Bkper MCP server configuration installed successfully!"
-echo "📍 Config file: $CLAUDE_CONFIG_DIR/claude_desktop_config.json"
-echo "🔄 Please restart Claude Desktop to load the MCP server"
+echo "✅ Bkper MCP server configuration created successfully!"
+echo "📍 Config file: $TEMP_DIR/claude_desktop_config.json"
 echo ""
+echo "To install to Claude Desktop, copy the config file:"
+echo "cp \"$TEMP_DIR/claude_desktop_config.json\" \"$HOME/Library/Application Support/Claude/claude_desktop_config.json\""
+echo ""
+echo "Then restart Claude Desktop to load the MCP server"
 ```
