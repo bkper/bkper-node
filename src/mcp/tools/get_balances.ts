@@ -25,10 +25,10 @@ export async function handleGetBalances(params: GetBalancesParams): Promise<Call
     }
 
     // Get configured Bkper instance
-    const bkperInstance = getBkperInstance();
+    const bkper = getBkperInstance();
 
     // Get the book first
-    const book = await bkperInstance.getBook(params.bookId);
+    const book = await bkper.getBook(params.bookId);
     if (!book) {
       throw new McpError(
         ErrorCode.InvalidParams,
