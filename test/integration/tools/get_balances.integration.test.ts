@@ -223,6 +223,68 @@ describe('Integration: get_balances Tool', function() {
       expect(response.matrix).to.have.length(1); // Only header row
       expect(response.matrix[0]).to.deep.equal(['Account Name', 'Balance']);
     }));
+    
+    it('should handle group query with date range for time-based matrix', integrationTest(async () => {
+      const result = await withRetry(() => 
+        context.server.testCallTool('get_balances', {
+          bookId: TEST_BOOK_ID,
+          query: "group:'Bkper Assets' after:2022 before:10/2025"
+        })
+      );
+      
+      const response = parseToolResponse(result);
+      logApiResponse('get_balances (Bkper Assets group with date range)', response);
+      
+      // Verify response structure
+      expect(response).to.have.property('matrix').that.is.an('array');
+      expect(response).to.have.property('query', "group:'Bkper Assets' after:2022 before:10/2025");
+      
+      // Check if the group exists and has data
+      if (response.matrix.length === 0) {
+        console.log('Warning: Bkper Assets group query returned empty matrix - group may not exist in test book');
+        // Test passes but logs warning
+      } else if (response.matrix.length === 1 && response.matrix[0][0] === 'Account Name') {
+        // Only header row returned - no data
+        console.log('Warning: Bkper Assets group has no data in the specified date range');
+        expect(response.matrix[0]).to.include('Account Name');
+      } else {
+        // Matrix has data - for time-based queries with date range, it should be transposed
+        const firstRow = response.matrix[0];
+        
+        // Check if this looks like a header row or data row
+        const hasHeaders = firstRow[0] === 'Account' || firstRow[0] === 'Account Name';
+        
+        if (hasHeaders) {
+          // Has headers - validate structure
+          expect(firstRow).to.have.length.greaterThan(2); // At least Account + 2 date columns
+          
+          // Data rows should have account names and numeric values
+          const dataRows = response.matrix.slice(1);
+          dataRows.forEach((row: any) => {
+            expect(row).to.have.length(firstRow.length);
+            expect(row[0]).to.be.a('string'); // Account name
+            // Rest should be numbers (balances)
+            for (let i = 1; i < row.length; i++) {
+              expect(row[i]).to.be.a('number');
+            }
+          });
+        } else {
+          // No headers - data starts from first row
+          // For time-based queries, expect multiple columns
+          expect(firstRow).to.have.length.greaterThan(2); // At least account + 2 time periods
+          
+          // All rows should have consistent structure
+          response.matrix.forEach((row: any) => {
+            expect(row).to.have.length(firstRow.length);
+            expect(row[0]).to.be.a('string'); // Account name
+            // Rest should be numbers (balances)
+            for (let i = 1; i < row.length; i++) {
+              expect(row[i]).to.be.a('number');
+            }
+          });
+        }
+      }
+    }));
   });
   
   describe('Error Handling', function() {
