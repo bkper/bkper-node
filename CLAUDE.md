@@ -184,6 +184,7 @@ bun run build && node lib/cli.js mcp start
        - Review implementation
        - Ensure all tests pass
        - Refactor if necessary
+  - **IMPORTANT**: NEVER move to the second phase automatically. Wait me to review the tests and commit them manually.
 
 ### Running Tests
 ```bash

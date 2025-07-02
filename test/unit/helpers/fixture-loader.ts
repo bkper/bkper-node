@@ -51,6 +51,14 @@ export function loadAccountBalances(testDir: string): AccountBalanceData[] {
   return loadFixture<AccountBalanceData>(testDir, 'sample-account-balances.json');
 }
 
+export function loadBalanceMatrixTotal(testDir: string): any[][] {
+  return loadFixture<any[]>(testDir, 'sample-balance-matrix-total.json');
+}
+
+export function loadBalanceMatrixPeriod(testDir: string): any[][] {
+  return loadFixture<any[]>(testDir, 'sample-balance-matrix-period.json');
+}
+
 // Large dataset generators for pagination testing
 export function generateLargeAccounts(count: number = 150): AccountData[] {
   return Array.from({ length: count }, (_, i) => ({

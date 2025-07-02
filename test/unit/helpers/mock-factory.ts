@@ -6,6 +6,7 @@ import {
   MockBalance,
   MockAccountBalance,
   MockGroup,
+  MockDataTableBuilder,
   BookData,
   AccountData,
   TransactionData,
@@ -15,6 +16,58 @@ import {
 
 // Mock auth service
 export const mockGetOAuthToken = async (): Promise<string> => 'mock-token';
+
+// Mock DataTableBuilder implementation
+function createMockDataTableBuilder(balances: AccountBalanceData[], query?: string): MockDataTableBuilder {
+  let formatValues = false;
+  let formatDates = false;
+  let transposed = false;
+  let raw = false;
+
+  return {
+    formatValues(format: boolean): MockDataTableBuilder {
+      formatValues = format;
+      return this;
+    },
+    formatDates(format: boolean): MockDataTableBuilder {
+      formatDates = format;
+      return this;
+    },
+    transposed(transpose: boolean): MockDataTableBuilder {
+      transposed = transpose;
+      return this;
+    },
+    raw(rawMode: boolean): MockDataTableBuilder {
+      raw = rawMode;
+      return this;
+    },
+    build(): any[][] {
+      // Determine if this is a time-based query
+      const isTimeBased = query?.includes('on:') || query?.includes('after:') || query?.includes('before:');
+      
+      if (isTimeBased && transposed) {
+        // Period/Cumulative format - transposed (dates as columns)
+        return [
+          ["Account", "2024-01-01", "2024-01-02", "2024-01-03", "2024-01-04", "2024-01-05"],
+          ["Cash", 5000.00, 6200.00, 5900.00, 8400.00, 8250.00],
+          ["Accounts Receivable", 0.00, 0.00, 0.00, 0.00, 0.00],
+          ["Service Revenue", -5000.00, -1200.00, 0.00, -2500.00, 0.00],
+          ["Office Rent", 0.00, 0.00, 300.00, 0.00, 150.00]
+        ];
+      } else {
+        // Total format - standard (accounts as rows)
+        const matrix: any[][] = [["Account Name", "Balance"]];
+        
+        balances.forEach(balance => {
+          const balanceValue = parseFloat(balance.balance);
+          matrix.push([balance.account.name || '', balanceValue]);
+        });
+        
+        return matrix;
+      }
+    }
+  };
+}
 
 // Setup module mocking - centralized function used by all tests
 export async function setupMocks() {
@@ -116,19 +169,30 @@ export function createMockBkperForBook(
           // For 'on:$m' default or other date queries, return all balances (no filtering in mock)
           
           return {
-            getBalancesContainers: (): MockAccountBalance[] => filteredBalances.map((balanceData: AccountBalanceData) => ({
-              json: (): AccountBalanceData => balanceData,
-              getAccount: (): MockAccount => ({
-                json: (): AccountData => balanceData.account,
-                getId: (): string => balanceData.account.id || '',
+            getBalancesContainers: (): MockAccountBalance[] => {
+              const containers = filteredBalances.map((balanceData: AccountBalanceData) => ({
+                json: (): AccountBalanceData => balanceData,
+                getAccount: (): MockAccount => ({
+                  json: (): AccountData => balanceData.account,
+                  getId: (): string => balanceData.account.id || '',
+                  getName: (): string => balanceData.account.name || '',
+                  getType: (): string => balanceData.account.type || ''
+                }),
+                getGroup: (): MockGroup | null => null,
                 getName: (): string => balanceData.account.name || '',
-                getType: (): string => balanceData.account.type || ''
-              }),
-              getGroup: (): MockGroup | null => null,
-              getName: (): string => balanceData.account.name || '',
-              getPeriodBalance: (): string => balanceData.balance,
-              getCumulativeBalance: (): string => balanceData.cumulative
-            }))
+                getPeriodBalance: (): string => balanceData.balance,
+                getCumulativeBalance: (): string => balanceData.cumulative,
+                createDataTable: (): MockDataTableBuilder => createMockDataTableBuilder(filteredBalances, effectiveQuery)
+              }));
+              
+              // For matrix functionality, we need to add createDataTable to the first container
+              // This simulates the real API where you call it on the first container or the report
+              if (containers.length > 0) {
+                containers[0].createDataTable = () => createMockDataTableBuilder(filteredBalances, effectiveQuery);
+              }
+              
+              return containers;
+            }
           };
         } : undefined,
         

@@ -126,6 +126,14 @@ export interface MockBalance {
   json(): BalanceData;
 }
 
+export interface MockDataTableBuilder {
+  formatValues(format: boolean): MockDataTableBuilder;
+  formatDates(format: boolean): MockDataTableBuilder;
+  transposed(transposed: boolean): MockDataTableBuilder;
+  raw(raw: boolean): MockDataTableBuilder;
+  build(): any[][];
+}
+
 export interface MockAccountBalance {
   json(): AccountBalanceData;
   getAccount(): MockAccount | null;
@@ -133,6 +141,7 @@ export interface MockAccountBalance {
   getName(): string;
   getPeriodBalance(): string;
   getCumulativeBalance(): string;
+  createDataTable(): MockDataTableBuilder;
 }
 
 export interface MockGroup {
@@ -149,6 +158,7 @@ export interface MockAccount {
 
 export interface MockBalanceReport {
   getBalances(): Promise<MockAccountBalance[]>;
+  getBalancesContainers(): MockAccountBalance[];
 }
 
 export interface MockTransactionIterator {

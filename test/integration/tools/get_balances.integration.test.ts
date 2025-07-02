@@ -67,41 +67,37 @@ describe('Integration: get_balances Tool', function() {
       logApiResponse('get_balances (no query)', response);
       
       // Validate response structure
-      expect(response).to.have.property('total').that.is.a('number');
-      expect(response).to.have.property('balances').that.is.an('array');
+      expect(response).to.have.property('matrix').that.is.an('array');
       expect(response).to.have.property('query').that.is.a('string');
+      expect(response).to.not.have.property('total');
+      expect(response).to.not.have.property('balances');
       
       // Default query should be current month
       expect(response.query).to.equal('on:$m');
       
-      // Validate each balance structure
-      if (response.balances.length > 0) {
-        response.balances.forEach((balance: any, index: number) => {
+      // Validate matrix structure
+      if (response.matrix.length > 0) {
+        // First row should be headers
+        const headers = response.matrix[0];
+        expect(headers).to.be.an('array');
+        expect(headers).to.have.length(2);
+        expect(headers[0]).to.equal('Account Name');
+        expect(headers[1]).to.equal('Balance');
+        
+        // Validate data rows
+        const dataRows = response.matrix.slice(1);
+        dataRows.forEach((row: any, index: number) => {
           try {
-            expect(balance).to.have.property('account').that.is.an('object');
-            expect(balance).to.have.property('balance').that.is.a('string');
-            expect(balance).to.have.property('cumulative').that.is.a('string');
-            
-            // Validate account structure
-            expect(balance.account).to.have.property('id').that.is.a('string');
-            expect(balance.account).to.have.property('name').that.is.a('string');
-            if (balance.account.type) {
-              expect(['ASSET', 'LIABILITY', 'INCOMING', 'OUTGOING']).to.include(balance.account.type);
-            }
+            expect(row).to.be.an('array');
+            expect(row).to.have.length(2);
+            expect(row[0]).to.be.a('string'); // Account name
+            expect(row[1]).to.be.a('number'); // Balance as raw number
           } catch (error) {
-            console.error(`Balance at index ${index} failed validation:`, balance);
+            console.error(`Matrix row at index ${index + 1} failed validation:`, row);
             throw error;
           }
         });
       }
-      
-      // Balance amounts should be parseable as numbers
-      response.balances.forEach((balance: any) => {
-        const balanceNum = parseFloat(balance.balance);
-        const cumulativeNum = parseFloat(balance.cumulative);
-        expect(balanceNum).to.not.be.NaN;
-        expect(cumulativeNum).to.not.be.NaN;
-      });
     }));
     
     it('should get asset group balances for current month', integrationTest(async () => {
@@ -116,21 +112,23 @@ describe('Integration: get_balances Tool', function() {
       logApiResponse('get_balances (Assets group)', response);
       
       // Validate response structure
-      expect(response).to.have.property('total').that.is.a('number');
-      expect(response).to.have.property('balances').that.is.an('array');
+      expect(response).to.have.property('matrix').that.is.an('array');
       expect(response).to.have.property('query', 'group:Assets on:$m');
+      expect(response).to.not.have.property('total');
+      expect(response).to.not.have.property('balances');
       
-      // All balances should be from accounts in the Assets group or of ASSET type
-      response.balances.forEach((balance: any) => {
-        // The balance should have account information
-        expect(balance.account).to.have.property('name').that.is.a('string');
-        
-        // Note: We can't always guarantee the type field is present,
-        // but if it is, it should make sense for an Assets group query
-        if (balance.account.type) {
-          // Assets group typically contains ASSET type accounts
-          expect(balance.account.type).to.be.oneOf(['ASSET', 'LIABILITY', 'INCOMING', 'OUTGOING']);
-        }
+      // Validate matrix structure for asset group query
+      expect(response.matrix).to.have.length.greaterThan(0);
+      const headers = response.matrix[0];
+      expect(headers).to.deep.equal(['Account Name', 'Balance']);
+      
+      // All data rows should be valid matrix entries
+      const dataRows = response.matrix.slice(1);
+      dataRows.forEach((row: any) => {
+        expect(row).to.be.an('array');
+        expect(row).to.have.length(2);
+        expect(row[0]).to.be.a('string'); // Account name
+        expect(row[1]).to.be.a('number'); // Balance
       });
     }));
     
@@ -146,22 +144,24 @@ describe('Integration: get_balances Tool', function() {
       logApiResponse('get_balances (explicit current month)', response);
       
       // Validate response structure
-      expect(response).to.have.property('total').that.is.a('number');
-      expect(response).to.have.property('balances').that.is.an('array');
+      expect(response).to.have.property('matrix').that.is.an('array');
       expect(response).to.have.property('query', 'on:$m');
+      expect(response).to.not.have.property('total');
+      expect(response).to.not.have.property('balances');
       
-      // Should return all accounts with activity in current month
-      expect(response.balances).to.be.an('array');
+      // Should return matrix with all accounts
+      expect(response.matrix).to.be.an('array');
+      expect(response.matrix).to.have.length.greaterThan(0);
       
-      // Validate balance data integrity
-      response.balances.forEach((balance: any) => {
-        expect(balance).to.have.property('account');
-        expect(balance).to.have.property('balance');
-        expect(balance).to.have.property('cumulative');
-        
-        // Balance values should be numeric strings
-        expect(balance.balance).to.match(/^-?\d+(\.\d+)?$/);
-        expect(balance.cumulative).to.match(/^-?\d+(\.\d+)?$/);
+      // Validate matrix data integrity
+      const headers = response.matrix[0];
+      expect(headers).to.deep.equal(['Account Name', 'Balance']);
+      
+      const dataRows = response.matrix.slice(1);
+      dataRows.forEach((row: any) => {
+        expect(row).to.have.length(2);
+        expect(row[0]).to.be.a('string'); // Account name
+        expect(row[1]).to.be.a('number'); // Raw balance number
       });
     }));
   });
@@ -192,16 +192,19 @@ describe('Integration: get_balances Tool', function() {
         
         logApiResponse(`get_balances (specific account: ${targetAccount.name})`, specificResponse);
         
-        // Should return only that account (or accounts with similar names)
+        // Should return matrix with only that account (or accounts with similar names)
         expect(specificResponse.query).to.equal(accountQuery);
-        expect(specificResponse.balances).to.be.an('array');
+        expect(specificResponse.matrix).to.be.an('array');
+        expect(specificResponse.matrix).to.have.length.greaterThan(0);
         
-        // At least one balance should match the target account
-        const matchingBalance = specificResponse.balances.find(
-          (balance: any) => balance.account.id === targetAccount.id
-        );
-        expect(matchingBalance).to.exist;
-        expect(matchingBalance.account.name).to.equal(targetAccount.name);
+        // Headers should be standard
+        expect(specificResponse.matrix[0]).to.deep.equal(['Account Name', 'Balance']);
+        
+        // At least one data row should match the target account
+        const dataRows = specificResponse.matrix.slice(1);
+        const matchingRow = dataRows.find((row: any) => row[0] === targetAccount.name);
+        expect(matchingRow).to.exist;
+        expect(matchingRow[1]).to.be.a('number');
       } else {
         console.log('Skipping specific account test - no balances available');
       }
@@ -216,8 +219,9 @@ describe('Integration: get_balances Tool', function() {
       );
       const response = parseToolResponse(result);
       
-      expect(response.total).to.equal(0);
-      expect(response.balances).to.have.length(0);
+      expect(response.matrix).to.be.an('array');
+      expect(response.matrix).to.have.length(1); // Only header row
+      expect(response.matrix[0]).to.deep.equal(['Account Name', 'Balance']);
     }));
   });
   
@@ -255,10 +259,10 @@ describe('Integration: get_balances Tool', function() {
         );
         const response = parseToolResponse(result);
         
-        // If it succeeds, it should have proper structure
-        expect(response).to.have.property('total');
-        expect(response).to.have.property('balances');
+        // If it succeeds, it should have proper matrix structure
+        expect(response).to.have.property('matrix');
         expect(response).to.have.property('query');
+        expect(response.matrix).to.be.an('array');
       } catch (error: any) {
         // If it fails, should be a proper MCP error
         expect(error).to.have.property('code');
@@ -317,15 +321,14 @@ describe('Integration: get_balances Tool', function() {
       const response2 = parseToolResponse(result2);
       
       // Results should be consistent
-      expect(response1.total).to.equal(response2.total);
-      expect(response1.balances.length).to.equal(response2.balances.length);
+      expect(response1.matrix.length).to.equal(response2.matrix.length);
       expect(response1.query).to.equal(response2.query);
       
-      // Balance values should match (order might vary)
-      const balances1 = response1.balances.map((b: any) => ({ id: b.account.id, balance: b.balance })).sort((a: any, b: any) => a.id.localeCompare(b.id));
-      const balances2 = response2.balances.map((b: any) => ({ id: b.account.id, balance: b.balance })).sort((a: any, b: any) => a.id.localeCompare(b.id));
+      // Matrix values should match (order might vary, so sort by account name)
+      const sortedMatrix1 = [response1.matrix[0], ...response1.matrix.slice(1).sort((a: any, b: any) => a[0].localeCompare(b[0]))];
+      const sortedMatrix2 = [response2.matrix[0], ...response2.matrix.slice(1).sort((a: any, b: any) => a[0].localeCompare(b[0]))];
       
-      expect(balances1).to.deep.equal(balances2);
+      expect(sortedMatrix1).to.deep.equal(sortedMatrix2);
     }));
   });
 });

@@ -1,7 +1,7 @@
 import { expect, setupTestEnvironment, getTestPaths } from '../helpers/test-setup.js';
 import { BkperMcpServerType, AccountBalanceData, BookData } from '../helpers/mock-interfaces.js';
 import { setupMocks, createMockBkperForBook, setMockBkper } from '../helpers/mock-factory.js';
-import { loadAccountBalances, generateLargeAccountBalances, loadBooks } from '../helpers/fixture-loader.js';
+import { loadAccountBalances, generateLargeAccountBalances, loadBooks, loadBalanceMatrixTotal, loadBalanceMatrixPeriod } from '../helpers/fixture-loader.js';
 
 const { __dirname } = getTestPaths(import.meta.url);
 
@@ -9,6 +9,8 @@ const { __dirname } = getTestPaths(import.meta.url);
 const mockBooks: BookData[] = loadBooks(__dirname);
 const mockAccountBalances: AccountBalanceData[] = loadAccountBalances(__dirname);
 const largeMockAccountBalances: AccountBalanceData[] = generateLargeAccountBalances(150);
+const mockMatrixTotal: any[][] = loadBalanceMatrixTotal(__dirname);
+const mockMatrixPeriod: any[][] = loadBalanceMatrixPeriod(__dirname);
 
 let currentMockAccountBalances: AccountBalanceData[] = mockAccountBalances;
 
@@ -92,21 +94,26 @@ describe('MCP Server - get_balances Tool Calls', function() {
     
     // Parse the JSON response
     const jsonResponse = JSON.parse(response.content[0].text as string);
-    expect(jsonResponse).to.have.property('total');
-    expect(jsonResponse).to.have.property('balances');
-    expect(jsonResponse).to.not.have.property('pagination');
+    expect(jsonResponse).to.have.property('matrix');
+    expect(jsonResponse).to.have.property('query');
+    expect(jsonResponse).to.not.have.property('total');
+    expect(jsonResponse).to.not.have.property('balances');
     
-    expect(jsonResponse.total).to.equal(10);
-    expect(jsonResponse.balances).to.have.length(10);
+    // Verify matrix structure
+    expect(jsonResponse.matrix).to.be.an('array');
+    expect(jsonResponse.matrix).to.have.length.greaterThan(0);
     
-    // Verify balance structure
-    const balance = jsonResponse.balances[0];
-    expect(balance).to.have.property('account');
-    expect(balance).to.have.property('balance');
-    expect(balance).to.have.property('cumulative');
-    expect(balance.account).to.have.property('id');
-    expect(balance.account).to.have.property('name');
-    expect(balance.account).to.have.property('type');
+    // First row should be headers
+    const headers = jsonResponse.matrix[0];
+    expect(headers).to.deep.equal(['Account Name', 'Balance']);
+    
+    // Subsequent rows should have account name and numeric balance
+    if (jsonResponse.matrix.length > 1) {
+      const firstDataRow = jsonResponse.matrix[1];
+      expect(firstDataRow).to.have.length(2);
+      expect(firstDataRow[0]).to.be.a('string'); // Account name
+      expect(firstDataRow[1]).to.be.a('number'); // Balance as number
+    }
   });
 
   it('should handle MCP get_balances tool call with query filter', async function() {
@@ -117,9 +124,15 @@ describe('MCP Server - get_balances Tool Calls', function() {
     
     const jsonResponse = JSON.parse(response.content[0].text as string);
     
-    // Verify all returned balances are for Cash account
-    jsonResponse.balances.forEach((balance: any) => {
-      expect(balance.account.name).to.equal('Cash');
+    // Verify matrix structure and filter results
+    expect(jsonResponse.matrix).to.be.an('array');
+    expect(jsonResponse.matrix[0]).to.deep.equal(['Account Name', 'Balance']);
+    
+    // Verify all returned data rows are for Cash account
+    const dataRows = jsonResponse.matrix.slice(1);
+    dataRows.forEach((row: any) => {
+      expect(row[0]).to.equal('Cash');
+      expect(row[1]).to.be.a('number');
     });
   });
 
@@ -134,9 +147,11 @@ describe('MCP Server - get_balances Tool Calls', function() {
     const response = await server.testCallTool('get_balances', { bookId: 'book-1' });
     const jsonResponse = JSON.parse(response.content[0].text as string);
     
-    expect(jsonResponse.total).to.equal(150);
-    expect(jsonResponse.balances).to.have.length(150);
-    expect(jsonResponse).to.not.have.property('pagination');
+    expect(jsonResponse.matrix).to.be.an('array');
+    expect(jsonResponse.matrix).to.have.length(151); // 150 data rows + 1 header row
+    expect(jsonResponse.matrix[0]).to.deep.equal(['Account Name', 'Balance']);
+    expect(jsonResponse).to.not.have.property('total');
+    expect(jsonResponse).to.not.have.property('balances');
   });
 
   it('should handle MCP error for missing bookId parameter', async function() {
@@ -165,14 +180,17 @@ describe('MCP Server - get_balances Tool Calls', function() {
       query: "on:2024-01-31"
     });
     
-    // All should return valid MCP responses
+    // All should return valid MCP responses with matrix format
     [accountQuery, groupQuery, dateQuery].forEach(response => {
       expect(response).to.have.property('content');
       expect(response.content[0]).to.have.property('type', 'text');
       const data = JSON.parse(response.content[0].text as string);
-      expect(data).to.have.property('balances');
-      expect(data).to.have.property('total');
-      expect(data).to.not.have.property('pagination');
+      expect(data).to.have.property('matrix');
+      expect(data).to.have.property('query');
+      expect(data.matrix).to.be.an('array');
+      expect(data.matrix).to.have.length.greaterThan(0);
+      expect(data).to.not.have.property('total');
+      expect(data).to.not.have.property('balances');
     });
   });
 });
