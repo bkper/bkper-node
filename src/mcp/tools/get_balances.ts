@@ -1,5 +1,6 @@
 import { CallToolResult, ErrorCode, McpError } from '@modelcontextprotocol/sdk/types.js';
 import { getBkperInstance } from '../bkper-factory.js';
+import { AccountType, BalanceType } from 'bkper-js';
 
 interface GetBalancesParams {
   bookId: string;
@@ -7,8 +8,7 @@ interface GetBalancesParams {
 }
 
 interface BalancesResponse {
-  total: number;
-  balances: Array<any>;
+  matrix: any[][];
   query?: string;
 }
 
@@ -28,7 +28,7 @@ export async function handleGetBalances(params: GetBalancesParams): Promise<Call
     const bkper = getBkperInstance();
 
     // Get the book first
-    const book = await bkper.getBook(params.bookId);
+    const book = await bkper.getBook(params.bookId, true);
     if (!book) {
       throw new McpError(
         ErrorCode.InvalidParams,
@@ -42,27 +42,44 @@ export async function handleGetBalances(params: GetBalancesParams): Promise<Call
     const balancesReport = await book.getBalancesReport(actualQuery);
     const bkperBalances = balancesReport.getBalancesContainers();
     
-    // Map BalancesContainer objects to response format
-    const balances = bkperBalances.map((balanceContainer: any) => {
-      const account = balanceContainer.getAccount();
-      const group = balanceContainer.getGroup();
-      
-      return {
-        account: {
-          id: account?.getId?.() || group?.getId?.() || balanceContainer.getName(),
-          name: balanceContainer.getName(),
-          type: account?.getType?.() || undefined
-        },
-        balance: balanceContainer.getPeriodBalance()?.toString() || '0',
-        cumulative: balanceContainer.getCumulativeBalance()?.toString() || '0'
-      };
-    });
-    const total = balances.length;
+    let type = BalanceType.TOTAL;
 
-    // Build response with all balances
+
+    
+    // Use BalancesDataTableBuilder to generate matrix
+    let matrix: any[][];
+    if (bkperBalances.length > 0) {
+      const balanceContainer = bkperBalances[0];
+
+
+      const isTimeBased = (actualQuery.includes('after:') || actualQuery.includes('before:')) || actualQuery.includes('by:');
+
+      if (isTimeBased) {
+        const accountType = (await balanceContainer.getGroup())?.getType() || (await balanceContainer.getAccount())?.getType();
+        if (accountType === AccountType.ASSET || accountType === AccountType.LIABILITY) {
+          type = BalanceType.CUMULATIVE;
+        } else {
+          type = BalanceType.PERIOD;
+        }
+      }
+
+      // Get the first container to access createDataTable
+      const dataTableBuilder = balanceContainer.createDataTable()
+        .formatValues(false)    // Raw numbers for LLMs
+        .formatDates(true)     // YYYY-MM-DD dates
+        .raw(true)              // Raw balances
+        .transposed(type !== BalanceType.TOTAL)
+        .type(type); // Smart transposition for time-based queries
+      
+      matrix = dataTableBuilder.build();
+    } else {
+      // Empty result - just headers
+      matrix = [['Account Name', 'Balance']];
+    }
+
+    // Build response with matrix format
     const response: BalancesResponse = {
-      total,
-      balances,
+      matrix,
       query: actualQuery
     };
 
