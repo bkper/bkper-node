@@ -73,8 +73,8 @@ export async function handleGetBalances(params: GetBalancesParams): Promise<Call
       
       matrix = dataTableBuilder.build();
     } else {
-      // Empty result - just headers
-      matrix = [['Account Name', 'Balance']];
+      // Empty result - empty matrix
+      matrix = [];
     }
 
     // Build response with matrix format

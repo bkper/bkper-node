@@ -23,6 +23,7 @@ function createMockDataTableBuilder(balances: AccountBalanceData[], query?: stri
   let formatDates = false;
   let transposed = false;
   let raw = false;
+  let balanceType: any = null;
 
   return {
     formatValues(format: boolean): MockDataTableBuilder {
@@ -41,22 +42,27 @@ function createMockDataTableBuilder(balances: AccountBalanceData[], query?: stri
       raw = rawMode;
       return this;
     },
+    type(type: any): MockDataTableBuilder {
+      balanceType = type;
+      return this;
+    },
     build(): any[][] {
       // Determine if this is a time-based query
       const isTimeBased = query?.includes('on:') || query?.includes('after:') || query?.includes('before:');
       
       if (isTimeBased && transposed) {
         // Period/Cumulative format - transposed (dates as columns)
+        // First column header is empty, followed by date columns
         return [
-          ["Account", "2024-01-01", "2024-01-02", "2024-01-03", "2024-01-04", "2024-01-05"],
+          ["", "2024-01-01", "2024-01-02", "2024-01-03", "2024-01-04", "2024-01-05"],
           ["Cash", 5000.00, 6200.00, 5900.00, 8400.00, 8250.00],
           ["Accounts Receivable", 0.00, 0.00, 0.00, 0.00, 0.00],
           ["Service Revenue", -5000.00, -1200.00, 0.00, -2500.00, 0.00],
           ["Office Rent", 0.00, 0.00, 300.00, 0.00, 150.00]
         ];
       } else {
-        // Total format - standard (accounts as rows)
-        const matrix: any[][] = [["Account Name", "Balance"]];
+        // Total format - standard (accounts as rows), no headers
+        const matrix: any[][] = [];
         
         balances.forEach(balance => {
           const balanceValue = parseFloat(balance.balance);

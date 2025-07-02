@@ -131,6 +131,7 @@ export interface MockDataTableBuilder {
   formatDates(format: boolean): MockDataTableBuilder;
   transposed(transposed: boolean): MockDataTableBuilder;
   raw(raw: boolean): MockDataTableBuilder;
+  type(balanceType: any): MockDataTableBuilder;
   build(): any[][];
 }
 

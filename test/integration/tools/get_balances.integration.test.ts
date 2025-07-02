@@ -75,25 +75,17 @@ describe('Integration: get_balances Tool', function() {
       // Default query should be current month
       expect(response.query).to.equal('on:$m');
       
-      // Validate matrix structure
+      // Validate matrix structure - no headers, just data
       if (response.matrix.length > 0) {
-        // First row should be headers
-        const headers = response.matrix[0];
-        expect(headers).to.be.an('array');
-        expect(headers).to.have.length(2);
-        expect(headers[0]).to.equal('Account Name');
-        expect(headers[1]).to.equal('Balance');
-        
-        // Validate data rows
-        const dataRows = response.matrix.slice(1);
-        dataRows.forEach((row: any, index: number) => {
+        // All rows are data (no headers)
+        response.matrix.forEach((row: any, index: number) => {
           try {
             expect(row).to.be.an('array');
             expect(row).to.have.length(2);
             expect(row[0]).to.be.a('string'); // Account name
             expect(row[1]).to.be.a('number'); // Balance as raw number
           } catch (error) {
-            console.error(`Matrix row at index ${index + 1} failed validation:`, row);
+            console.error(`Matrix row at index ${index} failed validation:`, row);
             throw error;
           }
         });
@@ -117,19 +109,18 @@ describe('Integration: get_balances Tool', function() {
       expect(response).to.not.have.property('total');
       expect(response).to.not.have.property('balances');
       
-      // Validate matrix structure for asset group query
-      expect(response.matrix).to.have.length.greaterThan(0);
-      const headers = response.matrix[0];
-      expect(headers).to.deep.equal(['Account Name', 'Balance']);
-      
-      // All data rows should be valid matrix entries
-      const dataRows = response.matrix.slice(1);
-      dataRows.forEach((row: any) => {
-        expect(row).to.be.an('array');
-        expect(row).to.have.length(2);
-        expect(row[0]).to.be.a('string'); // Account name
-        expect(row[1]).to.be.a('number'); // Balance
-      });
+      // Validate matrix structure for asset group query - no headers
+      if (response.matrix.length === 0) {
+        console.log('Warning: Assets group has no data in test book');
+      } else {
+        // All rows should be valid data entries
+        response.matrix.forEach((row: any) => {
+          expect(row).to.be.an('array');
+          expect(row).to.have.length(2);
+          expect(row[0]).to.be.a('string'); // Account name
+          expect(row[1]).to.be.a('number'); // Balance
+        });
+      }
     }));
     
     it('should get all balances for current month with explicit query', integrationTest(async () => {
@@ -153,12 +144,8 @@ describe('Integration: get_balances Tool', function() {
       expect(response.matrix).to.be.an('array');
       expect(response.matrix).to.have.length.greaterThan(0);
       
-      // Validate matrix data integrity
-      const headers = response.matrix[0];
-      expect(headers).to.deep.equal(['Account Name', 'Balance']);
-      
-      const dataRows = response.matrix.slice(1);
-      dataRows.forEach((row: any) => {
+      // Validate matrix data integrity - no headers
+      response.matrix.forEach((row: any) => {
         expect(row).to.have.length(2);
         expect(row[0]).to.be.a('string'); // Account name
         expect(row[1]).to.be.a('number'); // Raw balance number
@@ -177,9 +164,9 @@ describe('Integration: get_balances Tool', function() {
       );
       const allResponse = parseToolResponse(allResult);
       
-      if (allResponse.balances.length > 0) {
+      if (allResponse.matrix.length > 0) {
         // Pick the first account to query specifically
-        const targetAccount = allResponse.balances[0].account;
+        const targetAccount = { name: allResponse.matrix[0][0] };
         const accountQuery = `account:'${targetAccount.name}' on:$m`;
         
         const specificResult = await withRetry(() => 
@@ -197,12 +184,9 @@ describe('Integration: get_balances Tool', function() {
         expect(specificResponse.matrix).to.be.an('array');
         expect(specificResponse.matrix).to.have.length.greaterThan(0);
         
-        // Headers should be standard
-        expect(specificResponse.matrix[0]).to.deep.equal(['Account Name', 'Balance']);
-        
-        // At least one data row should match the target account
-        const dataRows = specificResponse.matrix.slice(1);
-        const matchingRow = dataRows.find((row: any) => row[0] === targetAccount.name);
+        // Matrix should contain data rows (no headers)
+        // At least one row should match the target account
+        const matchingRow = specificResponse.matrix.find((row: any) => row[0] === targetAccount.name);
         expect(matchingRow).to.exist;
         expect(matchingRow[1]).to.be.a('number');
       } else {
@@ -220,8 +204,7 @@ describe('Integration: get_balances Tool', function() {
       const response = parseToolResponse(result);
       
       expect(response.matrix).to.be.an('array');
-      expect(response.matrix).to.have.length(1); // Only header row
-      expect(response.matrix[0]).to.deep.equal(['Account Name', 'Balance']);
+      expect(response.matrix).to.have.length(0); // Empty matrix, no data
     }));
     
     it('should handle group query with date range for time-based matrix', integrationTest(async () => {

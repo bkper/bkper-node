@@ -99,21 +99,16 @@ describe('MCP Server - get_balances Tool Calls', function() {
     expect(jsonResponse).to.not.have.property('total');
     expect(jsonResponse).to.not.have.property('balances');
     
-    // Verify matrix structure
+    // Verify matrix structure - no headers for total format
     expect(jsonResponse.matrix).to.be.an('array');
     expect(jsonResponse.matrix).to.have.length.greaterThan(0);
     
-    // First row should be headers
-    const headers = jsonResponse.matrix[0];
-    expect(headers).to.deep.equal(['Account Name', 'Balance']);
-    
-    // Subsequent rows should have account name and numeric balance
-    if (jsonResponse.matrix.length > 1) {
-      const firstDataRow = jsonResponse.matrix[1];
-      expect(firstDataRow).to.have.length(2);
-      expect(firstDataRow[0]).to.be.a('string'); // Account name
-      expect(firstDataRow[1]).to.be.a('number'); // Balance as number
-    }
+    // All rows should be data (no headers)
+    jsonResponse.matrix.forEach((row: any) => {
+      expect(row).to.have.length(2);
+      expect(row[0]).to.be.a('string'); // Account name
+      expect(row[1]).to.be.a('number'); // Balance as number
+    });
   });
 
   it('should handle MCP get_balances tool call with query filter', async function() {
@@ -124,13 +119,11 @@ describe('MCP Server - get_balances Tool Calls', function() {
     
     const jsonResponse = JSON.parse(response.content[0].text as string);
     
-    // Verify matrix structure and filter results
+    // Verify matrix structure and filter results - no headers
     expect(jsonResponse.matrix).to.be.an('array');
-    expect(jsonResponse.matrix[0]).to.deep.equal(['Account Name', 'Balance']);
     
-    // Verify all returned data rows are for Cash account
-    const dataRows = jsonResponse.matrix.slice(1);
-    dataRows.forEach((row: any) => {
+    // Verify all returned rows are for Cash account
+    jsonResponse.matrix.forEach((row: any) => {
       expect(row[0]).to.equal('Cash');
       expect(row[1]).to.be.a('number');
     });
@@ -148,8 +141,7 @@ describe('MCP Server - get_balances Tool Calls', function() {
     const jsonResponse = JSON.parse(response.content[0].text as string);
     
     expect(jsonResponse.matrix).to.be.an('array');
-    expect(jsonResponse.matrix).to.have.length(151); // 150 data rows + 1 header row
-    expect(jsonResponse.matrix[0]).to.deep.equal(['Account Name', 'Balance']);
+    expect(jsonResponse.matrix).to.have.length(150); // 150 data rows, no headers
     expect(jsonResponse).to.not.have.property('total');
     expect(jsonResponse).to.not.have.property('balances');
   });
@@ -188,7 +180,6 @@ describe('MCP Server - get_balances Tool Calls', function() {
       expect(data).to.have.property('matrix');
       expect(data).to.have.property('query');
       expect(data.matrix).to.be.an('array');
-      expect(data.matrix).to.have.length.greaterThan(0);
       expect(data).to.not.have.property('total');
       expect(data).to.not.have.property('balances');
     });
