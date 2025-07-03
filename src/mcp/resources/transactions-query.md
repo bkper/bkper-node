@@ -48,14 +48,6 @@ Bkper queries use a simple text-based syntax with operators and keywords to filt
 | `'text'` | Search transaction descriptions | `'office rent'` |
 | `propertyName:` | Filter by custom property (dynamic) | `invoice_number:"INV-2024-001"` |
 
-### Logical Operators
-
-| Operator | Description | Example |
-|----------|-------------|---------|
-| `AND` | Both conditions must be true | `account:Cash AND amount:>1000` |
-| `OR` | Either condition must be true | `account:Cash OR account:Bank` |
-| `NOT` | Exclude transactions matching condition | `NOT account:Cash` |
-| `()` | Group conditions | `(account:Cash OR account:Bank) AND amount:>500` |
 
 ## Common Query Examples
 
@@ -110,7 +102,7 @@ amount>=1000 AND amount<=5000
 amount:2500.50
 ```
 
-### Status and Posted Queries
+### Text and Properties Queries
 
 ```
 # Transactions containing specific text
@@ -120,53 +112,7 @@ amount:2500.50
 invoice_number:"INV-2024-001"
 ```
 
-### Complex Combined Queries
 
-```
-# Large cash transactions this month
-account:'Cash' AND amount>1000 AND on:$m
-
-# All revenue transactions from Q1 2024
-group:'Revenue' AND after:2024-01-01 AND before:2024-04-01
-
-# Cash or bank transactions over $500
-(account:'Cash' OR account:'Bank') AND amount>500
-
-# Office expenses excluding rent
-group:'Operating Expenses' AND NOT 'rent'
-
-# Recent large transactions
-after:$d-7 AND amount:>2000
-```
-
-### Account Type Queries
-
-```
-# All asset account transactions
-type:ASSET
-
-# Liability account transactions
-type:LIABILITY
-
-# Income transactions (revenue)
-type:INCOMING
-
-# Expense transactions
-type:OUTGOING
-```
-
-### Multi-Account Queries
-
-```
-# Transfers between Cash and Bank accounts
-(from:'Cash' to:'Bank') OR (from:'Bank' to:'Cash')
-
-# All transactions involving either Cash or Checking
-account:'Cash' OR account:'Checking'
-
-# Exclude internal transfers
-NOT (group:'Assets' AND group:'Assets')
-```
 
 ## Query Best Practices
 
@@ -177,10 +123,7 @@ NOT (group:'Assets' AND group:'Assets')
    after:2024-01-01 before:2024-01-31
    ```
 
-2. **Filter by account first** - Account filters are typically faster
-   ```
-   account:'Cash' AND amount>1000
-   ```
+
 
 3. **Use date ranges** - Date filters help narrow results effectively
    ```
@@ -195,11 +138,6 @@ NOT (group:'Assets' AND group:'Assets')
    'office supplies'
    ```
 
-2. **Case sensitivity** - Account names and descriptions are case-sensitive
-   ```
-   account:'Cash'    # Correct
-   account:'cash'    # May not match
-   ```
 
 3. **Date format** - Use YYYY-MM-DD format for dates
    ```
@@ -215,31 +153,18 @@ NOT (group:'Assets' AND group:'Assets')
 after:2024-01-01 before:2024-02-01
 
 # Revenue for the month
-group:'Revenue' AND on:$m
+group:'Revenue' on:$m
 
 # Expenses for the month  
 group:'Expenses' AND on:$m
 ```
 
-#### Cash Flow Analysis
-```
-# Cash inflows (credit to Cash)
-to:'Cash'
-
-# Cash outflows (debit from Cash)
-from:'Cash'
-
-# Net cash flow analysis
-account:'Cash'
-```
 
 #### Reconciliation
 ```
 # Recent large transactions for audit
-after:$d-30 AND amount>5000
+after:$d-30  amount>5000
 
-# Transactions with missing documentation
-NOT receipt_number:*
 ```
 
 ## API Pagination with Queries
@@ -256,14 +181,14 @@ When using queries with the `list_transactions` tool:
 // First page with query
 {
   "bookId": "book-123",
-  "query": "account:'Cash' AND amount>1000 AND after:2024-01-01",
+  "query": "account:'Cash' after:2024-01-01",
   "limit": 50
 }
 
 // Next page using cursor (query is preserved)
 {
   "bookId": "book-123", 
-  "query": "account:'Cash' AND amount>1000 AND after:2024-01-01",
+  "query": "account:'Cash' after:2024-01-01",
   "limit": 50,
   "cursor": "eyJvZmZzZXQiOjUwfQ=="
 }

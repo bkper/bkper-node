@@ -22,9 +22,9 @@ interface ResourceDefinition {
 // Define available resources
 const RESOURCES: ResourceDefinition[] = [
   {
-    uri: 'bkper://getting-started',
-    name: 'Bkper MCP Getting Started Guide',
-    description: 'Comprehensive guide covering core concepts, account fundamentals, tool selection, workflows, and best practices',
+    uri: 'bkper://usage-guide',
+    name: 'Bkper MCP Usage Guide',
+    description: 'Comprehensive guide covering core concepts, account fundamentals, tool selection, workflows, and best practices for effective MCP usage',
     mimeType: 'text/markdown'
   },
   {
@@ -68,8 +68,8 @@ export async function handleReadResource(uri: string): Promise<ReadResourceResul
     // Map URI to file path
     let filePath: string;
     switch (uri) {
-      case 'bkper://getting-started':
-        filePath = join(__dirname, 'getting-started.md');
+      case 'bkper://usage-guide':
+        filePath = join(__dirname, 'usage-guide.md');
         break;
       case 'bkper://balances-query':
         filePath = join(__dirname, 'balances-query.md');

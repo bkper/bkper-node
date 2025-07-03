@@ -134,6 +134,8 @@ get_groups({ bookId: "book-123" })
 
 ### 2. Financial Analysis
 
+
+
 #### Balance Sheet Analysis (Permanent Accounts)
 Use `get_balances` with a specific date:
 ```javascript
@@ -244,14 +246,20 @@ list_transactions({ query: "account:'Checking Account' AND after:$d-7" })
 1. **Explore first**: Use `list_books` and `get_book` to understand available data
 2. **Understand structure**: Use `list_accounts` and `get_groups` to understand organization
 3. **Analyze efficiently**: Use focused queries with `get_balances` and `list_transactions`
+4. **Prefer group queries over account queries**
 
 ### Important Rules
 
-1. **Never use `list_transactions` for balance calculations** - Transactions are for inspection only
-2. **Always use monthly granularity** for date queries when possible
-3. **Group filtering is preferred** over individual account filtering for analysis
-4. **Date variables**: Use `$m` for current month, `$y` for current year, `$d` for today
-5. **Case sensitivity**: Account names must match exactly
+1. **MANDATORY FILTERING**: Never perform balance analysis without account: or group: filters
+2. **Never use `list_transactions` for balance calculations** - Transactions are for inspection only
+3. **Always use monthly granularity** for date queries when possible
+4. **Strongly prefer root groups** over individual accounts for analysis:
+   - Use `group:'Assets'` instead of `account:'Cash'`
+   - Use `group:'Revenue'` instead of `account:'Sales'`
+   - Use `group:'Expenses'` instead of `account:'Office Supplies'`
+5. **Root group examples**: Assets, Liabilities, Equity, Revenue, Expenses, Current Assets, Fixed Assets, Operating Expenses
+6. **Date variables**: Use `$m` for current month, `$y` for current year, `$d` for today
+7. **Case sensitivity**: Account names must match exactly
 
 ## Resource References
 

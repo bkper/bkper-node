@@ -84,16 +84,41 @@ For more complex filtering, use the `list_transactions` tool instead.
 
 ## Query Best Practices
 
+### Mandatory Filtering Requirements
+
+1. **NEVER query without filters** - Always use account: or group: filters for balance analysis
+   ```
+   # WRONG - No filtering
+   on:2024-01-31
+   
+   # CORRECT - With group filtering
+   group:'Assets' on:2024-01-31
+   ```
+
+2. **Strongly prefer root groups** - Use root groups over individual accounts
+   ```
+   # PREFERRED - Root group filtering
+   group:'Assets'
+   group:'Revenue'
+   group:'Expenses'
+   
+   # LESS PREFERRED - Individual account filtering
+   account:'Cash'
+   account:'Sales'
+   ```
+
+3. **Root group examples** - Assets, Liabilities, Equity, Revenue, Expenses, Current Assets, Fixed Assets, Operating Expenses
+
 ### Performance Tips
 
-1. **Use specific accounts** - Account filters are fastest
-   ```
-   account:'Cash'
-   ```
-
-2. **Use group filters** - Group filters are efficient for multiple accounts
+1. **Use group filters** - Group filters are efficient for multiple accounts
    ```
    group:'Current Assets'
+   ```
+
+2. **Use specific accounts** - Account filters are fastest when you need specific account data
+   ```
+   account:'Cash'
    ```
 
 3. **Specify dates** - Date filters help narrow results
