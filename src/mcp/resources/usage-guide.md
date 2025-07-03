@@ -114,6 +114,68 @@ Revenue                         Expenses
 - Understanding transaction details
 - **Never for balance calculations**
 
+## Choosing the Right Root Group for Analysis
+
+### Critical Decision: Permanent vs Non-Permanent Accounts
+
+When performing financial analysis, the **most important decision** is choosing the correct root group based on the type of analysis:
+
+#### Balance Sheet Analysis (Point-in-Time)
+For balance sheet analysis, **ALWAYS use permanent account root groups**:
+- **Assets** - For analyzing what the company owns
+- **Liabilities** - For analyzing what the company owes
+- **Equity** - For analyzing owner's equity (less common in Bkper)
+
+These accounts are **permanent** because their balances carry forward from period to period. Always use `on:` date filters for point-in-time analysis.
+
+**Example Balance Sheet Analysis:**
+```javascript
+// Assets at month end
+get_balances({ 
+  bookId: "book-123", 
+  query: "group:'Assets' on:$m" 
+})
+
+// Liabilities at year end
+get_balances({ 
+  bookId: "book-123", 
+  query: "group:'Liabilities' on:2024-12-31" 
+})
+```
+
+#### Income Statement / P&L Analysis (Period-Based)
+For P&L analysis, **ALWAYS use non-permanent account root groups**:
+- **Revenue** / **Incoming** - For analyzing income and gains
+- **Expenses** / **Outgoing** - For analyzing costs and losses
+
+These accounts are **non-permanent** because they reset each period. Always use `after:` and `before:` date ranges for period analysis.
+
+**Example P&L Analysis:**
+```javascript
+// Monthly revenue
+get_balances({ 
+  bookId: "book-123", 
+  query: "group:'Revenue' after:$m-1 before:$m" 
+})
+
+// Annual expenses
+get_balances({ 
+  bookId: "book-123", 
+  query: "group:'Expenses' after:2024-01-01 before:2024-12-31" 
+})
+```
+
+### Root Group Selection Rules
+
+1. **Never mix permanent and non-permanent accounts** in the same analysis
+2. **Always start with root groups**, not individual accounts
+3. **Use the correct date filters**:
+   - Permanent accounts: `on:` for point-in-time
+   - Non-permanent accounts: `after:` and `before:` for periods
+4. **Common root groups to use**:
+   - Balance Sheet: Assets, Liabilities, Current Assets, Fixed Assets, Current Liabilities, Long-term Liabilities
+   - P&L: Revenue, Expenses, Operating Expenses, Administrative Expenses, Cost of Goods Sold
+
 ## Basic Workflows
 
 ### 1. Book Discovery and Selection
@@ -257,9 +319,13 @@ list_transactions({ query: "account:'Checking Account' AND after:$d-7" })
    - Use `group:'Assets'` instead of `account:'Cash'`
    - Use `group:'Revenue'` instead of `account:'Sales'`
    - Use `group:'Expenses'` instead of `account:'Office Supplies'`
-5. **Root group examples**: Assets, Liabilities, Equity, Revenue, Expenses, Current Assets, Fixed Assets, Operating Expenses
-6. **Date variables**: Use `$m` for current month, `$y` for current year, `$d` for today
-7. **Case sensitivity**: Account names must match exactly
+5. **Critical root group selection**:
+   - **Balance Sheet**: Use permanent root groups (Assets, Liabilities) with `on:` dates
+   - **P&L Statement**: Use non-permanent root groups (Revenue/Incoming, Expenses/Outgoing) with `after:` and `before:` date ranges
+   - **Never mix permanent and non-permanent accounts in the same analysis**
+6. **Root group examples**: Assets, Liabilities, Equity, Revenue, Expenses, Current Assets, Fixed Assets, Operating Expenses
+7. **Date variables**: Use `$m` for current month, `$y` for current year, `$d` for today
+8. **Case sensitivity**: Account names must match exactly
 
 ## Resource References
 
@@ -273,6 +339,13 @@ For detailed information on specific topics:
 - **Error Handling**: See `error-handling` resource for common errors and solutions
 
 ## Quick Reference
+
+### Root Group Selection Guide
+
+| Analysis Type | Root Groups | Date Filter | Example |
+|--------------|-------------|-------------|---------|
+| **Balance Sheet** | Assets, Liabilities | `on:` | `group:'Assets' on:$m` |
+| **P&L Statement** | Revenue, Expenses | `after:` `before:` | `group:'Revenue' after:$m-1 before:$m` |
 
 ### Essential Commands
 ```javascript

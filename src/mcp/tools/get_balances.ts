@@ -102,7 +102,7 @@ export async function handleGetBalances(params: GetBalancesParams): Promise<Call
 
 export const getBalancesToolDefinition = {
   name: 'get_balances',
-  description: `Get account balances with optional query filtering. Supports account, group, and date filtering. For comprehensive query syntax documentation, see the balances-query resource.`,
+  description: `Get account balances with query filtering. CRITICAL: For Balance Sheet analysis, use permanent root groups (Assets, Liabilities) with 'on:' dates. For P&L analysis, use non-permanent root groups (Revenue/Incoming, Expenses/Outgoing) with 'after:' and 'before:' date ranges. See the usage-guide resource for root group selection rules.`,
   inputSchema: {
     type: 'object',
     properties: {
