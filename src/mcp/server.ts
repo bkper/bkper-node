@@ -20,6 +20,7 @@ import { handleListAccounts, listAccountsToolDefinition } from './tools/list_acc
 import { handleGetBalances, getBalancesToolDefinition } from './tools/get_balances.js';
 import { handleListTransactions, listTransactionsToolDefinition } from './tools/list_transactions.js';
 import { handleListBooks, listBooksToolDefinition } from './tools/list_books.js';
+import { handleGetGroups, getGroupsToolDefinition } from './tools/get_groups.js';
 import { handleListResources, handleReadResource } from './resources/index.js';
 
 
@@ -54,6 +55,7 @@ class BkperMcpServer {
           listAccountsToolDefinition,
           getBalancesToolDefinition,
           listTransactionsToolDefinition,
+          getGroupsToolDefinition,
         ],
       };
     });
@@ -70,6 +72,8 @@ class BkperMcpServer {
           return await handleGetBalances(request.params.arguments as any);
         case 'list_transactions':
           return await handleListTransactions(request.params.arguments as any);
+        case 'get_groups':
+          return await handleGetGroups(request.params.arguments as any);
         default:
           throw new McpError(
             ErrorCode.MethodNotFound,
