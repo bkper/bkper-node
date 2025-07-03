@@ -22,9 +22,27 @@ interface ResourceDefinition {
 // Define available resources
 const RESOURCES: ResourceDefinition[] = [
   {
-    uri: 'bkper://usage-guide',
-    name: 'Bkper MCP Usage Guide',
-    description: 'Comprehensive guide on how to use Bkper MCP tools for financial analysis',
+    uri: 'bkper://getting-started',
+    name: 'Bkper MCP Getting Started Guide',
+    description: 'Comprehensive guide covering core concepts, account fundamentals, tool selection, workflows, and best practices',
+    mimeType: 'text/markdown'
+  },
+  {
+    uri: 'bkper://balances-query',
+    name: 'Balance Query Syntax Guide',
+    description: 'Complete reference for balance query filters and operators used with get_balances tool',
+    mimeType: 'text/markdown'
+  },
+  {
+    uri: 'bkper://transactions-query',
+    name: 'Transaction Query Syntax Guide',
+    description: 'Comprehensive reference for transaction query filters, operators, and logical combinations',
+    mimeType: 'text/markdown'
+  },
+  {
+    uri: 'bkper://error-handling',
+    name: 'Error Handling Guide',
+    description: 'Common errors, troubleshooting strategies, and best practices for error prevention',
     mimeType: 'text/markdown'
   }
 ];
@@ -50,8 +68,17 @@ export async function handleReadResource(uri: string): Promise<ReadResourceResul
     // Map URI to file path
     let filePath: string;
     switch (uri) {
-      case 'bkper://usage-guide':
-        filePath = join(__dirname, 'usage-guide.md');
+      case 'bkper://getting-started':
+        filePath = join(__dirname, 'getting-started.md');
+        break;
+      case 'bkper://balances-query':
+        filePath = join(__dirname, 'balances-query.md');
+        break;
+      case 'bkper://transactions-query':
+        filePath = join(__dirname, 'transactions-query.md');
+        break;
+      case 'bkper://error-handling':
+        filePath = join(__dirname, 'error-handling.md');
         break;
       default:
         throw new McpError(

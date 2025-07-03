@@ -1,14 +1,13 @@
 import { expect, setupTestEnvironment, getTestPaths } from '../helpers/test-setup.js';
 import { BkperMcpServerType, TransactionData, BookData } from '../helpers/mock-interfaces.js';
 import { setupMocks, createMockBkperForBook, setMockBkper } from '../helpers/mock-factory.js';
-import { loadTransactions, generateLargeTransactions, loadBooks } from '../helpers/fixture-loader.js';
+import { loadTransactions, loadBooks } from '../helpers/fixture-loader.js';
 
 const { __dirname } = getTestPaths(import.meta.url);
 
 // Load test data
 const mockBooks: BookData[] = loadBooks(__dirname);
 const mockTransactions: TransactionData[] = loadTransactions(__dirname);
-const largeMockTransactions: TransactionData[] = generateLargeTransactions(500);
 
 let currentMockTransactions: TransactionData[] = mockTransactions;
 
@@ -37,7 +36,7 @@ describe('MCP Server - list_transactions Tool Registration', function() {
     // This test will FAIL until list_transactions tool is implemented
     expect(listTransactionsTool).to.exist;
     expect(listTransactionsTool!.name).to.equal('list_transactions');
-    expect(listTransactionsTool!.description).to.include('API cursor-based pagination');
+    expect(listTransactionsTool!.description).to.include('cursor-based pagination');
     expect(listTransactionsTool!.description).to.include('query support');
     expect(listTransactionsTool!.inputSchema).to.have.property('properties');
     expect(listTransactionsTool!.inputSchema.properties).to.have.property('bookId');

@@ -39,7 +39,7 @@ describe('MCP Server - get_balances Tool Registration', function() {
     // This test will FAIL until get_balances tool is implemented
     expect(getBalancesTool).to.exist;
     expect(getBalancesTool!.name).to.equal('get_balances');
-    expect(getBalancesTool!.description).to.include('all account balances');
+    expect(getBalancesTool!.description).to.include('account balances');
     expect(getBalancesTool!.inputSchema).to.have.property('properties');
     expect(getBalancesTool!.inputSchema.properties).to.have.property('bookId');
     expect(getBalancesTool!.inputSchema.properties).to.have.property('query');

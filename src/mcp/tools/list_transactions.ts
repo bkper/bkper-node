@@ -89,76 +89,7 @@ export async function handleListTransactions(params: ListTransactionsParams): Pr
 
 export const listTransactionsToolDefinition = {
   name: 'list_transactions',
-  description: `List transactions with native API cursor-based pagination and comprehensive query support.
-
-COMPREHENSIVE QUERY SYNTAX:
-
-Account Filtering:
-- account:'AccountName' - Transactions involving specific account
-- from:'AccountName' - Transactions where account is credit (money from)
-- to:'AccountName' - Transactions where account is debit (money to)
-- group:'GroupName' - Transactions involving accounts in group
-
-Date Filtering:
-- on:YYYY-MM-DD - Transactions on specific date
-- after:YYYY-MM-DD - Transactions after date
-- before:YYYY-MM-DD - Transactions before date
-- Date variables: $d (today), $m (current month), $y (current year)
-
-Amount Filtering:
-- amount:1000 - Exact amount
-- amount>500 - Greater than amount
-- amount<1000 - Less than amount
-- amount>=100 - Greater than or equal
-- amount<=5000 - Less than or equal
-
-Text Search and Properties:
-- 'search text' - Search transaction descriptions
-- propertyName:"value" - Filter by custom property (dynamic)
-
-Logical Operators:
-- AND - Both conditions must be true
-- OR - Either condition must be true
-- NOT - Exclude matching transactions
-- () - Group conditions
-
-QUERY EXAMPLES:
-
-Basic:
-- account:'Cash' - All Cash transactions
-- from:'Cash' - Cash outflows (Cash as credit)
-- to:'Expenses' - Money going to Expenses
-- group:'Revenue' - All revenue transactions
-
-Date Range:
-- after:2024-01-01 before:2024-02-01 - January 2024 transactions
-- after:$d-30 - Last 30 days
-- on:$m - This month's transactions
-
-Amount-Based:
-- amount>5000 - Large transactions over $5,000
-- amount>=1000 AND amount<=5000 - Between $1,000-$5,000
-
-Complex:
-- account:'Cash' AND amount>1000 AND on:$m - Large cash transactions this month
-- (account:'Cash' OR account:'Bank') AND amount>500 - Cash/bank over $500
-- group:'Revenue' AND after:2024-01-01 - Revenue since start of year
-- NOT account:'Cash' - Exclude cash transactions
-
-Multi-Account:
-- from:'Cash' to:'Bank' - Transfers from Cash to Bank
-- account:'Cash' OR account:'Checking' - Either account
-
-Performance Tips:
-- Use specific date ranges: after:2024-01-01 before:2024-01-31
-- Filter by account first: account:'Cash' AND amount>1000
-- Use reasonable limits (default 25, max 100)
-
-Syntax Rules:
-- Quote multi-word values: account:'Accounts Receivable'
-- Case-sensitive account names: account:'Cash' not account:'cash'  
-- Date format YYYY-MM-DD: after:2024-01-15
-- Queries preserved across pagination automatically`,
+  description: `List transactions with cursor-based pagination and comprehensive query support. Supports account, date, amount filtering, text search, and logical operators. For complete query syntax documentation, see the transactions-query resource.`,
   inputSchema: {
     type: 'object',
     properties: {

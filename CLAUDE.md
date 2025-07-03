@@ -86,7 +86,8 @@ Bkper.setConfig({
 #### Key Concepts
 - **Apps**: Bkper applications/bots that extend functionality
 - **Books**: Top-level containers for accounting data (like individual company ledgers)
-- **Accounts**: Categories within books (assets, liabilities, income, expenses)
+- **Accounts**: Categories within books (ASSETS, LIABILITIES, INCOMING, OUTGOING)
+- **Groups**: Hierarchical organization of accounts (Current Assets, Operating Expenses, etc.)
 - **Transactions**: Financial entries that move money between accounts
 - **Collections**: Groups of related books for multi-currency/multi-entity operations
 

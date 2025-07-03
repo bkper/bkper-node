@@ -96,31 +96,7 @@ export async function handleGetBalances(params: GetBalancesParams): Promise<Call
 
 export const getBalancesToolDefinition = {
   name: 'get_balances',
-  description: `Get all account balances with optional query filtering.
-
-QUERY SYNTAX:
-Balances queries support account, group, and date filtering:
-
-Account Filtering:
-- account:'AccountName' - Match specific account balance
-- group:'GroupName' - Match balances for accounts in group
-
-Date Filtering:
-- on:YYYY-MM-DD - Balances on specific date
-- after:YYYY-MM-DD - Balances after date  
-- before:YYYY-MM-DD - Balances before date
-- Date variables: $d (today), $m (current month), $y (current year)
-
-QUERY EXAMPLES:
-- account:'Cash' - Cash account balance
-- group:'Current Assets' - All current asset balances
-- on:2024-01-31 - All balances as of January 31, 2024
-- account:'Cash' on:$m - Cash balance at end of current month
-- group:'Revenue' after:2024-01-01 - Revenue balances since start of year
-
-LIMITATIONS:
-Balances queries do NOT support amount filtering, text search, or property filtering.
-Use list_transactions tool for more advanced filtering.`,
+  description: `Get account balances with optional query filtering. Supports account, group, and date filtering. For comprehensive query syntax documentation, see the balances-query resource.`,
   inputSchema: {
     type: 'object',
     properties: {
