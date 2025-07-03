@@ -107,12 +107,6 @@ describe('Integration: get_book Tool', function() {
       if (book.description !== undefined) {
         expect(book.description).to.be.a('string');
       }
-      if (book.currencyCode !== undefined) {
-        expect(book.currencyCode).to.be.a('string');
-      }
-      if (book.currencySymbol !== undefined) {
-        expect(book.currencySymbol).to.be.a('string');
-      }
       
       // Validate permission values
       expect(book.permission).to.be.oneOf(['VIEWER', 'POSTER', 'EDITOR', 'OWNER']);
@@ -131,10 +125,6 @@ describe('Integration: get_book Tool', function() {
         expect(book.dateFormat).to.match(/^[dMy\/\-\s]+$/);
       }
       
-      // Validate currency code format (ISO 4217) - if present
-      if (book.currencyCode) {
-        expect(book.currencyCode).to.match(/^[A-Z]{3}$/);
-      }
       
       // Validate timestamp format
       expect(book.lastUpdateMs).to.match(/^\d+$/);
@@ -146,7 +136,6 @@ describe('Integration: get_book Tool', function() {
         console.log(`- Description: ${book.description || 'N/A'}`);
         console.log(`- Permission: ${book.permission}`);
         console.log(`- Visibility: ${book.visibility}`);
-        console.log(`- Currency: ${book.currencyCode || 'N/A'} (${book.currencySymbol || 'N/A'})`);
         console.log(`- Decimal places: ${book.fracDigits}`);
         console.log(`- Time zone: ${book.timeZone}`);
         console.log(`- Date format: ${book.dateFormat}`);
@@ -185,12 +174,6 @@ describe('Integration: get_book Tool', function() {
       // Compare optional properties if they exist
       if (response1.book.description !== undefined && response2.book.description !== undefined) {
         expect(response1.book.description).to.equal(response2.book.description);
-      }
-      if (response1.book.currencyCode !== undefined && response2.book.currencyCode !== undefined) {
-        expect(response1.book.currencyCode).to.equal(response2.book.currencyCode);
-      }
-      if (response1.book.currencySymbol !== undefined && response2.book.currencySymbol !== undefined) {
-        expect(response1.book.currencySymbol).to.equal(response2.book.currencySymbol);
       }
       
       // Timestamps might differ slightly but should be very close
@@ -293,14 +276,6 @@ describe('Integration: get_book Tool', function() {
       expect(book.name).to.have.length.greaterThan(0);
       expect(book.name).to.have.length.lessThan(256);
       
-      // Currency configuration - only validate if present
-      if (book.currencyCode) {
-        expect(book.currencyCode).to.match(/^[A-Z]{3}$/);
-      }
-      if (book.currencySymbol) {
-        expect(book.currencySymbol).to.have.length.greaterThan(0);
-        expect(book.currencySymbol).to.have.length.lessThan(10);
-      }
       
       // Decimal configuration - only validate if present
       if (book.fracDigits !== undefined) {
