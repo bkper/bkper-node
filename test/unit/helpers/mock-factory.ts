@@ -11,7 +11,8 @@ import {
   AccountData,
   TransactionData,
   BalanceData,
-  AccountBalanceData
+  AccountBalanceData,
+  GroupData
 } from './mock-interfaces.js';
 import { loadBalanceMatrixTotal, loadBalanceMatrixPeriod } from './fixture-loader.js';
 import { dirname } from 'path';
@@ -166,7 +167,8 @@ export function createMockBkperForBook(
   books: BookData[], 
   accounts?: AccountData[], 
   transactions?: TransactionData[], 
-  accountBalances?: AccountBalanceData[]
+  accountBalances?: AccountBalanceData[],
+  groups?: GroupData[]
 ): MockBkper {
   return {
     setConfig: () => {},
@@ -277,6 +279,54 @@ export function createMockBkperForBook(
             })),
             getCursor: () => nextCursor
           };
+        } : undefined,
+        
+        // Groups support
+        getGroups: groups ? async (): Promise<MockGroup[]> => {
+          // Create a map for quick parent lookup
+          const groupMap = new Map<string, MockGroup>();
+          const mockGroups: MockGroup[] = [];
+          
+          // First pass: create all mock groups
+          groups.forEach((groupData: GroupData) => {
+            const mockGroup: MockGroup = {
+              getId: (): string => groupData.id || '',
+              getName: (): string => groupData.name || '',
+              getType: (): string => groupData.type || '',
+              isHidden: (): boolean => groupData.hidden || false,
+              isPermanent: (): boolean => groupData.permanent || false,
+              getParent: (): MockGroup | null => null, // Will be set in second pass
+              getChildren: (): MockGroup[] => [], // Will be populated in second pass
+              getProperties: (): { [name: string]: string } => groupData.properties || {},
+              json: (): GroupData => groupData
+            };
+            
+            mockGroups.push(mockGroup);
+            if (groupData.id) {
+              groupMap.set(groupData.id, mockGroup);
+            }
+          });
+          
+          // Second pass: set up parent-child relationships
+          groups.forEach((groupData: GroupData, index: number) => {
+            const mockGroup = mockGroups[index];
+            
+            // Set parent
+            if (groupData.parent?.id) {
+              const parent = groupMap.get(groupData.parent.id);
+              if (parent) {
+                mockGroup.getParent = () => parent;
+              }
+            }
+            
+            // Collect children
+            const children = mockGroups.filter((child, childIndex) => 
+              groups[childIndex].parent?.id === groupData.id
+            );
+            mockGroup.getChildren = () => children;
+          });
+          
+          return mockGroups;
         } : undefined
       };
     }

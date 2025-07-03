@@ -102,6 +102,17 @@ export interface BalanceData {
   year?: number;
 }
 
+// Group data interface for get_groups tool
+export interface GroupData {
+  id?: string;
+  name?: string;
+  type?: "ASSET" | "LIABILITY" | "INCOMING" | "OUTGOING";
+  hidden?: boolean;
+  permanent?: boolean;
+  parent?: Group;
+  properties?: { [name: string]: string };
+}
+
 // Account Balance data (for account-specific balance queries)
 export interface AccountBalanceData {
   account: AccountData;
@@ -115,6 +126,7 @@ export interface MockBook {
   getAccounts?(): Promise<MockAccount[]>;
   getBalancesReport?(query?: string): Promise<MockBalanceReport>;
   listTransactions?(query?: string, limit?: number, cursor?: string): Promise<MockTransactionIterator>;
+  getGroups?(): Promise<MockGroup[]>;
 }
 
 
@@ -150,6 +162,13 @@ export interface MockAccountBalance {
 export interface MockGroup {
   getId(): string;
   getName(): string;
+  getType(): string;
+  isHidden(): boolean;
+  isPermanent(): boolean;
+  getParent(): MockGroup | null;
+  getChildren(): MockGroup[];
+  getProperties(): { [name: string]: string };
+  json(): GroupData;
 }
 
 export interface MockAccount {
