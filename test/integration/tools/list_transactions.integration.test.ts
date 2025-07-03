@@ -1,0 +1,574 @@
+import {
+  expect,
+  createTestContext,
+  integrationTest,
+  parseToolResponse,
+  getToolDefinition,
+  logApiResponse,
+  withRetry,
+  TestMode
+} from '../setup/test-helpers.js';
+import { testDataManager } from '../setup/test-data-manager.js';
+import type { IntegrationTestContext } from '../setup/test-helpers.js';
+
+describe('Integration: list_transactions Tool', function() {
+  let context: IntegrationTestContext;
+  const TEST_BOOK_ID = process.env.TEST_BOOK_ID;
+  
+  before(async function() {
+    this.timeout(60000); // Allow more time for initial setup
+    context = createTestContext();
+    
+    if (!TEST_BOOK_ID) {
+      throw new Error('TEST_BOOK_ID environment variable is required for list_transactions integration tests');
+    }
+    
+    // Verify we can access the API and the test book
+    const stats = await testDataManager.getTestDataStats();
+    console.log(`\nIntegration test environment:`);
+    console.log(`- Using test book ID: ${TEST_BOOK_ID}`);
+    console.log(`- Total books available: ${stats.totalBooks}`);
+    console.log(`- Test books: ${stats.testBooks}`);
+    console.log(`- Permissions:`, stats.permissions);
+    
+    if (stats.totalBooks === 0) {
+      throw new Error('No books available for integration testing');
+    }
+  });
+  
+  after(function() {
+    // Clear any cached data
+    testDataManager.clearCache();
+  });
+  
+  describe('Tool Registration', function() {
+    it('should have list_transactions tool properly registered', integrationTest(async () => {
+      const tool = await getToolDefinition(context.server, 'list_transactions');
+      
+      expect(tool).to.exist;
+      expect(tool.name).to.equal('list_transactions');
+      expect(tool.description).to.include('List transactions with native API cursor-based pagination');
+      expect(tool.inputSchema).to.have.property('type', 'object');
+      expect(tool.inputSchema.properties).to.have.property('bookId');
+      expect(tool.inputSchema.properties).to.have.property('cursor');
+      expect(tool.inputSchema.properties).to.have.property('query');
+      expect(tool.inputSchema.properties).to.have.property('limit');
+      expect(tool.inputSchema.required).to.include('bookId');
+    }));
+  });
+  
+  describe('Basic Functionality', function() {
+    it('should list transactions without parameters (default limit)', integrationTest(async () => {
+      const result = await withRetry(() => 
+        context.server.testCallTool('list_transactions', {
+          bookId: TEST_BOOK_ID
+        })
+      );
+      
+      const response = parseToolResponse(result);
+      logApiResponse('list_transactions (default)', response);
+      
+      // Validate response structure
+      expect(response).to.have.property('transactions').that.is.an('array');
+      expect(response).to.have.property('hasMore').that.is.a('boolean');
+      expect(response).to.have.property('cursor');
+      expect(response).to.have.property('limit', 25);
+      expect(response).to.not.have.property('query');
+      
+      // Validate transactions structure
+      expect(response.transactions).to.have.length.at.most(25);
+      
+      if (response.transactions.length > 0) {
+        const transaction = response.transactions[0];
+        expect(transaction).to.have.property('id').that.is.a('string');
+        expect(transaction).to.have.property('date').that.is.a('string');
+        expect(transaction).to.have.property('dateValue').that.is.a('number');
+        expect(transaction).to.have.property('amount').that.is.a('number');
+        expect(transaction).to.have.property('description').that.is.a('string');
+        expect(transaction).to.have.property('posted').that.is.a('boolean');
+        expect(transaction).to.have.property('checked').that.is.a('boolean');
+        expect(transaction).to.have.property('trashed').that.is.a('boolean');
+        expect(transaction).to.have.property('locked').that.is.a('boolean');
+        expect(transaction).to.have.property('creditAccount').that.is.an('object');
+        expect(transaction).to.have.property('debitAccount').that.is.an('object');
+        expect(transaction).to.have.property('createdAt').that.is.a('string');
+        expect(transaction).to.have.property('updatedAt').that.is.a('string');
+        expect(transaction).to.have.property('payeeOrPayer').that.is.a('string');
+        expect(transaction).to.have.property('remoteIds').that.is.an('array');
+        expect(transaction).to.have.property('urls').that.is.an('array');
+        expect(transaction).to.have.property('tags').that.is.an('array');
+        expect(transaction).to.have.property('properties').that.is.an('object');
+        
+        // Validate account structure
+        expect(transaction.creditAccount).to.have.property('id').that.is.a('string');
+        expect(transaction.creditAccount).to.have.property('name').that.is.a('string');
+        expect(transaction.debitAccount).to.have.property('id').that.is.a('string');
+        expect(transaction.debitAccount).to.have.property('name').that.is.a('string');
+        
+        // Validate date format
+        expect(transaction.date).to.match(/^\d{4}-\d{2}-\d{2}$/);
+        expect(transaction.createdAt).to.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z?$/);
+        expect(transaction.updatedAt).to.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z?$/);
+        
+        // Validate amount
+        expect(transaction.amount).to.be.greaterThan(0);
+        expect(transaction.dateValue).to.be.greaterThan(0);
+        
+        // Log transaction details for debugging
+        if (TestMode.DEBUG_API) {
+          console.log(`Sample transaction:`);
+          console.log(`- ID: ${transaction.id}`);
+          console.log(`- Date: ${transaction.date}`);
+          console.log(`- Amount: ${transaction.amount}`);
+          console.log(`- Description: ${transaction.description}`);
+          console.log(`- From: ${transaction.creditAccount.name}`);
+          console.log(`- To: ${transaction.debitAccount.name}`);
+          console.log(`- Posted: ${transaction.posted}`);
+        }
+      }
+    }));
+    
+    it('should list transactions with custom limit', integrationTest(async () => {
+      const result = await withRetry(() => 
+        context.server.testCallTool('list_transactions', {
+          bookId: TEST_BOOK_ID,
+          limit: 10
+        })
+      );
+      
+      const response = parseToolResponse(result);
+      logApiResponse('list_transactions (limit 10)', response);
+      
+      // Validate response structure
+      expect(response).to.have.property('transactions').that.is.an('array');
+      expect(response).to.have.property('hasMore').that.is.a('boolean');
+      expect(response).to.have.property('cursor');
+      expect(response).to.have.property('limit', 10);
+      
+      // Should respect limit
+      expect(response.transactions).to.have.length.at.most(10);
+    }));
+    
+    it('should handle maximum limit constraint', integrationTest(async () => {
+      const result = await withRetry(() => 
+        context.server.testCallTool('list_transactions', {
+          bookId: TEST_BOOK_ID,
+          limit: 200 // Should be capped at 100
+        })
+      );
+      
+      const response = parseToolResponse(result);
+      
+      // Limit should be capped at 100
+      expect(response.limit).to.equal(100);
+      expect(response.transactions).to.have.length.at.most(100);
+    }));
+  });
+  
+  describe('Pagination Functionality', function() {
+    it('should handle cursor-based pagination correctly', integrationTest(async () => {
+      const result = await withRetry(() => 
+        context.server.testCallTool('list_transactions', {
+          bookId: TEST_BOOK_ID,
+          limit: 5
+        })
+      );
+      
+      const response = parseToolResponse(result);
+      
+      // If we have more than 5 transactions, pagination should work
+      if (response.hasMore && response.cursor) {
+        expect(response.transactions).to.have.length(5);
+        expect(response.cursor).to.be.a('string');
+        
+        // Get next page
+        const nextResult = await withRetry(() => 
+          context.server.testCallTool('list_transactions', {
+            bookId: TEST_BOOK_ID,
+            limit: 5,
+            cursor: response.cursor
+          })
+        );
+        const nextResponse = parseToolResponse(nextResult);
+        
+        // Validate next page
+        expect(nextResponse.transactions).to.have.length.at.most(5);
+        expect(nextResponse.limit).to.equal(5);
+        
+        // Transaction IDs should not overlap between pages
+        const firstPageIds = new Set(response.transactions.map((tx: any) => tx.id));
+        const secondPageIds = new Set(nextResponse.transactions.map((tx: any) => tx.id));
+        const intersection = new Set([...firstPageIds].filter(id => secondPageIds.has(id)));
+        expect(intersection.size).to.equal(0, 'Pages should not have overlapping transactions');
+        
+        logApiResponse('list_transactions (second page)', nextResponse);
+      } else {
+        console.log('Not enough transactions for pagination test');
+      }
+    }));
+    
+    it('should handle invalid cursor gracefully', integrationTest(async () => {
+      const result = await withRetry(() => 
+        context.server.testCallTool('list_transactions', {
+          bookId: TEST_BOOK_ID,
+          cursor: 'invalid-cursor-123'
+        })
+      );
+      
+      const response = parseToolResponse(result);
+      
+      // Should return valid response even with invalid cursor
+      expect(response).to.have.property('transactions').that.is.an('array');
+      expect(response).to.have.property('hasMore').that.is.a('boolean');
+      expect(response).to.have.property('cursor');
+      expect(response).to.have.property('limit', 25);
+    }));
+  });
+  
+  describe('Query Functionality', function() {
+    it('should handle basic account query', integrationTest(async () => {
+      // First get some transactions to find an account to query
+      const allResult = await withRetry(() => 
+        context.server.testCallTool('list_transactions', {
+          bookId: TEST_BOOK_ID,
+          limit: 10
+        })
+      );
+      const allResponse = parseToolResponse(allResult);
+      
+      if (allResponse.transactions.length > 0) {
+        // Pick the first transaction's credit account to query
+        const targetAccount = allResponse.transactions[0].creditAccount.name;
+        const query = `account:'${targetAccount}'`;
+        
+        const result = await withRetry(() => 
+          context.server.testCallTool('list_transactions', {
+            bookId: TEST_BOOK_ID,
+            query: query
+          })
+        );
+        const response = parseToolResponse(result);
+        
+        logApiResponse(`list_transactions (account: ${targetAccount})`, response);
+        
+        // Should return transactions and preserve query
+        expect(response).to.have.property('query', query);
+        expect(response).to.have.property('transactions').that.is.an('array');
+        
+        // All transactions should involve the target account
+        response.transactions.forEach((tx: any) => {
+          expect(
+            tx.creditAccount.name === targetAccount || tx.debitAccount.name === targetAccount
+          ).to.be.true;
+        });
+      } else {
+        console.log('No transactions available for account query test');
+      }
+    }));
+    
+    it('should handle amount filtering queries', integrationTest(async () => {
+      // Test with a reasonable amount threshold
+      const query = 'amount>0';
+      
+      const result = await withRetry(() => 
+        context.server.testCallTool('list_transactions', {
+          bookId: TEST_BOOK_ID,
+          query: query
+        })
+      );
+      const response = parseToolResponse(result);
+      
+      logApiResponse('list_transactions (amount>0)', response);
+      
+      // Should return transactions and preserve query
+      expect(response).to.have.property('query', query);
+      expect(response).to.have.property('transactions').that.is.an('array');
+      
+      // All transactions should have positive amounts
+      response.transactions.forEach((tx: any) => {
+        expect(tx.amount).to.be.greaterThan(0);
+      });
+    }));
+    
+    it('should handle date range queries', integrationTest(async () => {
+      // Test with a broad date range to ensure we get results
+      const query = 'after:2020-01-01 before:2025-12-31';
+      
+      const result = await withRetry(() => 
+        context.server.testCallTool('list_transactions', {
+          bookId: TEST_BOOK_ID,
+          query: query
+        })
+      );
+      const response = parseToolResponse(result);
+      
+      logApiResponse('list_transactions (date range)', response);
+      
+      // Should return transactions and preserve query
+      expect(response).to.have.property('query', query);
+      expect(response).to.have.property('transactions').that.is.an('array');
+      
+      // All transactions should be within date range
+      response.transactions.forEach((tx: any) => {
+        const txDate = new Date(tx.date);
+        expect(txDate.getFullYear()).to.be.at.least(2020);
+        expect(txDate.getFullYear()).to.be.at.most(2025);
+      });
+    }));
+    
+    it('should handle complex queries with logical operators', integrationTest(async () => {
+      // Test with complex query combining multiple conditions
+      const query = 'amount>0 AND after:2020-01-01';
+      
+      const result = await withRetry(() => 
+        context.server.testCallTool('list_transactions', {
+          bookId: TEST_BOOK_ID,
+          query: query
+        })
+      );
+      const response = parseToolResponse(result);
+      
+      logApiResponse('list_transactions (complex query)', response);
+      
+      // Should return transactions and preserve query
+      expect(response).to.have.property('query', query);
+      expect(response).to.have.property('transactions').that.is.an('array');
+      
+      // All transactions should meet both conditions
+      response.transactions.forEach((tx: any) => {
+        expect(tx.amount).to.be.greaterThan(0);
+        const txDate = new Date(tx.date);
+        expect(txDate.getFullYear()).to.be.at.least(2020);
+      });
+    }));
+    
+    it('should handle empty result queries', integrationTest(async () => {
+      // Test with a query that should return no results
+      const query = 'amount>999999999';
+      
+      const result = await withRetry(() => 
+        context.server.testCallTool('list_transactions', {
+          bookId: TEST_BOOK_ID,
+          query: query
+        })
+      );
+      const response = parseToolResponse(result);
+      
+      // Should return empty results with proper structure
+      expect(response).to.have.property('query', query);
+      expect(response).to.have.property('transactions').that.is.an('array');
+      expect(response.transactions).to.have.length(0);
+      expect(response.hasMore).to.be.false;
+      expect(response.cursor).to.be.null;
+    }));
+    
+    it('should preserve query across pagination', integrationTest(async () => {
+      const query = 'amount>0';
+      
+      const result = await withRetry(() => 
+        context.server.testCallTool('list_transactions', {
+          bookId: TEST_BOOK_ID,
+          query: query,
+          limit: 3
+        })
+      );
+      const response = parseToolResponse(result);
+      
+      if (response.hasMore && response.cursor) {
+        // Get next page with same query
+        const nextResult = await withRetry(() => 
+          context.server.testCallTool('list_transactions', {
+            bookId: TEST_BOOK_ID,
+            query: query,
+            limit: 3,
+            cursor: response.cursor
+          })
+        );
+        const nextResponse = parseToolResponse(nextResult);
+        
+        // Both pages should have the same query
+        expect(response.query).to.equal(query);
+        expect(nextResponse.query).to.equal(query);
+        
+        // Both pages should meet query criteria
+        [...response.transactions, ...nextResponse.transactions].forEach((tx: any) => {
+          expect(tx.amount).to.be.greaterThan(0);
+        });
+      } else {
+        console.log('Not enough transactions for query pagination test');
+      }
+    }));
+  });
+  
+  describe('Error Handling', function() {
+    it('should return MCP error for missing bookId', integrationTest(async () => {
+      try {
+        await context.server.testCallTool('list_transactions', {});
+        expect.fail('Should have thrown an error for missing bookId');
+      } catch (error: any) {
+        expect(error).to.have.property('code');
+        expect(error.code).to.equal(-32602); // Invalid params
+        expect(error.message).to.include('Missing required parameter: bookId');
+      }
+    }));
+    
+    it('should return MCP error for invalid bookId', integrationTest(async () => {
+      try {
+        await context.server.testCallTool('list_transactions', {
+          bookId: 'invalid-book-id-123'
+        });
+        expect.fail('Should have thrown an error for invalid bookId');
+      } catch (error: any) {
+        expect(error).to.have.property('code');
+        expect(error.code).to.equal(-32602); // Invalid params
+        expect(error.message).to.include('Book not found: invalid-book-id-123');
+      }
+    }));
+    
+    it('should return MCP error for empty bookId', integrationTest(async () => {
+      try {
+        await context.server.testCallTool('list_transactions', {
+          bookId: ''
+        });
+        expect.fail('Should have thrown an error for empty bookId');
+      } catch (error: any) {
+        expect(error).to.have.property('code');
+        expect(error.code).to.equal(-32602); // Invalid params
+        expect(error.message).to.include('Missing required parameter: bookId');
+      }
+    }));
+    
+    it('should handle malformed queries gracefully', integrationTest(async () => {
+      // Test with malformed query syntax
+      const result = await withRetry(() => 
+        context.server.testCallTool('list_transactions', {
+          bookId: TEST_BOOK_ID,
+          query: 'invalid:syntax:query::'
+        })
+      );
+      const response = parseToolResponse(result);
+      
+      // Should return valid response structure even with malformed query
+      expect(response).to.have.property('transactions').that.is.an('array');
+      expect(response).to.have.property('hasMore').that.is.a('boolean');
+      expect(response).to.have.property('cursor');
+      expect(response).to.have.property('limit');
+    }));
+  });
+  
+  describe('Performance', function() {
+    it('should complete list_transactions request within reasonable time', integrationTest(async () => {
+      const startTime = Date.now();
+      
+      const result = await withRetry(() => 
+        context.server.testCallTool('list_transactions', {
+          bookId: TEST_BOOK_ID,
+          limit: 25
+        })
+      );
+      
+      const endTime = Date.now();
+      const duration = endTime - startTime;
+      
+      parseToolResponse(result); // Ensure response is valid
+      
+      // Should complete within 15 seconds (generous for network latency)
+      expect(duration).to.be.lessThan(15000);
+      
+      if (TestMode.DEBUG_API) {
+        console.log(`list_transactions completed in ${duration}ms`);
+      }
+    }));
+    
+    it('should handle large limit requests efficiently', integrationTest(async () => {
+      const startTime = Date.now();
+      
+      const result = await withRetry(() => 
+        context.server.testCallTool('list_transactions', {
+          bookId: TEST_BOOK_ID,
+          limit: 100
+        })
+      );
+      
+      const endTime = Date.now();
+      const duration = endTime - startTime;
+      
+      parseToolResponse(result); // Ensure response is valid
+      
+      // Should complete within 20 seconds even with large limit
+      expect(duration).to.be.lessThan(20000);
+    }));
+  });
+  
+  describe('Data Consistency', function() {
+    it('should return consistent transaction data structure', integrationTest(async () => {
+      const result = await withRetry(() => 
+        context.server.testCallTool('list_transactions', {
+          bookId: TEST_BOOK_ID,
+          limit: 10
+        })
+      );
+      
+      const response = parseToolResponse(result);
+      
+      // All transactions should have consistent structure
+      response.transactions.forEach((transaction: any) => {
+        expect(transaction).to.have.property('id').that.is.a('string');
+        expect(transaction).to.have.property('date').that.is.a('string');
+        expect(transaction).to.have.property('dateValue').that.is.a('number');
+        expect(transaction).to.have.property('amount').that.is.a('number');
+        expect(transaction).to.have.property('description').that.is.a('string');
+        expect(transaction).to.have.property('posted').that.is.a('boolean');
+        expect(transaction).to.have.property('creditAccount').that.is.an('object');
+        expect(transaction).to.have.property('debitAccount').that.is.an('object');
+        expect(transaction).to.have.property('properties').that.is.an('object');
+        expect(transaction).to.have.property('tags').that.is.an('array');
+        expect(transaction).to.have.property('urls').that.is.an('array');
+        expect(transaction).to.have.property('remoteIds').that.is.an('array');
+        
+        // Validate data integrity
+        expect(transaction.id).to.have.length.greaterThan(0);
+        expect(transaction.date).to.match(/^\d{4}-\d{2}-\d{2}$/);
+        expect(transaction.amount).to.be.greaterThan(0);
+        expect(transaction.creditAccount.id).to.have.length.greaterThan(0);
+        expect(transaction.debitAccount.id).to.have.length.greaterThan(0);
+        expect(transaction.creditAccount.name).to.have.length.greaterThan(0);
+        expect(transaction.debitAccount.name).to.have.length.greaterThan(0);
+      });
+    }));
+    
+    it('should return transactions in consistent order', integrationTest(async () => {
+      // Get first page twice
+      const result1 = await withRetry(() => 
+        context.server.testCallTool('list_transactions', {
+          bookId: TEST_BOOK_ID,
+          limit: 5
+        })
+      );
+      const response1 = parseToolResponse(result1);
+      
+      // Small delay to avoid rate limiting
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      const result2 = await withRetry(() => 
+        context.server.testCallTool('list_transactions', {
+          bookId: TEST_BOOK_ID,
+          limit: 5
+        })
+      );
+      const response2 = parseToolResponse(result2);
+      
+      // Results should be identical
+      expect(response1.transactions).to.have.length(response2.transactions.length);
+      
+      // Transaction order should be consistent
+      response1.transactions.forEach((tx1: any, index: number) => {
+        const tx2 = response2.transactions[index];
+        expect(tx1.id).to.equal(tx2.id);
+        expect(tx1.date).to.equal(tx2.date);
+        expect(tx1.amount).to.equal(tx2.amount);
+        expect(tx1.description).to.equal(tx2.description);
+      });
+    }));
+  });
+});
