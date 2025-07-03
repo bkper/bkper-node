@@ -207,65 +207,66 @@ describe('Integration: get_balances Tool', function() {
       expect(response.matrix).to.have.length(0); // Empty matrix, no data
     }));
     
-    it('should handle group query with date range for time-based matrix', integrationTest(async () => {
+    it('should return matrix data for Assets group with 2013-2015 date range', integrationTest(async () => {
       const result = await withRetry(() => 
         context.server.testCallTool('get_balances', {
           bookId: TEST_BOOK_ID,
-          query: "group:'Bkper Assets' after:2022 before:10/2025"
+          query: "group:'Assets' after:2013 before:2015"
         })
       );
       
       const response = parseToolResponse(result);
-      logApiResponse('get_balances (Bkper Assets group with date range)', response);
+      logApiResponse('get_balances (Assets group 2013-2015)', response);
       
       // Verify response structure
       expect(response).to.have.property('matrix').that.is.an('array');
-      expect(response).to.have.property('query', "group:'Bkper Assets' after:2022 before:10/2025");
+      expect(response).to.have.property('query', "group:'Assets' after:2013 before:2015");
       
-      // Check if the group exists and has data
-      if (response.matrix.length === 0) {
-        console.log('Warning: Bkper Assets group query returned empty matrix - group may not exist in test book');
-        // Test passes but logs warning
-      } else if (response.matrix.length === 1 && response.matrix[0][0] === 'Account Name') {
-        // Only header row returned - no data
-        console.log('Warning: Bkper Assets group has no data in the specified date range');
-        expect(response.matrix[0]).to.include('Account Name');
-      } else {
-        // Matrix has data - for time-based queries with date range, it should be transposed
-        const firstRow = response.matrix[0];
+      // Matrix should have data (headers + at least one data row)
+      expect(response.matrix).to.have.length.greaterThan(1, 
+        'Matrix should have headers plus at least one data row');
+      
+      // For time-based queries with date range, matrix should have headers
+      const headerRow = response.matrix[0];
+      expect(headerRow).to.have.length.greaterThan(2, 
+        'Header row should have multiple columns (empty string + date columns)');
+      
+      // Validate header row structure
+      expect(headerRow[0]).to.equal('', 
+        'Header row first element should be empty string');
+      
+      // Rest of header should be date strings (YYYY-MM-DD format)
+      for (let i = 1; i < headerRow.length; i++) {
+        expect(headerRow[i]).to.be.a('string', 
+          `Header column ${i} should be a date string`);
+        expect(headerRow[i]).to.match(/^\d{4}-\d{2}-\d{2}$/, 
+          `Header column ${i} should be in YYYY-MM-DD format, got: ${headerRow[i]}`);
+      }
+      
+      // Data rows start from index 1
+      const dataRows = response.matrix.slice(1);
+      expect(dataRows).to.have.length.greaterThan(0, 
+        'Should have at least one data row after headers');
+      
+      // Validate data rows structure
+      dataRows.forEach((row: any, index: number) => {
+        expect(row).to.have.length(headerRow.length, 
+          `Data row ${index + 1} should have same length as header row`);
+        expect(row[0]).to.be.a('string', 
+          `Data row ${index + 1} first column should be account name`);
         
-        // Check if this looks like a header row or data row
-        const hasHeaders = firstRow[0] === 'Account' || firstRow[0] === 'Account Name';
-        
-        if (hasHeaders) {
-          // Has headers - validate structure
-          expect(firstRow).to.have.length.greaterThan(2); // At least Account + 2 date columns
-          
-          // Data rows should have account names and numeric values
-          const dataRows = response.matrix.slice(1);
-          dataRows.forEach((row: any) => {
-            expect(row).to.have.length(firstRow.length);
-            expect(row[0]).to.be.a('string'); // Account name
-            // Rest should be numbers (balances)
-            for (let i = 1; i < row.length; i++) {
-              expect(row[i]).to.be.a('number');
-            }
-          });
-        } else {
-          // No headers - data starts from first row
-          // For time-based queries, expect multiple columns
-          expect(firstRow).to.have.length.greaterThan(2); // At least account + 2 time periods
-          
-          // All rows should have consistent structure
-          response.matrix.forEach((row: any) => {
-            expect(row).to.have.length(firstRow.length);
-            expect(row[0]).to.be.a('string'); // Account name
-            // Rest should be numbers (balances)
-            for (let i = 1; i < row.length; i++) {
-              expect(row[i]).to.be.a('number');
-            }
-          });
+        // Rest should be numbers (balances for each time period)
+        for (let i = 1; i < row.length; i++) {
+          expect(row[i]).to.be.a('number', 
+            `Data row ${index + 1} column ${i} should be a numeric balance`);
         }
+      });
+      
+      // Log the matrix structure for debugging
+      console.log(`Matrix structure: ${response.matrix.length} rows x ${headerRow.length} columns`);
+      console.log(`Header: [${headerRow.join(', ')}]`);
+      if (dataRows.length > 0) {
+        console.log(`Sample data row: [${dataRows[0].join(', ')}]`);
       }
     }));
   });

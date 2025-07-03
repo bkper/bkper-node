@@ -40,42 +40,31 @@ export async function handleGetBalances(params: GetBalancesParams): Promise<Call
     // Use 'on:$m' as default query to get balances for current month
     const actualQuery = params.query || 'on:$m';
     const balancesReport = await book.getBalancesReport(actualQuery);
-    const bkperBalances = balancesReport.getBalancesContainers();
     
     let type = BalanceType.TOTAL;
 
-
-    
     // Use BalancesDataTableBuilder to generate matrix
     let matrix: any[][];
-    if (bkperBalances.length > 0) {
-      const balanceContainer = bkperBalances[0];
-
 
       const isTimeBased = (actualQuery.includes('after:') || actualQuery.includes('before:')) || actualQuery.includes('by:');
 
       if (isTimeBased) {
-        const accountType = (await balanceContainer.getGroup())?.getType() || (await balanceContainer.getAccount())?.getType();
-        if (accountType === AccountType.ASSET || accountType === AccountType.LIABILITY) {
-          type = BalanceType.CUMULATIVE;
-        } else {
-          type = BalanceType.PERIOD;
-        }
+        type = BalanceType.CUMULATIVE;
       }
 
+      console.log(actualQuery);
+      // balanceContainer.getBalancesContainers().forEach(b => console.log(b.getName()));
+
       // Get the first container to access createDataTable
-      const dataTableBuilder = balanceContainer.createDataTable()
-        .formatValues(false)    // Raw numbers for LLMs
-        .formatDates(true)     // YYYY-MM-DD dates
-        .raw(true)              // Raw balances
-        .transposed(type !== BalanceType.TOTAL)
-        .type(type); // Smart transposition for time-based queries
-      
+    const dataTableBuilder = balancesReport.createDataTable()
+      .formatValues(false)    // Raw numbers for LLMs
+      .formatDates(true)     // YYYY-MM-DD dates
+      .raw(true)              // Raw balances
+      .expanded(-1)
+      .type(type); // Smart transposition for time-based queries
+
       matrix = dataTableBuilder.build();
-    } else {
-      // Empty result - empty matrix
-      matrix = [];
-    }
+
 
     // Build response with matrix format
     const response: BalancesResponse = {

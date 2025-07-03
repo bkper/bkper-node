@@ -131,7 +131,9 @@ export interface MockDataTableBuilder {
   formatDates(format: boolean): MockDataTableBuilder;
   transposed(transposed: boolean): MockDataTableBuilder;
   raw(raw: boolean): MockDataTableBuilder;
+  expanded(value: number): MockDataTableBuilder;
   type(balanceType: any): MockDataTableBuilder;
+  hideNames(): MockDataTableBuilder;
   build(): any[][];
 }
 
@@ -160,6 +162,7 @@ export interface MockAccount {
 export interface MockBalanceReport {
   getBalances(): Promise<MockAccountBalance[]>;
   getBalancesContainers(): MockAccountBalance[];
+  createDataTable(): MockDataTableBuilder;
 }
 
 export interface MockTransactionIterator {

@@ -13,6 +13,9 @@ import {
   BalanceData,
   AccountBalanceData
 } from './mock-interfaces.js';
+import { loadBalanceMatrixTotal, loadBalanceMatrixPeriod } from './fixture-loader.js';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
 
 // Mock auth service
 export const mockGetOAuthToken = async (): Promise<string> => 'mock-token';
@@ -24,6 +27,7 @@ function createMockDataTableBuilder(balances: AccountBalanceData[], query?: stri
   let transposed = false;
   let raw = false;
   let balanceType: any = null;
+  let expandedValue: number = 0;
 
   return {
     formatValues(format: boolean): MockDataTableBuilder {
@@ -42,8 +46,15 @@ function createMockDataTableBuilder(balances: AccountBalanceData[], query?: stri
       raw = rawMode;
       return this;
     },
+    expanded(value: number): MockDataTableBuilder {
+      expandedValue = value;
+      return this;
+    },
     type(type: any): MockDataTableBuilder {
       balanceType = type;
+      return this;
+    },
+    hideNames(): MockDataTableBuilder {
       return this;
     },
     build(): any[][] {
@@ -51,25 +62,46 @@ function createMockDataTableBuilder(balances: AccountBalanceData[], query?: stri
       const isTimeBased = query?.includes('on:') || query?.includes('after:') || query?.includes('before:');
       
       if (isTimeBased && transposed) {
-        // Period/Cumulative format - transposed (dates as columns)
-        // First column header is empty, followed by date columns
-        return [
-          ["", "2024-01-01", "2024-01-02", "2024-01-03", "2024-01-04", "2024-01-05"],
-          ["Cash", 5000.00, 6200.00, 5900.00, 8400.00, 8250.00],
-          ["Accounts Receivable", 0.00, 0.00, 0.00, 0.00, 0.00],
-          ["Service Revenue", -5000.00, -1200.00, 0.00, -2500.00, 0.00],
-          ["Office Rent", 0.00, 0.00, 300.00, 0.00, 150.00]
-        ];
+        // Period/Cumulative format - load from fixture
+        try {
+          const currentDir = dirname(fileURLToPath(import.meta.url));
+          return loadBalanceMatrixPeriod(currentDir);
+        } catch {
+          // Fallback hardcoded data if fixture loading fails
+          return [
+            ["", "2024-01-01", "2024-01-02", "2024-01-03", "2024-01-04", "2024-01-05"],
+            ["Cash", 5000.00, 6200.00, 5900.00, 8400.00, 8250.00],
+            ["Accounts Receivable", 0.00, 0.00, 0.00, 0.00, 0.00],
+            ["Service Revenue", -5000.00, -1200.00, 0.00, -2500.00, 0.00],
+            ["Office Rent", 0.00, 0.00, 300.00, 0.00, 150.00]
+          ];
+        }
       } else {
-        // Total format - standard (accounts as rows), no headers
-        const matrix: any[][] = [];
-        
-        balances.forEach(balance => {
-          const balanceValue = parseFloat(balance.balance);
-          matrix.push([balance.account.name || '', balanceValue]);
-        });
-        
-        return matrix;
+        // Total format - load from fixture or generate from balances
+        try {
+          const currentDir = dirname(fileURLToPath(import.meta.url));
+          const fixtureMatrix = loadBalanceMatrixTotal(currentDir);
+          
+          // If we have filtered balances, generate matrix from them
+          if (balances.length < 10) { // Assuming fixture has 10 accounts
+            const matrix: any[][] = [];
+            balances.forEach(balance => {
+              const balanceValue = parseFloat(balance.balance);
+              matrix.push([balance.account.name || '', balanceValue]);
+            });
+            return matrix;
+          }
+          
+          return fixtureMatrix;
+        } catch {
+          // Fallback to generating from balances
+          const matrix: any[][] = [];
+          balances.forEach(balance => {
+            const balanceValue = parseFloat(balance.balance);
+            matrix.push([balance.account.name || '', balanceValue]);
+          });
+          return matrix;
+        }
       }
     }
   };
@@ -198,7 +230,8 @@ export function createMockBkperForBook(
               }
               
               return containers;
-            }
+            },
+            createDataTable: (): MockDataTableBuilder => createMockDataTableBuilder(filteredBalances, effectiveQuery)
           };
         } : undefined,
         
