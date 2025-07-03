@@ -52,43 +52,22 @@ describe('Integration: get_balances Tool', function() {
       expect(tool.inputSchema.properties).to.have.property('bookId');
       expect(tool.inputSchema.properties).to.have.property('query');
       expect(tool.inputSchema.required).to.include('bookId');
+      expect(tool.inputSchema.required).to.include('query');
     }));
   });
   
   describe('Basic Functionality', function() {
-    it('should get balances without query (defaults to current month)', integrationTest(async () => {
-      const result = await withRetry(() => 
-        context.server.testCallTool('get_balances', {
-          bookId: TEST_BOOK_ID
-        })
-      );
-      
-      const response = parseToolResponse(result);
-      logApiResponse('get_balances (no query)', response);
-      
-      // Validate response structure
-      expect(response).to.have.property('matrix').that.is.an('array');
-      expect(response).to.have.property('query').that.is.a('string');
-      expect(response).to.not.have.property('total');
-      expect(response).to.not.have.property('balances');
-      
-      // Default query should be current month
-      expect(response.query).to.equal('on:$m');
-      
-      // Validate matrix structure - no headers, just data
-      if (response.matrix.length > 0) {
-        // All rows are data (no headers)
-        response.matrix.forEach((row: any, index: number) => {
-          try {
-            expect(row).to.be.an('array');
-            expect(row).to.have.length(2);
-            expect(row[0]).to.be.a('string'); // Account name
-            expect(row[1]).to.be.a('number'); // Balance as raw number
-          } catch (error) {
-            console.error(`Matrix row at index ${index} failed validation:`, row);
-            throw error;
-          }
-        });
+    it('should return MCP error for missing query parameter', integrationTest(async () => {
+      try {
+        await withRetry(() => 
+          context.server.testCallTool('get_balances', {
+            bookId: TEST_BOOK_ID
+          })
+        );
+        expect.fail('Should have thrown an error for missing query');
+      } catch (error: any) {
+        expect(error).to.have.property('code');
+        expect(error.code).to.be.oneOf([-32602, -32603]); // Invalid params or internal error
       }
     }));
     
@@ -285,7 +264,8 @@ describe('Integration: get_balances Tool', function() {
     it('should return MCP error for invalid bookId', integrationTest(async () => {
       try {
         await context.server.testCallTool('get_balances', {
-          bookId: 'invalid-book-id-123'
+          bookId: 'invalid-book-id-123',
+          query: 'on:$m'
         });
         expect.fail('Should have thrown an error for invalid bookId');
       } catch (error: any) {

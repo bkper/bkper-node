@@ -4,7 +4,7 @@ import { AccountType, BalanceType } from 'bkper-js';
 
 interface GetBalancesParams {
   bookId: string;
-  query?: string;
+  query: string;
 }
 
 interface BalancesResponse {
@@ -24,6 +24,13 @@ export async function handleGetBalances(params: GetBalancesParams): Promise<Call
       );
     }
 
+    if (!params.query) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        'Missing required parameter: query'
+      );
+    }
+
     // Get configured Bkper instance
     const bkper = getBkperInstance();
 
@@ -37,8 +44,7 @@ export async function handleGetBalances(params: GetBalancesParams): Promise<Call
     }
 
     // Get balances from the book with query (required by bkper-js)
-    // Use 'on:$m' as default query to get balances for current month
-    const actualQuery = params.query || 'on:$m';
+    const actualQuery = params.query;
     const balancesReport = await book.getBalancesReport(actualQuery);
     
     let type = BalanceType.TOTAL;
@@ -106,9 +112,9 @@ export const getBalancesToolDefinition = {
       },
       query: {
         type: 'string',
-        description: 'Optional query to filter balances (e.g., "account:\'Cash\'", "group:\'Assets\'", "on:2024-01-31")'
+        description: 'Required query to filter balances (e.g., "account:\'Cash\'", "group:\'Assets\'", "on:2024-01-31")'
       }
     },
-    required: ['bookId']
+    required: ['bookId', 'query']
   }
 };

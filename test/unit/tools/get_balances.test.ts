@@ -46,6 +46,7 @@ describe('MCP Server - get_balances Tool Registration', function() {
     expect(getBalancesTool!.inputSchema.properties).to.not.have.property('cursor');
     expect(getBalancesTool!.inputSchema.properties).to.not.have.property('limit');
     expect(getBalancesTool!.inputSchema.required).to.include('bookId');
+    expect(getBalancesTool!.inputSchema.required).to.include('query');
   });
 
   it('should have proper MCP tool schema for get_balances', async function() {
@@ -62,10 +63,10 @@ describe('MCP Server - get_balances Tool Registration', function() {
         },
         query: {
           type: 'string',
-          description: 'Optional query to filter balances (e.g., "account:\'Cash\'", "group:\'Assets\'", "on:2024-01-31")'
+          description: 'Required query to filter balances (e.g., "account:\'Cash\'", "group:\'Assets\'", "on:2024-01-31")'
         }
       },
-      required: ['bookId']
+      required: ['bookId', 'query']
     });
   });
 });
@@ -82,33 +83,13 @@ describe('MCP Server - get_balances Tool Calls', function() {
     server = new BkperMcpServer();
   });
 
-  it('should handle MCP get_balances tool call without query', async function() {
-    const response = await server.testCallTool('get_balances', { bookId: 'book-1' });
-    
-    // Verify MCP response structure
-    expect(response).to.have.property('content');
-    expect(response.content).to.be.an('array');
-    expect(response.content).to.have.length(1);
-    expect(response.content[0]).to.have.property('type', 'text');
-    expect(response.content[0]).to.have.property('text');
-    
-    // Parse the JSON response
-    const jsonResponse = JSON.parse(response.content[0].text as string);
-    expect(jsonResponse).to.have.property('matrix');
-    expect(jsonResponse).to.have.property('query');
-    expect(jsonResponse).to.not.have.property('total');
-    expect(jsonResponse).to.not.have.property('balances');
-    
-    // Verify matrix structure - no headers for total format
-    expect(jsonResponse.matrix).to.be.an('array');
-    expect(jsonResponse.matrix).to.have.length.greaterThan(0);
-    
-    // All rows should be data (no headers)
-    jsonResponse.matrix.forEach((row: any) => {
-      expect(row).to.have.length(2);
-      expect(row[0]).to.be.a('string'); // Account name
-      expect(row[1]).to.be.a('number'); // Balance as number
-    });
+  it('should handle MCP error for missing query parameter', async function() {
+    try {
+      await server.testCallTool('get_balances', { bookId: 'book-1' });
+      expect.fail('Should have thrown an error for missing query');
+    } catch (error) {
+      expect(error).to.be.an('error');
+    }
   });
 
   it('should handle MCP get_balances tool call with query filter', async function() {
@@ -136,8 +117,11 @@ describe('MCP Server - get_balances Tool Calls', function() {
     setMockBkper(mockBkper);
     server = new BkperMcpServer();
     
-    // Call to get all balances
-    const response = await server.testCallTool('get_balances', { bookId: 'book-1' });
+    // Call to get all balances with required query
+    const response = await server.testCallTool('get_balances', { 
+      bookId: 'book-1',
+      query: 'on:$m'
+    });
     const jsonResponse = JSON.parse(response.content[0].text as string);
     
     expect(jsonResponse.matrix).to.be.an('array');

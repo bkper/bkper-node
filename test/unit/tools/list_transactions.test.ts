@@ -44,6 +44,16 @@ describe('MCP Server - list_transactions Tool Registration', function() {
     expect(listTransactionsTool!.inputSchema.properties).to.have.property('limit');
     expect(listTransactionsTool!.inputSchema.properties).to.have.property('cursor');
     expect(listTransactionsTool!.inputSchema.required).to.include('bookId');
+    expect(listTransactionsTool!.inputSchema.required).to.include('query');
+  });
+
+  it('should handle MCP error for missing query parameter', async function() {
+    try {
+      await server.testCallTool('list_transactions', { bookId: 'book-1' });
+      expect.fail('Should have thrown an error for missing query');
+    } catch (error) {
+      expect(error).to.be.an('error');
+    }
   });
 
   it('should handle MCP list_transactions tool call', async function() {

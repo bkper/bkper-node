@@ -54,127 +54,22 @@ describe('Integration: list_transactions Tool', function() {
       expect(tool.inputSchema.properties).to.have.property('query');
       expect(tool.inputSchema.properties).to.have.property('limit');
       expect(tool.inputSchema.required).to.include('bookId');
+      expect(tool.inputSchema.required).to.include('query');
     }));
   });
   
   describe('Basic Functionality', function() {
-    it('should list transactions without parameters (default limit)', integrationTest(async () => {
-      const result = await withRetry(() => 
-        context.server.testCallTool('list_transactions', {
-          bookId: TEST_BOOK_ID
-        })
-      );
-      
-      const response = parseToolResponse(result);
-      logApiResponse('list_transactions (default)', response);
-      
-      // Validate response structure
-      expect(response).to.have.property('transactions').that.is.an('array');
-      expect(response).to.have.property('hasMore').that.is.a('boolean');
-      expect(response).to.have.property('cursor');
-      expect(response).to.have.property('limit', 25);
-      expect(response).to.not.have.property('query');
-      
-      // Validate transactions structure
-      expect(response.transactions).to.have.length.at.most(25);
-      
-      if (response.transactions.length > 0) {
-        const transaction = response.transactions[0];
-        expect(transaction).to.have.property('id').that.is.a('string');
-        expect(transaction).to.have.property('date').that.is.a('string');
-        expect(transaction).to.have.property('dateValue').that.is.a('number');
-        expect(transaction).to.have.property('amount'); // Can be string or number
-        expect(transaction).to.have.property('description').that.is.a('string');
-        expect(transaction).to.have.property('posted').that.is.a('boolean');
-        
-        // Optional boolean properties
-        if (transaction.checked !== undefined) {
-          expect(transaction.checked).to.be.a('boolean');
-        }
-        if (transaction.trashed !== undefined) {
-          expect(transaction.trashed).to.be.a('boolean');
-        }
-        if (transaction.locked !== undefined) {
-          expect(transaction.locked).to.be.a('boolean');
-        }
-        expect(transaction).to.have.property('creditAccount').that.is.an('object');
-        expect(transaction).to.have.property('debitAccount').that.is.an('object');
-        expect(transaction).to.have.property('createdAt').that.is.a('string');
-        expect(transaction).to.have.property('updatedAt').that.is.a('string');
-        // Optional properties
-        if (transaction.payeeOrPayer !== undefined) {
-          expect(transaction.payeeOrPayer).to.be.a('string');
-        }
-        if (transaction.remoteIds !== undefined) {
-          expect(transaction.remoteIds).to.be.an('array');
-        }
-        if (transaction.urls !== undefined) {
-          expect(transaction.urls).to.be.an('array');
-        }
-        if (transaction.tags !== undefined) {
-          expect(transaction.tags).to.be.an('array');
-        }
-        if (transaction.properties !== undefined) {
-          expect(transaction.properties).to.be.an('object');
-        }
-        
-        // Validate account structure
-        expect(transaction.creditAccount).to.have.property('id').that.is.a('string');
-        expect(transaction.debitAccount).to.have.property('id').that.is.a('string');
-        
-        // Account name is optional based on actual API structure
-        if (transaction.creditAccount.name !== undefined) {
-          expect(transaction.creditAccount.name).to.be.a('string');
-        }
-        if (transaction.debitAccount.name !== undefined) {
-          expect(transaction.debitAccount.name).to.be.a('string');
-        }
-        
-        // Validate date format
-        expect(transaction.date).to.match(/^\d{4}-\d{2}-\d{2}$/);
-        
-        // createdAt and updatedAt can be Unix timestamps or ISO dates
-        if (transaction.createdAt !== undefined) {
-          if (typeof transaction.createdAt === 'string') {
-            // Could be Unix timestamp string or ISO date
-            if (transaction.createdAt.match(/^\d+$/)) {
-              // Unix timestamp string
-              expect(parseInt(transaction.createdAt)).to.be.greaterThan(0);
-            } else {
-              // ISO date
-              expect(transaction.createdAt).to.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z?$/);
-            }
-          }
-        }
-        if (transaction.updatedAt !== undefined) {
-          if (typeof transaction.updatedAt === 'string') {
-            // Could be Unix timestamp string or ISO date
-            if (transaction.updatedAt.match(/^\d+$/)) {
-              // Unix timestamp string
-              expect(parseInt(transaction.updatedAt)).to.be.greaterThan(0);
-            } else {
-              // ISO date
-              expect(transaction.updatedAt).to.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z?$/);
-            }
-          }
-        }
-        
-        // Validate amount
-        const amount = typeof transaction.amount === 'string' ? parseFloat(transaction.amount) : transaction.amount;
-        expect(amount).to.be.greaterThan(0);
-        expect(transaction.dateValue).to.be.greaterThan(0);
-        
-        // Log transaction details for debugging
-        if (TestMode.DEBUG_API) {
-          console.log(`Sample transaction:`);
-          console.log(`- ID: ${transaction.id}`);
-          console.log(`- Date: ${transaction.date}`);
-          console.log(`- Amount: ${transaction.amount}`);
-          console.log(`- Description: ${transaction.description}`);
-          console.log(`- From: ${transaction.creditAccount.name}`);
-          console.log(`- To: ${transaction.debitAccount.name}`);
-          console.log(`- Posted: ${transaction.posted}`);
-        }
+    it('should return MCP error for missing query parameter', integrationTest(async () => {
+      try {
+        await withRetry(() => 
+          context.server.testCallTool('list_transactions', {
+            bookId: TEST_BOOK_ID
+          })
+        );
+        expect.fail('Should have thrown an error for missing query');
+      } catch (error: any) {
+        expect(error).to.have.property('code');
+        expect(error.code).to.be.oneOf([-32602, -32603]); // Invalid params or internal error
       }
     }));
     
@@ -182,6 +77,7 @@ describe('Integration: list_transactions Tool', function() {
       const result = await withRetry(() => 
         context.server.testCallTool('list_transactions', {
           bookId: TEST_BOOK_ID,
+          query: 'after:2020-01-01',
           limit: 10
         })
       );
@@ -203,6 +99,7 @@ describe('Integration: list_transactions Tool', function() {
       const result = await withRetry(() => 
         context.server.testCallTool('list_transactions', {
           bookId: TEST_BOOK_ID,
+          query: 'after:2020-01-01',
           limit: 200 // Should be capped at 100
         })
       );
@@ -220,6 +117,7 @@ describe('Integration: list_transactions Tool', function() {
       const result = await withRetry(() => 
         context.server.testCallTool('list_transactions', {
           bookId: TEST_BOOK_ID,
+          query: 'after:2020-01-01',
           limit: 5
         })
       );
@@ -281,6 +179,7 @@ describe('Integration: list_transactions Tool', function() {
       const allResult = await withRetry(() => 
         context.server.testCallTool('list_transactions', {
           bookId: TEST_BOOK_ID,
+          query: 'after:2020-01-01',
           limit: 10
         })
       );
@@ -446,7 +345,8 @@ describe('Integration: list_transactions Tool', function() {
     it('should return MCP error for invalid bookId', integrationTest(async () => {
       try {
         await context.server.testCallTool('list_transactions', {
-          bookId: 'invalid-book-id-123'
+          bookId: 'invalid-book-id-123',
+          query: 'after:2020-01-01'
         });
         expect.fail('Should have thrown an error for invalid bookId');
       } catch (error: any) {
@@ -495,6 +395,7 @@ describe('Integration: list_transactions Tool', function() {
       const result = await withRetry(() => 
         context.server.testCallTool('list_transactions', {
           bookId: TEST_BOOK_ID,
+          query: 'after:2020-01-01',
           limit: 25
         })
       );
@@ -518,6 +419,7 @@ describe('Integration: list_transactions Tool', function() {
       const result = await withRetry(() => 
         context.server.testCallTool('list_transactions', {
           bookId: TEST_BOOK_ID,
+          query: 'after:2020-01-01',
           limit: 100
         })
       );
@@ -537,6 +439,7 @@ describe('Integration: list_transactions Tool', function() {
       const result = await withRetry(() => 
         context.server.testCallTool('list_transactions', {
           bookId: TEST_BOOK_ID,
+          query: 'after:2020-01-01',
           limit: 10
         })
       );
@@ -591,6 +494,7 @@ describe('Integration: list_transactions Tool', function() {
       const result1 = await withRetry(() => 
         context.server.testCallTool('list_transactions', {
           bookId: TEST_BOOK_ID,
+          query: 'after:2020-01-01',
           limit: 5
         })
       );
@@ -602,6 +506,7 @@ describe('Integration: list_transactions Tool', function() {
       const result2 = await withRetry(() => 
         context.server.testCallTool('list_transactions', {
           bookId: TEST_BOOK_ID,
+          query: 'after:2020-01-01',
           limit: 5
         })
       );

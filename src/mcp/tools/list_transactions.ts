@@ -4,7 +4,7 @@ import { getBkperInstance } from '../bkper-factory.js';
 interface ListTransactionsParams {
   bookId: string;
   cursor?: string;
-  query?: string;
+  query: string;
   limit?: number;
 }
 
@@ -23,6 +23,13 @@ export async function handleListTransactions(params: ListTransactionsParams): Pr
       throw new McpError(
         ErrorCode.InvalidParams,
         'Missing required parameter: bookId'
+      );
+    }
+
+    if (!params.query) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        'Missing required parameter: query'
       );
     }
 
@@ -60,10 +67,8 @@ export async function handleListTransactions(params: ListTransactionsParams): Pr
       limit
     };
 
-    // Include query in response if provided
-    if (params.query) {
-      response.query = params.query;
-    }
+    // Include query in response (now always provided)
+    response.query = params.query;
 
     return {
       content: [
@@ -103,7 +108,7 @@ export const listTransactionsToolDefinition = {
       },
       query: {
         type: 'string',
-        description: 'Optional query string to filter transactions using comprehensive syntax (account:, from:, to:, group:, on:, after:, before:, amount:, text search, logical operators, etc.)'
+        description: 'Required query string to filter transactions using comprehensive syntax (account:, from:, to:, group:, on:, after:, before:, amount:, text search, logical operators, etc.)'
       },
       limit: {
         type: 'number',
@@ -112,6 +117,6 @@ export const listTransactionsToolDefinition = {
         maximum: 100
       }
     },
-    required: ['bookId']
+    required: ['bookId', 'query']
   }
 };
