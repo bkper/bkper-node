@@ -31,6 +31,14 @@ export async function handleGetBalances(params: GetBalancesParams): Promise<Call
       );
     }
 
+    // Validate query contains either group: or account: operator
+    if (!params.query.includes('group:') && !params.query.includes('account:')) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        'Query must include either \'group:\' or \'account:\' operator for proper balance filtering. Example: "group:\'Assets\' on:$m" or "account:\'Cash\' on:$m"'
+      );
+    }
+
     // Get configured Bkper instance
     const bkper = getBkperInstance();
 
@@ -58,8 +66,6 @@ export async function handleGetBalances(params: GetBalancesParams): Promise<Call
         type = BalanceType.CUMULATIVE;
       }
 
-      console.log(actualQuery);
-      // balanceContainer.getBalancesContainers().forEach(b => console.log(b.getName()));
 
       // Get the first container to access createDataTable
     const dataTableBuilder = balancesReport.createDataTable()
@@ -102,7 +108,7 @@ export async function handleGetBalances(params: GetBalancesParams): Promise<Call
 
 export const getBalancesToolDefinition = {
   name: 'get_balances',
-  description: `Get account group balances with query filtering. CRITICAL: 
+  description: `Get account balances with query filtering. CRITICAL: 
   For Balance Sheet analysis, use permanent root groups (groups with Assets, Liabilities sub-groups) with 'on:' dates.
   For P&L analysis, use non-permanent root groups (Revenue/Incoming, Expenses/Outgoing) with 'after:' and 'before:' date ranges. 
   See the usage-guide resource for root group selection rules.`,
@@ -115,7 +121,7 @@ export const getBalancesToolDefinition = {
       },
       query: {
         type: 'string',
-        description: 'Required query to filter balances (e.g.,  "group:\'Total Equity\'", "on:2024-01-31")'
+        description: 'Required query to filter balances (e.g., "account:\'Cash\'", "group:\'Assets\'", "on:2024-01-31")'
       }
     },
     required: ['bookId', 'query']

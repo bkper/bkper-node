@@ -71,6 +71,23 @@ describe('Integration: get_balances Tool', function() {
       }
     }));
     
+    it('should return MCP error for query without group or account operator', integrationTest(async () => {
+      try {
+        await withRetry(() => 
+          context.server.testCallTool('get_balances', {
+            bookId: TEST_BOOK_ID,
+            query: 'on:$m'
+          })
+        );
+        expect.fail('Should have thrown an error for missing group/account operator');
+      } catch (error: any) {
+        expect(error).to.have.property('code');
+        expect(error.code).to.equal(-32602); // Invalid params
+        expect(error.message).to.include('group:');
+        expect(error.message).to.include('account:');
+      }
+    }));
+    
     it('should get asset group balances for current month', integrationTest(async () => {
       const result = await withRetry(() => 
         context.server.testCallTool('get_balances', {
@@ -134,11 +151,11 @@ describe('Integration: get_balances Tool', function() {
   
   describe('Query Functionality', function() {
     it('should handle specific account queries', integrationTest(async () => {
-      // First get all balances to find an account to query specifically
+      // First get asset balances to find an account to query specifically
       const allResult = await withRetry(() => 
         context.server.testCallTool('get_balances', {
           bookId: TEST_BOOK_ID,
-          query: 'on:$m'
+          query: 'group:Assets on:$m'
         })
       );
       const allResponse = parseToolResponse(allResult);
@@ -265,7 +282,7 @@ describe('Integration: get_balances Tool', function() {
       try {
         await context.server.testCallTool('get_balances', {
           bookId: 'invalid-book-id-123',
-          query: 'on:$m'
+          query: 'group:Assets on:$m'
         });
         expect.fail('Should have thrown an error for invalid bookId');
       } catch (error: any) {

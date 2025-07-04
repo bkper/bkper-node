@@ -69,7 +69,7 @@ export async function handleGetBook(params: GetBookParams): Promise<CallToolResu
     const bkperInstance = getBkperInstance();
 
     // Get the specific book
-    const book = await bkperInstance.getBook(params.bookId);
+    const book = await bkperInstance.getBook(params.bookId, false, true);
     
     if (!book) {
       throw new McpError(

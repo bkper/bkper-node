@@ -1,10 +1,13 @@
 # Bkper MCP Usage Guide
 
-## Quick Decision Guide
-- Need balance data? → Use `get_balances`
-- Need transaction details? → Use `list_transactions` 
-- Analyzing Assets/Liabilities? → Use `on:` dates
-- Analyzing Revenue/Expenses? → Use `after:` and `before:` dates
+## CRITICAL REQUIREMENT
+
+**⚠️ ALL get_balances queries MUST include either `group:` or `account:` operator.**
+
+Queries without proper filtering (e.g., just `on:$m`) are **NOT ALLOWED** and will throw an error.
+
+✅ **Correct**: `get_balances({ query: "group:'Total Equity' on:$m" })`  
+❌ **Wrong**: `get_balances({ query: "on:$m" })` - Missing group/account filter!
 
 ## Essential Tools
 
@@ -42,10 +45,12 @@ Then use `group:'Total Equity'` - NOT `group:'Assets'` or `group:'Liabilities'`
 - **Balance analysis**: Always use `get_balances`
 - **Transaction inspection**: Use `list_transactions` (never for calculations)
 
-### 4. Query Requirements
-- Never query subgroups (Assets, Liabilities, Revenue, Expenses)
-- Never query individual accounts (Cash, Sales, etc.)
-- Always include group filters and date filters
+### 4. Query Requirements (MANDATORY)
+- **MUST include either `group:` or `account:` operator in EVERY query**
+- Never query subgroups directly (Assets, Liabilities, Revenue, Expenses) - use root groups
+- When using `account:`, be specific about individual accounts
+- Always include appropriate date filters
+- Queries without group/account operators will be rejected with an error
 
 ## Examples
 
@@ -163,11 +168,17 @@ When generating financial insights, reports, or analysis, **strongly prefer well
 
 ## Common Mistakes to Avoid
 
-❌ **Wrong**: `get_balances({ query: "group:'Assets'" })`  
+❌ **Wrong**: `get_balances({ query: "on:$m" })` - Missing group/account operator!  
 ✅ **Right**: `get_balances({ query: "group:'[ROOT_GROUP]' on:$m" })`
 
-❌ **Wrong**: `get_balances({ query: "account:'Cash'" })`  
-✅ **Right**: `get_balances({ query: "group:'[ROOT_GROUP]' on:$m" })`
+❌ **Wrong**: `get_balances({ query: "after:2024-01-01" })` - Missing group/account operator!  
+✅ **Right**: `get_balances({ query: "group:'[ROOT_GROUP]' after:2024-01-01 before:2024-12-31" })`
+
+❌ **Wrong**: `get_balances({ query: "group:'Assets'" })` - Using subgroup instead of root group  
+✅ **Right**: `get_balances({ query: "group:'[ROOT_GROUP_WITH_ASSETS]' on:$m" })`
+
+❌ **Wrong**: Query without any filtering  
+✅ **Right**: Always include `group:` or `account:` operator for focused analysis
 
 ❌ **Wrong**: Using `list_transactions` for balance calculations  
 ✅ **Right**: Use `get_balances` for all balance analysis
