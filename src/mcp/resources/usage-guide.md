@@ -26,10 +26,10 @@ Bkper supports four fundamental account types based on accounting principles:
 
 | Type | Description | Examples | Normal Balance | Nature |
 |------|-------------|----------|----------------|--------|
-| **ASSET** | Resources owned by the entity | Cash, Inventory, Equipment | Debit | Permanent |
+| **ASSET** | Resources owned by the entity | Cash, Accounts Receivable | Debit | Permanent |
 | **LIABILITY** | Obligations owed to others | Accounts Payable, Loans | Credit | Permanent |
 | **INCOMING** | Revenue and gains | Sales, Interest Income | Credit | Non-permanent |
-| **OUTGOING** | Expenses and losses | Rent, Utilities, Salaries | Debit | Non-permanent |
+| **OUTGOING** | Expenses and losses | Rent, Utilities, Salaries to pay | Debit | Non-permanent |
 
 
 ### Account Groups and Hierarchies
@@ -115,73 +115,45 @@ Net Income
 When performing financial analysis, the **most important decision** is choosing the correct root group based on the type of analysis:
 
 #### Balance Sheet Analysis (Point-in-Time)
-For balance sheet analysis, **ALWAYS use permanent account root groups**:
-- **Equity** - The root group containing both Assets and Liabilities
-- **Assets** - For analyzing what the company owns (sub-group of Equity)
-- **Liabilities** - For analyzing what the company owes (sub-group of Equity)
+For balance sheet analysis, **ALWAYS use the Equity root group**:
+- **Equity** - The root group that provides complete balance sheet data including all Assets and Liabilities
 
 These accounts are **permanent** because their balances carry forward from period to period. Always use `on:` date filters for point-in-time analysis.
 
 **Example Balance Sheet Analysis:**
 ```javascript
-// Complete balance sheet (unified under Equity)
+// Complete balance sheet - query the root group to get all data
 get_balances({ 
   bookId: "book-123", 
   query: "group:'Equity' on:$m" 
 })
-
-// Assets at month end (sub-group of Equity)
-get_balances({ 
-  bookId: "book-123", 
-  query: "group:'Assets' on:$m" 
-})
-
-// Liabilities at year end (sub-group of Equity)
-get_balances({ 
-  bookId: "book-123", 
-  query: "group:'Liabilities' on:2024-12-31" 
-})
 ```
 
 #### Income Statement / P&L Analysis (Period-Based)
-For P&L analysis, **ALWAYS use non-permanent account root groups**:
-- **Net Income** - The root group containing both Revenue and Expenses
-- **Revenue** / **Incoming** - For analyzing income and gains (sub-group of Net Income)
-- **Expenses** / **Outgoing** - For analyzing costs and losses (sub-group of Net Income)
+For P&L analysis, **ALWAYS use the Net Income root group**:
+- **Net Income** - The root group that provides complete P&L data including all Revenue and Expenses
 
 These accounts are **non-permanent** because they reset each period. Always use `after:` and `before:` date ranges for period analysis.
 
 **Example P&L Analysis:**
 ```javascript
-// Complete P&L (unified under Net Income)
+// Complete P&L - query the root group to get all data
 get_balances({ 
   bookId: "book-123", 
   query: "group:'Net Income' after:$m-1 before:$m" 
-})
-
-// Monthly revenue (sub-group of Net Income)
-get_balances({ 
-  bookId: "book-123", 
-  query: "group:'Revenue' after:$m-1 before:$m" 
-})
-
-// Annual expenses (sub-group of Net Income)
-get_balances({ 
-  bookId: "book-123", 
-  query: "group:'Expenses' after:2024-01-01 before:2024-12-31" 
 })
 ```
 
 ### Root Group Selection Rules
 
-1. **Never mix permanent and non-permanent accounts** in the same analysis
-2. **Always start with root groups**, not individual accounts
+1. **Always query root groups only** - Root groups provide complete hierarchical data
+2. **Never mix permanent and non-permanent accounts** in the same analysis
 3. **Use the correct date filters**:
-   - Permanent accounts: `on:` for point-in-time
-   - Non-permanent accounts: `after:` and `before:` for periods
-4. **Common root groups to use**:
-   - Balance Sheet: Equity (root), Assets, Liabilities, Current Assets, Fixed Assets, Current Liabilities, Long-term Liabilities
-   - P&L: Net Income (root), Revenue, Expenses, Operating Expenses, Administrative Expenses, Cost of Goods Sold
+   - Permanent accounts (Equity): `on:` for point-in-time
+   - Non-permanent accounts (Net Income): `after:` and `before:` for periods
+4. **Two root groups for all analysis**:
+   - Balance Sheet: **Equity** (contains all Assets and Liabilities)
+   - P&L: **Net Income** (contains all Revenue and Expenses)
 
 ## Basic Workflows
 
@@ -206,34 +178,22 @@ get_groups({ bookId: "book-123" })
 
 
 #### Balance Sheet Analysis (Permanent Accounts)
-Use `get_balances` with a specific date:
+Use `get_balances` with the Equity root group:
 ```javascript
-// Assets at month end
+// Complete balance sheet
 get_balances({ 
   bookId: "book-123", 
-  query: "group:'Assets' on:$m" 
-})
-
-// Liabilities at year end
-get_balances({ 
-  bookId: "book-123", 
-  query: "group:'Liabilities' on:2024-12-31" 
+  query: "group:'Equity' on:$m" 
 })
 ```
 
 #### P&L Analysis (Non-Permanent Accounts)
-Use `get_balances` with date ranges:
+Use `get_balances` with the Net Income root group:
 ```javascript
-// Monthly revenue
+// Complete P&L statement
 get_balances({ 
   bookId: "book-123", 
-  query: "group:'Revenue' after:$m-1 before:$m" 
-})
-
-// Annual expenses
-get_balances({ 
-  bookId: "book-123", 
-  query: "group:'Expenses' after:2024-01-01 before:2024-12-31" 
+  query: "group:'Net Income' after:$m-1 before:$m" 
 })
 ```
 
@@ -267,70 +227,49 @@ get_balances({ query: "group:'Equity' on:$m" })
 get_balances({ query: "group:'Net Income' after:$m-1 before:$m" })
 ```
 
-### Cash Flow Analysis
-```javascript
-// Current cash position
-get_balances({ query: "account:'Cash' on:$d" })
-
-// Recent cash transactions
-list_transactions({ query: "account:'Cash' AND after:$d-30" })
-```
-
-### Account Reconciliation
-```javascript
-// Account balance verification
-get_balances({ query: "account:'Checking Account' on:$d" })
-
-// Recent account transactions
-list_transactions({ query: "account:'Checking Account' AND after:$d-7" })
-```
 
 ## Best Practices
 
 ### Performance Optimization
 
-1. **Use Groups for Efficiency**
+1. **Always Use Root Groups**
    ```javascript
-   // Preferred: Group-based analysis
-   get_balances({ query: "group:'Current Assets'" })
+   // Preferred: Root group analysis (gets complete hierarchical data)
+   get_balances({ query: "group:'Equity' on:$m" })
+   get_balances({ query: "group:'Net Income' after:$m-1 before:$m" })
    
-   // Less efficient: Individual account queries
+   // Avoid: Individual account queries
    get_balances({ query: "account:'Cash'" })
-   get_balances({ query: "account:'Checking'" })
+   get_balances({ query: "account:'Sales'" })
    ```
 
-2. **Specify Date Ranges**
-   - Use specific dates to narrow results
+2. **Use Correct Date Filters**
+   - Equity (permanent): `on:` for point-in-time
+   - Net Income (non-permanent): `after:` and `before:` for periods
    - Leverage date variables: `$d` (today), `$m` (month), `$y` (year)
-
-3. **Filter Strategically**
-   - Start with broader queries, then narrow down
-   - Combine filters for precision: date + account + amount
 
 ### Query Strategy
 
-#### Start Broad, Then Narrow
+#### Root Group Focus
 1. **Explore first**: Use `list_books` and `get_book` to understand available data
 2. **Understand structure**: Use `list_accounts` and `get_groups` to understand organization
-3. **Analyze efficiently**: Use focused queries with `get_balances` and `list_transactions`
-4. **Prefer group queries over account queries**
+3. **Analyze with root groups**: Use `get_balances` with Equity or Net Income root groups
+4. **Always query root groups** - they provide complete hierarchical data
 
 ### Important Rules
 
-1. **MANDATORY FILTERING**: Never perform balance analysis without account: or group: filters
+1. **MANDATORY ROOT GROUP FILTERING**: Always use group: filters with root groups only
 2. **Never use `list_transactions` for balance calculations** - Transactions are for inspection only
-3. **Always use monthly granularity** for date queries when possible
-4. **Strongly prefer root groups** over individual accounts for analysis:
-   - Use `group:'Assets'` instead of `account:'Cash'`
-   - Use `group:'Revenue'` instead of `account:'Sales'`
-   - Use `group:'Expenses'` instead of `account:'Office Supplies'`
-5. **Critical root group selection**:
-   - **Balance Sheet**: Use permanent root groups (Equity, Assets, Liabilities) with `on:` dates
-   - **P&L Statement**: Use non-permanent root groups (Net Income, Revenue/Incoming, Expenses/Outgoing) with `after:` and `before:` date ranges
+3. **Always use root groups** - Never query individual accounts or subgroups:
+   - Use `group:'Equity'` for complete balance sheet data
+   - Use `group:'Net Income'` for complete P&L data
+4. **Critical root group selection**:
+   - **Balance Sheet**: Use `group:'Equity'` with `on:` dates
+   - **P&L Statement**: Use `group:'Net Income'` with `after:` and `before:` date ranges
    - **Never mix permanent and non-permanent accounts in the same analysis**
-6. **Root group examples**: Equity (root), Net Income (root), Assets, Liabilities, Revenue, Expenses, Current Assets, Fixed Assets, Operating Expenses
-7. **Date variables**: Use `$m` for current month, `$y` for current year, `$d` for today
-8. **Case sensitivity**: Account names must match exactly
+5. **Only two root groups needed**: Equity and Net Income
+6. **Date variables**: Use `$m` for current month, `$y` for current year, `$d` for today
+7. **Case sensitivity**: Group names must match exactly
 
 ## Resource References
 
@@ -347,10 +286,10 @@ For detailed information on specific topics:
 
 ### Root Group Selection Guide
 
-| Analysis Type | Root Groups | Date Filter | Example |
-|--------------|-------------|-------------|---------|
-| **Balance Sheet** | Equity, Assets, Liabilities | `on:` | `group:'Equity' on:$m` |
-| **P&L Statement** | Net Income, Revenue, Expenses | `after:` `before:` | `group:'Net Income' after:$m-1 before:$m` |
+| Analysis Type | Root Group | Date Filter | Example |
+|--------------|------------|-------------|---------|
+| **Balance Sheet** | Equity | `on:` | `group:'Equity' on:$m` |
+| **P&L Statement** | Net Income | `after:` `before:` | `group:'Net Income' after:$m-1 before:$m` |
 
 ### Essential Commands
 ```javascript
@@ -374,8 +313,8 @@ list_transactions({ bookId, query, limit })    // Transaction details
 
 ### Query Examples
 ```
-account:'Cash'                    // Specific account
-group:'Assets'                    // Account group
+group:'Equity'                    // Balance sheet root group
+group:'Net Income'                // P&L root group
 on:2024-01-31                    // Point in time
 after:2024-01-01 before:2024-02-01  // Date range
 amount>1000                      // Amount filter (transactions only)
