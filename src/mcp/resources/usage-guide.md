@@ -1,18 +1,10 @@
 # Bkper MCP Usage Guide
 
-## Quick Start
-
-The Bkper MCP server provides LLM clients with direct access to financial data through specialized tools.
-
-### Root Group Discovery Rule
-**Always discover and use root groups dynamically based on account group types:**
-- **For Balance Sheet**: Find the root group containing ASSET and LIABILITY account types
-- **For P&L**: Find the root group containing INCOMING and OUTGOING account types
-
-
-### Date Filters Rule
-- **Permanent account groups** (ASSET, LIABILITY): Use `on:` for point-in-time
-- **Non-permanent account groups** (INCOMING, OUTGOING): Use `after:` and `before:` for periods
+## Quick Decision Guide
+- Need balance data? → Use `get_balances`
+- Need transaction details? → Use `list_transactions` 
+- Analyzing Assets/Liabilities? → Use `on:` dates
+- Analyzing Revenue/Expenses? → Use `after:` and `before:` dates
 
 ## Essential Tools
 
@@ -20,11 +12,18 @@ The Bkper MCP server provides LLM clients with direct access to financial data t
 - `list_books()` - Find available books
 - `get_book({ bookId })` - Book details, structure, and group hierarchies
 
-### Root Group Discovery Walkthrough
+### Analysis
+- `get_balances({ bookId, query })` - **THE** tool for all balance analysis
+- `list_transactions({ bookId, query })` - Transaction inspection only (never for balance calculations)
+
+## Core Rules
+
+### 1. Root Group Discovery
+**Always discover and use root groups dynamically based on account group types:**
 1. Call `get_book({ bookId })` to see the hierarchy
 2. Look for the top-level group that contains:
-   - For Balance Sheet: Both ASSET and LIABILITY account types
-   - For P&L: Both INCOMING and OUTGOING account types
+   - **For Balance Sheet**: Both ASSET and LIABILITY account types
+   - **For P&L**: Both INCOMING and OUTGOING account types
 3. Use that group name (not its children) in your queries
 
 **Example**: If you see this structure:
@@ -35,99 +34,36 @@ The Bkper MCP server provides LLM clients with direct access to financial data t
 ```
 Then use `group:'Total Equity'` - NOT `group:'Assets'` or `group:'Liabilities'`
 
+### 2. Date Filter Matching
+- **Permanent accounts** (ASSET, LIABILITY): Use `on:` dates for point-in-time
+- **Non-permanent accounts** (INCOMING, OUTGOING): Use `after:` and `before:` for periods
 
-### Analysis
-- `get_balances({ bookId, query })` - **THE** tool for all balance analysis
-- `list_transactions({ bookId, query })` - Transaction inspection only (never for balance calculations)
-
-## Quick Decision Guide
-- Need balance data? → Use `get_balances`
-- Need transaction details? → Use `list_transactions` 
-- Analyzing Assets/Liabilities? → Use `on:` dates
-- Analyzing Revenue/Expenses? → Use `after:` and `before:` dates
-
-## Core Rules
-
-### 1. Root Groups Only
-- **Never query subgroups** (Assets, Liabilities, Revenue, Expenses)
-- **Never query individual accounts** (Cash, Sales, etc.)
-- **Always discover and use root groups** that contain the account types you need
-
-### 2. Correct Tool Selection
+### 3. Correct Tool Selection
 - **Balance analysis**: Always use `get_balances`
 - **Transaction inspection**: Use `list_transactions` (never for calculations)
 
-### 3. Date Filter Matching
-- **Permanent accounts** (ASSET, LIABILITY): Use `on:` dates
-- **Non-permanent accounts** (INCOMING, OUTGOING): Use `after:` and `before:` date ranges
-
-### 4. Mandatory Filtering
-- Never perform analysis without group filters
-- Always include date filters
-
-## Discovering Root Groups
-
-### Step 1: Explore Account Structure
-```javascript
-// First, understand the book structure and group hierarchies
-const bookData = await get_book({ bookId: "book-123" });
-// bookData now includes: { book: {...}, groups: [...], totalGroups: N }
-```
-
-### Step 2: Identify Root Groups by Account Types
-- **For Balance Sheet**: Look for the root group that contains groups with `type: "ASSET"` and `type: "LIABILITY"`
-- **For P&L**: Look for the root group that contains groups with `type: "INCOMING"` and `type: "OUTGOING"`
-
-### Step 3: Use the Discovered Root Group
-```javascript
-// Example: If you discovered "Total Equity" contains ASSET and LIABILITY
-get_balances({ 
-  bookId: "book-123", 
-  query: "group:'Total Equity' on:$m" 
-});
-
-// Example: If you discovered "Net Result" contains INCOMING and OUTGOING  
-get_balances({ 
-  bookId: "book-123", 
-  query: "group:'Net Result' after:$m-1 before:$m" 
-});
-```
+### 4. Query Requirements
+- Never query subgroups (Assets, Liabilities, Revenue, Expenses)
+- Never query individual accounts (Cash, Sales, etc.)
+- Always include group filters and date filters
 
 ## Examples
 
 ### Balance Sheet Analysis
 ```javascript
 // After discovering root group for ASSET + LIABILITY accounts
-// (example: discovered root group is "Total Equity")
-
-// Monthly balance sheet
 get_balances({ 
   bookId: "book-123", 
   query: "group:'Total Equity' on:$m" 
-})
-
-// Year-end balance sheet
-get_balances({ 
-  bookId: "book-123", 
-  query: "group:'Total Equity' on:2024-12-31" 
 })
 ```
 
 ### P&L Analysis
 ```javascript
 // After discovering root group for INCOMING + OUTGOING accounts
-// (example: discovered root group is "Profit & Loss")
-
-// Monthly P&L
 get_balances({ 
   bookId: "book-123", 
   query: "group:'Profit & Loss' after:$m-1 before:$m" 
-})
-
-// Annual P&L
-get_balances({ 
-  bookId: "book-123", 
-  query: "group:'Profit & Loss' after:2024-01-01 before:2024-12-31" 
 })
 ```
 
@@ -237,10 +173,3 @@ amount>1000                                          // Amount filter (transacti
 
 ❌ **Wrong**: Assuming fixed root group names  
 ✅ **Right**: Always discover root groups using `get_book()` then navigate its `groups` property
-
-
-
-## Troubleshooting
-- **Empty results**: Check if you're using the correct root group name
-- **Wrong totals**: Ensure you're using the right date filter type (on: vs after:/before:)
-- **Missing data**: Verify the date range includes the period you expect
