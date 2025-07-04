@@ -155,8 +155,7 @@ describe('MCP Server - get_book Tool Calls', function() {
     // Parse the JSON response
     const jsonResponse = JSON.parse(response.content[0].text as string);
     expect(jsonResponse).to.have.property('book');
-    expect(jsonResponse).to.have.property('groups');
-    expect(jsonResponse).to.have.property('totalGroups');
+    expect(jsonResponse).to.have.property('readme');
     
     const book = jsonResponse.book;
     expect(book).to.have.property('id', 'book-1');
@@ -168,11 +167,9 @@ describe('MCP Server - get_book Tool Calls', function() {
     expect(book).to.have.property('permission');
     expect(book).to.have.property('visibility');
     
-    // Verify groups structure
-    const groups = jsonResponse.groups;
+    // Verify groups structure (now inside book object)
+    const groups = book.groups;
     expect(groups).to.be.an('array');
-    expect(jsonResponse.totalGroups).to.be.a('number');
-    expect(jsonResponse.totalGroups).to.equal(14); // Total groups in book-1
     
     // Verify hierarchical structure exists
     expect(groups.length).to.be.greaterThan(0);
@@ -233,22 +230,20 @@ describe('MCP Server - get_book Tool Calls', function() {
     expect(book1.timeZone).to.equal('America/New_York');
     expect(book2.timeZone).to.equal('America/Los_Angeles');
     
-    // Verify both books have groups
-    expect(jsonResponse1.groups).to.be.an('array');
-    expect(jsonResponse2.groups).to.be.an('array');
-    expect(jsonResponse1.totalGroups).to.equal(14);
-    expect(jsonResponse2.totalGroups).to.equal(10);
+    // Verify both books have groups (now inside book objects)
+    expect(book1.groups).to.be.an('array');
+    expect(book2.groups).to.be.an('array');
     
     // Verify book 1 has business-focused groups
-    const book1Assets = jsonResponse1.groups.find((g: any) => g.name === 'Assets');
-    expect(book1Assets).to.exist;
+    const book1Assets = book1.groups.find((g: any) => g.name === 'Assets');
+    expect(book1Assets, 'Assets group should exist in book1').to.exist;
     const book1Equipment = book1Assets.children.find((c: any) => c.name === 'Fixed Assets')
       ?.children.find((c: any) => c.name === 'Equipment');
     expect(book1Equipment).to.exist;
     expect(book1Equipment.properties).to.deep.equal({ depreciation: 'straight-line' });
     
     // Verify book 2 has personal finance groups
-    const book2Assets = jsonResponse2.groups.find((g: any) => g.name === 'Assets');
+    const book2Assets = book2.groups.find((g: any) => g.name === 'Assets');
     expect(book2Assets).to.exist;
     const book2Checking = book2Assets.children.find((c: any) => c.name === 'Checking Accounts');
     expect(book2Checking).to.exist;
@@ -258,16 +253,16 @@ describe('MCP Server - get_book Tool Calls', function() {
   it('should return groups with complete hierarchical structure', async function() {
     const response = await server.testCallTool('get_book', { bookId: 'book-1' });
     const jsonResponse = JSON.parse(response.content[0].text as string);
+    const book = jsonResponse.book;
     
-    // Verify top-level structure
-    expect(jsonResponse.groups).to.be.an('array');
-    expect(jsonResponse.totalGroups).to.equal(14);
+    // Verify top-level structure (groups now inside book)
+    expect(book.groups).to.be.an('array');
     
-    // Should have 4 root groups (Assets, Liabilities, Equity, Revenue, Expenses)
-    expect(jsonResponse.groups).to.have.length(5);
+    // Should have 5 root groups (Assets, Liabilities, Equity, Revenue, Expenses)
+    expect(book.groups).to.have.length(5);
     
     // Verify each group has required properties
-    jsonResponse.groups.forEach((group: any) => {
+    book.groups.forEach((group: any) => {
       expect(group).to.have.all.keys('id', 'name', 'type', 'hidden', 'permanent', 'properties', 'children');
       expect(group.id).to.be.a('string');
       expect(group.name).to.be.a('string');
@@ -279,12 +274,17 @@ describe('MCP Server - get_book Tool Calls', function() {
     });
     
     // Verify nested groups also have correct structure
-    const assetsGroup = jsonResponse.groups.find((g: any) => g.name === 'Assets');
-    expect(assetsGroup.children).to.have.length(2); // Current Assets and Fixed Assets
+    const assetsGroup = book.groups.find((g: any) => g.name === 'Assets');
+    expect(assetsGroup, 'Assets group should exist').to.exist;
+    if (assetsGroup) {
+      expect(assetsGroup.children).to.have.length(2); // Current Assets and Fixed Assets
+    }
     
-    assetsGroup.children.forEach((child: any) => {
-      expect(child).to.have.all.keys('id', 'name', 'type', 'hidden', 'permanent', 'properties', 'children');
-    });
+    if (assetsGroup) {
+      assetsGroup.children.forEach((child: any) => {
+        expect(child).to.have.all.keys('id', 'name', 'type', 'hidden', 'permanent', 'properties', 'children');
+      });
+    }
   });
 
   it('should return empty groups array when book has no groups', async function() {
@@ -300,9 +300,9 @@ describe('MCP Server - get_book Tool Calls', function() {
     
     const response = await server.testCallTool('get_book', { bookId: 'book-1' });
     const jsonResponse = JSON.parse(response.content[0].text as string);
+    const book = jsonResponse.book;
     
-    expect(jsonResponse.groups).to.be.an('array');
-    expect(jsonResponse.groups).to.have.length(0);
-    expect(jsonResponse.totalGroups).to.equal(0);
+    expect(book.groups).to.be.an('array');
+    expect(book.groups).to.have.length(0);
   });
 });

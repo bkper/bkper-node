@@ -94,9 +94,7 @@ export async function handleListTransactions(params: ListTransactionsParams): Pr
 
 export const listTransactionsToolDefinition = {
   name: 'list_transactions',
-  description: `List transactions with cursor-based pagination and comprehensive query support. 
-  Supports account, date, amount filtering, text search, and logical operators. 
-  For complete query syntax documentation, see the transactions-query resource.`,
+  description: 'List transactions with cursor-based pagination and query filtering. Use get_book first to understand query syntax and usage rules.',
   inputSchema: {
     type: 'object',
     properties: {

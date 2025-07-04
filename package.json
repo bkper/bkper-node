@@ -30,7 +30,7 @@
     "build": "run-s build:*",
     "build:clean": "gts clean && rimraf temp",
     "build:compile": "tsc",
-    "build:copy-resources": "mkdir -p lib/mcp/resources && cp -f src/mcp/resources/*.md lib/mcp/resources/ 2>/dev/null || true",
+    "build:copy-docs": "mkdir -p lib/docs && cp -f docs/*.md lib/docs/ 2>/dev/null || true",
     "predev": "bun run build",
     "dev": "bun run build && npx concurrently \"tsc -w\" \"./scripts/dev-mcp.sh\"",
     "mcp": "bun run build && node lib/cli.js mcp start",

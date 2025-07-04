@@ -37,7 +37,7 @@ describe('MCP Server - list_transactions Tool Registration', function() {
     expect(listTransactionsTool).to.exist;
     expect(listTransactionsTool!.name).to.equal('list_transactions');
     expect(listTransactionsTool!.description).to.include('cursor-based pagination');
-    expect(listTransactionsTool!.description).to.include('query support');
+    expect(listTransactionsTool!.description).to.include('query filtering');
     expect(listTransactionsTool!.inputSchema).to.have.property('properties');
     expect(listTransactionsTool!.inputSchema.properties).to.have.property('bookId');
     expect(listTransactionsTool!.inputSchema.properties).to.have.property('query');

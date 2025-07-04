@@ -1,6 +1,9 @@
 import { CallToolResult, ErrorCode, McpError } from '@modelcontextprotocol/sdk/types.js';
 import { getBkperInstance } from '../bkper-factory.js';
 import { Group } from 'bkper-js';
+import { readFileSync } from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
 
 interface GetBookParams {
   bookId: string;
@@ -55,6 +58,31 @@ function buildHierarchicalStructure(groups: Group[]): GroupNode[] {
   return rootGroups;
 }
 
+function loadCombinedDocumentation(): string {
+  try {
+    // Get the directory where this compiled file is located (/lib/mcp/tools/)
+    // and navigate to the docs directory (/lib/docs/)
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = dirname(__filename);
+    const docsPath = join(__dirname, '..', '..', 'docs');
+    
+    const usageGuide = readFileSync(join(docsPath, 'usage-guide.md'), 'utf-8');
+    const transactionsQuery = readFileSync(join(docsPath, 'transactions-query.md'), 'utf-8');
+    
+    return [
+      '# Bkper MCP Complete Usage Guide',
+      '',
+      usageGuide,
+      '',
+      '---',
+      '',
+      transactionsQuery
+    ].join('\n');
+  } catch (error) {
+    return `# Bkper MCP Usage Guide\n\nDocumentation not available.\nError: ${error instanceof Error ? error.message : String(error)}\nDocs path attempted: ${join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'docs')}`;
+  }
+}
+
 export async function handleGetBook(params: GetBookParams): Promise<CallToolResult> {
   try {
     // Validate required parameters
@@ -86,12 +114,13 @@ export async function handleGetBook(params: GetBookParams): Promise<CallToolResu
     
     // Build hierarchical structure
     const hierarchicalGroups = buildHierarchicalStructure(groups || []);
+
+    bookJson.groups = hierarchicalGroups as any;
     
     // Build response with book data and groups
     const response = {
       book: bookJson,
-      groups: hierarchicalGroups,
-      totalGroups: groups?.length || 0
+      readme: loadCombinedDocumentation()
     };
 
     return {
@@ -126,7 +155,7 @@ export async function handleGetBook(params: GetBookParams): Promise<CallToolResu
 
 export const getBookToolDefinition = {
   name: 'get_book',
-  description: 'Retrieve detailed information about a specific book including its group hierarchy',
+  description: 'Retrieve detailed information about a specific book including its group hierarchy and complete usage documentation',
   inputSchema: {
     type: 'object',
     properties: {

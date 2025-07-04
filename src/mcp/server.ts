@@ -11,15 +11,12 @@ import {
   ErrorCode,
   ListToolsRequestSchema,
   ListToolsResult,
-  ListResourcesRequestSchema,
-  ReadResourceRequestSchema,
   McpError,
 } from '@modelcontextprotocol/sdk/types.js';
 import { handleGetBook, getBookToolDefinition } from './tools/get_book.js';
 import { handleGetBalances, getBalancesToolDefinition } from './tools/get_balances.js';
 import { handleListTransactions, listTransactionsToolDefinition } from './tools/list_transactions.js';
 import { handleListBooks, listBooksToolDefinition } from './tools/list_books.js';
-import { handleListResources, handleReadResource } from './resources/index.js';
 
 
 class BkperMcpServer {
@@ -33,14 +30,12 @@ class BkperMcpServer {
       },
       {
         capabilities: {
-          tools: {},
-          resources: {}
+          tools: {}
         }
       }
     );
 
     this.setupToolHandlers();
-    this.setupResourceHandlers();
     this.setupErrorHandling();
   }
 
@@ -75,15 +70,6 @@ class BkperMcpServer {
     });
   }
 
-  private setupResourceHandlers() {
-    this.server.setRequestHandler(ListResourcesRequestSchema, async () => {
-      return await handleListResources();
-    });
-
-    this.server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
-      return await handleReadResource(request.params.uri);
-    });
-  }
 
   private setupErrorHandling() {
     this.server.onerror = (error) => {
@@ -131,33 +117,6 @@ class BkperMcpServer {
     return await handler(request);
   }
 
-  async testListResources(): Promise<any> {
-    // Call the list resources handler directly for testing
-    const requestHandlers = (this.server as any)._requestHandlers;
-    const handler = requestHandlers.get('resources/list');
-    if (!handler) throw new Error('ListResources handler not found');
-    
-    // Create proper MCP request format
-    const request = {
-      method: 'resources/list' as const,
-      params: {}
-    };
-    return await handler(request);
-  }
-
-  async testReadResource(uri: string): Promise<any> {
-    // Call the read resource handler directly for testing
-    const requestHandlers = (this.server as any)._requestHandlers;
-    const handler = requestHandlers.get('resources/read');
-    if (!handler) throw new Error('ReadResource handler not found');
-    
-    // Create proper MCP request format
-    const request = {
-      method: 'resources/read' as const,
-      params: { uri }
-    };
-    return await handler(request);
-  }
 }
 
 // Export the class for testing

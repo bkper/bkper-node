@@ -67,8 +67,7 @@ describe('Integration: get_book Tool', function() {
       
       // Validate response structure
       expect(response).to.have.property('book').that.is.an('object');
-      expect(response).to.have.property('groups').that.is.an('array');
-      expect(response).to.have.property('totalGroups').that.is.a('number');
+      expect(response).to.have.property('readme').that.is.a('string');
       
       // Validate book properties
       const book = response.book;
