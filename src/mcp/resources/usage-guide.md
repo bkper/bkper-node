@@ -9,6 +9,7 @@ The Bkper MCP server provides LLM clients with direct access to financial data t
 - **For Balance Sheet**: Find the root group containing ASSET and LIABILITY account types
 - **For P&L**: Find the root group containing INCOMING and OUTGOING account types
 
+
 ### Date Filters Rule
 - **Permanent account groups** (ASSET, LIABILITY): Use `on:` for point-in-time
 - **Non-permanent account groups** (INCOMING, OUTGOING): Use `after:` and `before:` for periods
@@ -18,6 +19,22 @@ The Bkper MCP server provides LLM clients with direct access to financial data t
 ### Discovery
 - `list_books()` - Find available books
 - `get_book({ bookId })` - Book details, structure, and group hierarchies
+
+### Root Group Discovery Walkthrough
+1. Call `get_book({ bookId })` to see the hierarchy
+2. Look for the top-level group that contains:
+   - For Balance Sheet: Both ASSET and LIABILITY account types
+   - For P&L: Both INCOMING and OUTGOING account types
+3. Use that group name (not its children) in your queries
+
+**Example**: If you see this structure:
+```
+"Total Equity" (root)
+├── "Assets" (type: ASSET)
+├── "Liabilities" (type: LIABILITY)
+```
+Then use `group:'Total Equity'` - NOT `group:'Assets'` or `group:'Liabilities'`
+
 
 ### Analysis
 - `get_balances({ bookId, query })` - **THE** tool for all balance analysis
@@ -154,15 +171,27 @@ list_transactions({
 | **OUTGOING** | Non-permanent | Rent, Utilities |
 
 ### Example Group Hierarchies
+
+**Example 1: Permanent Accounts (Balance Sheet Analysis)**
 ```
-Root Group Example 1            Root Group Example 2
-"Total Equity"                  "Profit & Loss"
-├── Assets                      ├── Revenue
-│   ├── Current Assets          │   ├── Product Sales
-│   └── Fixed Assets            │   └── Service Revenue
-└── Liabilities                 └── Expenses
-    ├── Current Liabilities         ├── Operating Expenses
-    └── Long-term Liabilities       └── Administrative Expenses
+"Total Equity"
+├── Assets
+│   ├── Current Assets
+│   └── Fixed Assets
+└── Liabilities
+    ├── Current Liabilities
+    └── Long-term Liabilities
+```
+
+**Example 2: Non-Permanent Accounts (Profit & Loss Analysis)**
+```
+"Profit & Loss"
+├── Revenue
+│   ├── Product Sales
+│   └── Service Revenue
+└── Expenses
+    ├── Operating Expenses
+    └── Administrative Expenses
 ```
 
 **Note**: Root group names vary by book. Always discover the actual names using `get_book()` which includes group hierarchies.
@@ -207,4 +236,11 @@ amount>1000                                          // Amount filter (transacti
 ✅ **Right**: Use `after:` and `before:` with INCOMING/OUTGOING accounts
 
 ❌ **Wrong**: Assuming fixed root group names  
-✅ **Right**: Always discover root groups using `get_groups()`
+✅ **Right**: Always discover root groups using `get_book()` then navigate its `groups` property
+
+
+
+## Troubleshooting
+- **Empty results**: Check if you're using the correct root group name
+- **Wrong totals**: Ensure you're using the right date filter type (on: vs after:/before:)
+- **Missing data**: Verify the date range includes the period you expect
