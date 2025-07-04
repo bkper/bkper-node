@@ -241,22 +241,19 @@ class MCPTester {
       // Test 4: Test get_book
       await this.testTool('get_book', { bookId: testBookId }, 'Get specific book details');
       
-      // Test 5: Test list_accounts
-      await this.testTool('list_accounts', { bookId: testBookId }, 'List accounts with pagination');
-      
-      // Test 6: Test get_balances
+      // Test 5: Test get_balances
       await this.testTool('get_balances', { bookId: testBookId }, 'Get account balances');
       
-      // Test 7: Test get_balances with query
+      // Test 6: Test get_balances with query
       await this.testTool('get_balances', { 
         bookId: testBookId, 
         query: "account:'Cash'" 
       }, 'Get balances with query filter');
       
-      // Test 8: Test list_transactions
+      // Test 7: Test list_transactions
       await this.testTool('list_transactions', { bookId: testBookId }, 'List transactions');
       
-      // Test 9: Test list_transactions with query
+      // Test 8: Test list_transactions with query
       await this.testTool('list_transactions', { 
         bookId: testBookId,
         query: "account:'Cash' AND amount>1000",

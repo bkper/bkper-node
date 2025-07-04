@@ -5,20 +5,19 @@
 The Bkper MCP server provides LLM clients with direct access to financial data through specialized tools.
 
 ### Root Group Discovery Rule
-**Always discover and use root groups dynamically based on account types:**
+**Always discover and use root groups dynamically based on account group types:**
 - **For Balance Sheet**: Find the root group containing ASSET and LIABILITY account types
 - **For P&L**: Find the root group containing INCOMING and OUTGOING account types
 
 ### Date Filters Rule
-- **Permanent accounts** (ASSET, LIABILITY): Use `on:` for point-in-time
-- **Non-permanent accounts** (INCOMING, OUTGOING): Use `after:` and `before:` for periods
+- **Permanent account groups** (ASSET, LIABILITY): Use `on:` for point-in-time
+- **Non-permanent account groups** (INCOMING, OUTGOING): Use `after:` and `before:` for periods
 
 ## Essential Tools
 
 ### Discovery
 - `list_books()` - Find available books
 - `get_book({ bookId })` - Book details and structure
-- `list_accounts({ bookId })` - View all accounts
 - `get_groups({ bookId })` - View group hierarchies
 
 ### Analysis
@@ -188,8 +187,8 @@ amount>1000                                          // Amount filter (transacti
 
 ### Analysis Workflow
 1. **Discover**: `list_books()` → `get_book()`
-2. **Explore Structure**: `list_accounts()` → `get_groups()`
-3. **Identify Root Groups**: Find groups containing the account types you need
+2. **Explore Structure**: `get_groups()`
+3. **Identify Root Groups**: Find groups containing the group types you need
 4. **Analyze**: `get_balances()` with discovered root groups
 5. **Inspect**: `list_transactions()` for transaction details
 

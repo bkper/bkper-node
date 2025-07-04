@@ -16,7 +16,6 @@ import {
   McpError,
 } from '@modelcontextprotocol/sdk/types.js';
 import { handleGetBook, getBookToolDefinition } from './tools/get_book.js';
-import { handleListAccounts, listAccountsToolDefinition } from './tools/list_accounts.js';
 import { handleGetBalances, getBalancesToolDefinition } from './tools/get_balances.js';
 import { handleListTransactions, listTransactionsToolDefinition } from './tools/list_transactions.js';
 import { handleListBooks, listBooksToolDefinition } from './tools/list_books.js';
@@ -52,7 +51,6 @@ class BkperMcpServer {
         tools: [
           listBooksToolDefinition,
           getBookToolDefinition,
-          listAccountsToolDefinition,
           getBalancesToolDefinition,
           listTransactionsToolDefinition,
           getGroupsToolDefinition,
@@ -66,8 +64,6 @@ class BkperMcpServer {
           return await handleListBooks(request.params.arguments as any);
         case 'get_book':
           return await handleGetBook(request.params.arguments as any);
-        case 'list_accounts':
-          return await handleListAccounts(request.params.arguments as any);
         case 'get_balances':
           return await handleGetBalances(request.params.arguments as any);
         case 'list_transactions':

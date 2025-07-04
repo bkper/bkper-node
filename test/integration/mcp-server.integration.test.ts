@@ -32,7 +32,6 @@ describe('Integration: MCP Server', function() {
       const toolNames = response.tools.map((tool: any) => tool.name);
       expect(toolNames).to.include('list_books');
       expect(toolNames).to.include('get_book');
-      expect(toolNames).to.include('list_accounts');
       expect(toolNames).to.include('get_balances');
       expect(toolNames).to.include('list_transactions');
       

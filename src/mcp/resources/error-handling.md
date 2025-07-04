@@ -63,7 +63,7 @@ Solution: Use list_transactions for complex filtering
 ```
 Error: Account 'NonExistentAccount' not found
 Cause: Account name doesn't exist or is misspelled
-Solution: Use list_accounts to verify exact account names
+Solution: Use get_groups to verify exact account names
 ```
 
 #### Group Not Found
@@ -106,7 +106,7 @@ Solution: Use consistent queries across pagination
 
 3. **Check account structure**
    ```javascript
-   list_accounts({ bookId: "book-123" })  // Verify accounts exist
+   get_groups({ bookId: "book-123" })  // Verify accounts exist
    ```
 
 #### For Query Issues
@@ -135,9 +135,9 @@ Solution: Use consistent queries across pagination
 
 #### Account Name Validation
 ```javascript
-// Get exact account names
-const accounts = await list_accounts({ bookId: "book-123" })
-const accountNames = accounts.accounts.map(acc => acc.name)
+// Get exact account names from groups
+const groups = await get_groups({ bookId: "book-123" })
+const accountNames = groups.groups.flatMap(g => g.accounts?.map(acc => acc.name) || [])
 console.log("Available accounts:", accountNames)
 ```
 
@@ -237,8 +237,8 @@ if (!validBookIds.includes(bookId)) {
 #### Validate Account Names
 ```javascript
 // Good practice
-const accounts = await list_accounts({ bookId })
-const validNames = accounts.accounts.map(a => a.name)
+const groups = await get_groups({ bookId })
+const validNames = groups.groups.flatMap(g => g.accounts?.map(a => a.name) || [])
 if (!validNames.includes(accountName)) {
   throw new Error(`Account not found: ${accountName}`)
 }
@@ -351,7 +351,7 @@ async function monitoredQuery(queryFn, context) {
 1. **Simplify query** - Remove complex filters
 2. **Validate components** - Test each part separately
 3. **Check spelling** - Verify exact account/group names
-4. **Use discovery tools** - `list_accounts`, `get_groups` for validation
+4. **Use discovery tools** - `get_groups` for validation
 
 ### 3. Network Recovery
 1. **Retry with backoff** - Implement exponential backoff

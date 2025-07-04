@@ -8,7 +8,6 @@ Implement in **two distinct phases**:
 
 ### Core Tools Required
 - `get_book` (instead of get_book_details)
-- `list_accounts` 
 - `get_balances`
 - `list_books` (existing)
 - `list_transactions`
@@ -16,7 +15,7 @@ Implement in **two distinct phases**:
 ### Pagination Strategy
 Apply consistent pagination handling for tools that return large JSON responses:
 
-**For `list_accounts` and `get_balances`:**
+**For `get_balances`:**
 - Implement same pagination strategy as `list_books`
 - Handle large JSON responses from single API fetch
 - Expose paginated interface to users
@@ -40,14 +39,12 @@ Apply consistent pagination handling for tools that return large JSON responses:
 ```
 tools/
 ├── get_book.js
-├── list_accounts.js
 ├── get_balances.js
 ├── list_transactions.js
 └── [other tools...]
 
 tests/
 ├── get_book.test.js
-├── list_accounts.test.js
 ├── get_balances.test.js
 ├── list_transactions.test.js
 └── [other tests...]
