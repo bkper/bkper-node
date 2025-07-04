@@ -67,6 +67,8 @@ describe('Integration: get_book Tool', function() {
       
       // Validate response structure
       expect(response).to.have.property('book').that.is.an('object');
+      expect(response).to.have.property('groups').that.is.an('array');
+      expect(response).to.have.property('totalGroups').that.is.a('number');
       
       // Validate book properties
       const book = response.book;
@@ -129,6 +131,41 @@ describe('Integration: get_book Tool', function() {
       // Validate timestamp format
       expect(book.lastUpdateMs).to.match(/^\d+$/);
       
+      // Validate groups structure
+      const groups = response.groups;
+      expect(groups).to.be.an('array');
+      expect(response.totalGroups).to.be.a('number');
+      expect(response.totalGroups).to.equal(groups.length > 0 ? response.totalGroups : 0);
+      
+      // If groups exist, validate structure
+      if (groups.length > 0) {
+        groups.forEach((group: any) => {
+          expect(group).to.have.property('id').that.is.a('string');
+          expect(group).to.have.property('name').that.is.a('string');
+          expect(group).to.have.property('type').that.is.a('string');
+          expect(group).to.have.property('hidden').that.is.a('boolean');
+          expect(group).to.have.property('permanent').that.is.a('boolean');
+          expect(group).to.have.property('properties').that.is.an('object');
+          expect(group).to.have.property('children').that.is.an('array');
+          
+          // Validate group type values
+          expect(group.type).to.be.oneOf(['INCOMING', 'OUTGOING']);
+          
+          // Recursively validate children structure
+          if (group.children.length > 0) {
+            group.children.forEach((child: any) => {
+              expect(child).to.have.property('id').that.is.a('string');
+              expect(child).to.have.property('name').that.is.a('string');
+              expect(child).to.have.property('type').that.is.a('string');
+              expect(child).to.have.property('hidden').that.is.a('boolean');
+              expect(child).to.have.property('permanent').that.is.a('boolean');
+              expect(child).to.have.property('properties').that.is.an('object');
+              expect(child).to.have.property('children').that.is.an('array');
+            });
+          }
+        });
+      }
+      
       // Log book details for debugging
       if (TestMode.DEBUG_API) {
         console.log(`Book details:`);
@@ -139,6 +176,7 @@ describe('Integration: get_book Tool', function() {
         console.log(`- Decimal places: ${book.fracDigits}`);
         console.log(`- Time zone: ${book.timeZone}`);
         console.log(`- Date format: ${book.dateFormat}`);
+        console.log(`- Groups: ${groups.length} root groups, ${response.totalGroups} total`);
       }
     }));
     
@@ -171,6 +209,12 @@ describe('Integration: get_book Tool', function() {
       expect(response1.book.timeZone).to.equal(response2.book.timeZone);
       expect(response1.book.dateFormat).to.equal(response2.book.dateFormat);
       
+      // Groups should be consistent
+      expect(response1.groups).to.be.an('array');
+      expect(response2.groups).to.be.an('array');
+      expect(response1.totalGroups).to.equal(response2.totalGroups);
+      expect(response1.groups.length).to.equal(response2.groups.length);
+      
       // Compare optional properties if they exist
       if (response1.book.description !== undefined && response2.book.description !== undefined) {
         expect(response1.book.description).to.equal(response2.book.description);
@@ -181,6 +225,53 @@ describe('Integration: get_book Tool', function() {
       const lastUpdate2 = parseInt(response2.book.lastUpdateMs);
       const timeDiff = Math.abs(lastUpdate1 - lastUpdate2);
       expect(timeDiff).to.be.lessThan(60000); // Within 1 minute
+    }));
+    
+    it('should return groups with hierarchical structure', integrationTest(async () => {
+      const result = await withRetry(() => 
+        context.server.testCallTool('get_book', {
+          bookId: TEST_BOOK_ID
+        })
+      );
+      
+      const response = parseToolResponse(result);
+      logApiResponse('get_book (groups validation)', response);
+      
+      // Validate groups structure
+      expect(response.groups).to.be.an('array');
+      expect(response.totalGroups).to.be.a('number');
+      
+      // Count actual groups vs reported total
+      let actualGroupCount = 0;
+      function countGroups(groups: any[]): number {
+        let count = groups.length;
+        groups.forEach(group => {
+          if (group.children && group.children.length > 0) {
+            count += countGroups(group.children);
+          }
+        });
+        return count;
+      }
+      
+      if (response.groups.length > 0) {
+        actualGroupCount = countGroups(response.groups);
+        expect(response.totalGroups).to.equal(actualGroupCount);
+        
+        // Verify root groups have no parent references (should be hierarchical)
+        response.groups.forEach((group: any) => {
+          expect(group).to.not.have.property('parent');
+        });
+        
+        // Log groups structure for debugging
+        if (TestMode.DEBUG_API) {
+          console.log(`Groups structure:`);
+          console.log(`- Root groups: ${response.groups.length}`);
+          console.log(`- Total groups: ${response.totalGroups}`);
+          response.groups.forEach((group: any, index: number) => {
+            console.log(`  ${index + 1}. ${group.name} (${group.type}) - ${group.children.length} children`);
+          });
+        }
+      }
     }));
   });
   

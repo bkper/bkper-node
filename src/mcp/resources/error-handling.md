@@ -63,14 +63,14 @@ Solution: Use list_transactions for complex filtering
 ```
 Error: Account 'NonExistentAccount' not found
 Cause: Account name doesn't exist or is misspelled
-Solution: Use get_groups to verify exact account names
+Solution: Use get_book to verify exact account names
 ```
 
 #### Group Not Found
 ```
 Error: Group 'NonExistentGroup' not found
 Cause: Group name doesn't exist or is misspelled
-Solution: Use get_groups to verify exact group names
+Solution: Use get_book to verify exact group names
 ```
 
 ### 5. Pagination Errors
@@ -106,7 +106,7 @@ Solution: Use consistent queries across pagination
 
 3. **Check account structure**
    ```javascript
-   get_groups({ bookId: "book-123" })  // Verify accounts exist
+   get_book({ bookId: "book-123" })  // Verify accounts and groups exist
    ```
 
 #### For Query Issues
@@ -135,17 +135,17 @@ Solution: Use consistent queries across pagination
 
 #### Account Name Validation
 ```javascript
-// Get exact account names from groups
-const groups = await get_groups({ bookId: "book-123" })
-const accountNames = groups.groups.flatMap(g => g.accounts?.map(acc => acc.name) || [])
+// Get exact account names from book data
+const bookData = await get_book({ bookId: "book-123" })
+const accountNames = bookData.groups.flatMap(g => g.accounts?.map(acc => acc.name) || [])
 console.log("Available accounts:", accountNames)
 ```
 
 #### Group Structure Validation
 ```javascript
 // Get group hierarchy
-const groups = await get_groups({ bookId: "book-123" })
-console.log("Available groups:", groups.groups)
+const bookData = await get_book({ bookId: "book-123" })
+console.log("Available groups:", bookData.groups)
 ```
 
 #### Date Format Validation
@@ -237,8 +237,8 @@ if (!validBookIds.includes(bookId)) {
 #### Validate Account Names
 ```javascript
 // Good practice
-const groups = await get_groups({ bookId })
-const validNames = groups.groups.flatMap(g => g.accounts?.map(a => a.name) || [])
+const bookData = await get_book({ bookId })
+const validNames = bookData.groups.flatMap(g => g.accounts?.map(a => a.name) || [])
 if (!validNames.includes(accountName)) {
   throw new Error(`Account not found: ${accountName}`)
 }
@@ -351,7 +351,7 @@ async function monitoredQuery(queryFn, context) {
 1. **Simplify query** - Remove complex filters
 2. **Validate components** - Test each part separately
 3. **Check spelling** - Verify exact account/group names
-4. **Use discovery tools** - `get_groups` for validation
+4. **Use discovery tools** - `get_book` for validation
 
 ### 3. Network Recovery
 1. **Retry with backoff** - Implement exponential backoff

@@ -17,8 +17,7 @@ The Bkper MCP server provides LLM clients with direct access to financial data t
 
 ### Discovery
 - `list_books()` - Find available books
-- `get_book({ bookId })` - Book details and structure
-- `get_groups({ bookId })` - View group hierarchies
+- `get_book({ bookId })` - Book details, structure, and group hierarchies
 
 ### Analysis
 - `get_balances({ bookId, query })` - **THE** tool for all balance analysis
@@ -53,9 +52,9 @@ The Bkper MCP server provides LLM clients with direct access to financial data t
 
 ### Step 1: Explore Account Structure
 ```javascript
-// First, understand the book structure
-const book = await get_book({ bookId: "book-123" });
-const groups = await get_groups({ bookId: "book-123" });
+// First, understand the book structure and group hierarchies
+const bookData = await get_book({ bookId: "book-123" });
+// bookData now includes: { book: {...}, groups: [...], totalGroups: N }
 ```
 
 ### Step 2: Identify Root Groups by Account Types
@@ -166,7 +165,7 @@ Root Group Example 1            Root Group Example 2
     └── Long-term Liabilities       └── Administrative Expenses
 ```
 
-**Note**: Root group names vary by book. Always discover the actual names using `get_groups()`.
+**Note**: Root group names vary by book. Always discover the actual names using `get_book()` which includes group hierarchies.
 
 ## Quick Reference
 
@@ -186,11 +185,10 @@ amount>1000                                          // Amount filter (transacti
 ```
 
 ### Analysis Workflow
-1. **Discover**: `list_books()` → `get_book()`
-2. **Explore Structure**: `get_groups()`
-3. **Identify Root Groups**: Find groups containing the group types you need
-4. **Analyze**: `get_balances()` with discovered root groups
-5. **Inspect**: `list_transactions()` for transaction details
+1. **Discover**: `list_books()` → `get_book()` (includes groups)
+2. **Identify Root Groups**: Find groups containing the group types you need
+3. **Analyze**: `get_balances()` with discovered root groups
+4. **Inspect**: `list_transactions()` for transaction details
 
 
 

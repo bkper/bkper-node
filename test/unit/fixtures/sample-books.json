@@ -11,45 +11,124 @@
     "fractionDigits": 2,
     "groups": [
       {
+        "id": "group-assets",
+        "name": "Assets",
+        "type": "INCOMING",
+        "hidden": false,
+        "permanent": true,
+        "properties": {}
+      },
+      {
         "id": "group-current-assets",
         "name": "Current Assets",
+        "type": "INCOMING",
         "hidden": false,
+        "permanent": false,
+        "parent": { "id": "group-assets", "name": "Assets" },
+        "properties": {}
+      },
+      {
+        "id": "group-cash",
+        "name": "Cash",
+        "type": "INCOMING",
+        "hidden": false,
+        "permanent": false,
+        "parent": { "id": "group-current-assets", "name": "Current Assets" },
+        "properties": { "category": "liquid" }
+      },
+      {
+        "id": "group-accounts-receivable",
+        "name": "Accounts Receivable",
+        "type": "INCOMING",
+        "hidden": false,
+        "permanent": false,
+        "parent": { "id": "group-current-assets", "name": "Current Assets" },
         "properties": {}
       },
       {
         "id": "group-fixed-assets",
         "name": "Fixed Assets",
+        "type": "INCOMING",
         "hidden": false,
+        "permanent": false,
+        "parent": { "id": "group-assets", "name": "Assets" },
+        "properties": {}
+      },
+      {
+        "id": "group-equipment",
+        "name": "Equipment",
+        "type": "INCOMING",
+        "hidden": false,
+        "permanent": false,
+        "parent": { "id": "group-fixed-assets", "name": "Fixed Assets" },
+        "properties": { "depreciation": "straight-line" }
+      },
+      {
+        "id": "group-liabilities",
+        "name": "Liabilities",
+        "type": "OUTGOING",
+        "hidden": false,
+        "permanent": true,
         "properties": {}
       },
       {
         "id": "group-current-liabilities",
         "name": "Current Liabilities",
+        "type": "OUTGOING",
         "hidden": false,
+        "permanent": false,
+        "parent": { "id": "group-liabilities", "name": "Liabilities" },
+        "properties": {}
+      },
+      {
+        "id": "group-accounts-payable",
+        "name": "Accounts Payable",
+        "type": "OUTGOING",
+        "hidden": false,
+        "permanent": false,
+        "parent": { "id": "group-current-liabilities", "name": "Current Liabilities" },
         "properties": {}
       },
       {
         "id": "group-long-term-liabilities",
         "name": "Long-term Liabilities",
+        "type": "OUTGOING",
         "hidden": false,
+        "permanent": false,
+        "parent": { "id": "group-liabilities", "name": "Liabilities" },
         "properties": {}
       },
       {
         "id": "group-equity",
         "name": "Equity",
+        "type": "OUTGOING",
         "hidden": false,
+        "permanent": true,
         "properties": {}
       },
       {
         "id": "group-revenue",
         "name": "Revenue",
+        "type": "OUTGOING",
         "hidden": false,
+        "permanent": true,
         "properties": {}
       },
       {
         "id": "group-operating-expenses",
         "name": "Operating Expenses",
+        "type": "INCOMING",
         "hidden": false,
+        "permanent": false,
+        "parent": { "id": "group-expenses", "name": "Expenses" },
+        "properties": {}
+      },
+      {
+        "id": "group-expenses",
+        "name": "Expenses",
+        "type": "INCOMING",
+        "hidden": false,
+        "permanent": true,
         "properties": {}
       }
     ],
@@ -80,26 +159,88 @@
       {
         "id": "group-assets",
         "name": "Assets",
+        "type": "INCOMING",
         "hidden": false,
+        "permanent": true,
         "properties": {}
+      },
+      {
+        "id": "group-checking-accounts",
+        "name": "Checking Accounts",
+        "type": "INCOMING",
+        "hidden": false,
+        "permanent": false,
+        "parent": { "id": "group-assets", "name": "Assets" },
+        "properties": { "category": "bank" }
+      },
+      {
+        "id": "group-savings-accounts",
+        "name": "Savings Accounts",
+        "type": "INCOMING",
+        "hidden": false,
+        "permanent": false,
+        "parent": { "id": "group-assets", "name": "Assets" },
+        "properties": { "category": "bank" }
       },
       {
         "id": "group-liabilities",
         "name": "Liabilities",
+        "type": "OUTGOING",
         "hidden": false,
+        "permanent": true,
+        "properties": {}
+      },
+      {
+        "id": "group-credit-cards",
+        "name": "Credit Cards",
+        "type": "OUTGOING",
+        "hidden": false,
+        "permanent": false,
+        "parent": { "id": "group-liabilities", "name": "Liabilities" },
         "properties": {}
       },
       {
         "id": "group-income",
         "name": "Income",
+        "type": "OUTGOING",
         "hidden": false,
+        "permanent": true,
+        "properties": {}
+      },
+      {
+        "id": "group-salary",
+        "name": "Salary",
+        "type": "OUTGOING",
+        "hidden": false,
+        "permanent": false,
+        "parent": { "id": "group-income", "name": "Income" },
         "properties": {}
       },
       {
         "id": "group-expenses",
         "name": "Expenses",
+        "type": "INCOMING",
         "hidden": false,
+        "permanent": true,
         "properties": {}
+      },
+      {
+        "id": "group-household",
+        "name": "Household",
+        "type": "INCOMING",
+        "hidden": false,
+        "permanent": false,
+        "parent": { "id": "group-expenses", "name": "Expenses" },
+        "properties": {}
+      },
+      {
+        "id": "group-groceries",
+        "name": "Groceries",
+        "type": "INCOMING",
+        "hidden": false,
+        "permanent": false,
+        "parent": { "id": "group-household", "name": "Household" },
+        "properties": { "category": "essential" }
       }
     ],
     "lastUpdateMs": "1672617600000",
