@@ -155,6 +155,10 @@ amount>1000                                          // Amount filter (transacti
 3. **Analyze**: `get_balances()` with discovered root groups
 4. **Inspect**: `list_transactions()` for transaction details
 
+## Reports and Insights Formatting
+
+### Markdown Output Preference
+When generating financial insights, reports, or analysis, **strongly prefer well-structured Markdown** for better readability across platforms (cloud, desktop, mobile). Use tables for financial data, clear headers for sections, bold formatting for totals and key metrics, and icons to enhance visual appeal.
 
 
 ## Common Mistakes to Avoid
