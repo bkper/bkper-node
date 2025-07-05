@@ -52,7 +52,13 @@ export async function handleGetBalances(params: GetBalancesParams): Promise<Call
     }
 
     // Get balances from the book with query (required by bkper-js)
-    const actualQuery = params.query;
+    let actualQuery = params.query;
+
+    if (!actualQuery.includes('by:m')) {
+      actualQuery = actualQuery + ' by:m';
+    }
+
+    // Get the first container to access createDataTable
     const balancesReport = await book.getBalancesReport(actualQuery);
     
     let type = BalanceType.TOTAL;
@@ -72,8 +78,8 @@ export async function handleGetBalances(params: GetBalancesParams): Promise<Call
       .formatValues(false)    // Raw numbers for LLMs
       .formatDates(true)     // YYYY-MM-DD dates
       .raw(true)              // Raw balances
-      .expanded(-1)
-      .type(type); // Smart transposition for time-based queries
+      .expanded(4)
+      .type(type); // 
 
       matrix = dataTableBuilder.build();
 

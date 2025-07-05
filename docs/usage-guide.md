@@ -186,5 +186,8 @@ When generating financial insights, reports, or analysis, **strongly prefer well
 ❌ **Wrong**: Using `on:` dates with non-permanent accounts  
 ✅ **Right**: Use `after:` and `before:` with INCOMING/OUTGOING accounts
 
+❌ **Wrong**: Using different date variables on same query. E.g.`after:$y-1` and `before:$d`
+✅ **Right**: Use same date variables on same query. E.g. `after:$y-1` and `before:$y`
+
 ❌ **Wrong**: Assuming fixed root group names  
 ✅ **Right**: Always discover root groups using `get_book()` then navigate its `groups` property
