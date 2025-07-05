@@ -117,6 +117,7 @@ export async function handleGetBook(params: GetBookParams): Promise<CallToolResu
 
     bookJson.groups = hierarchicalGroups as any;
     
+    
     // Build response with book data and groups
     const response = {
       book: bookJson,

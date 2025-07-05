@@ -94,7 +94,7 @@ export async function handleListTransactions(params: ListTransactionsParams): Pr
 
 export const listTransactionsToolDefinition = {
   name: 'list_transactions',
-  description: 'List transactions with cursor-based pagination and query filtering. Use get_book first to understand query syntax and usage rules.',
+  description: 'List transactions with native API cursor-based pagination and query filtering. Use get_book first to understand query syntax and usage rules.',
   inputSchema: {
     type: 'object',
     properties: {

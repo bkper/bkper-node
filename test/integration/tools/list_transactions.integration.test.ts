@@ -159,6 +159,7 @@ describe('Integration: list_transactions Tool', function() {
       const result = await withRetry(() => 
         context.server.testCallTool('list_transactions', {
           bookId: TEST_BOOK_ID,
+          query: 'on:$m',
           cursor: 'invalid-cursor-123'
         })
       );
