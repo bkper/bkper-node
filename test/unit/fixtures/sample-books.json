@@ -115,20 +115,20 @@
         "properties": {}
       },
       {
+        "id": "group-expenses",
+        "name": "Expenses",
+        "type": "INCOMING",
+        "hidden": false,
+        "permanent": true,
+        "properties": {}
+      },
+      {
         "id": "group-operating-expenses",
         "name": "Operating Expenses",
         "type": "INCOMING",
         "hidden": false,
         "permanent": false,
         "parent": { "id": "group-expenses", "name": "Expenses" },
-        "properties": {}
-      },
-      {
-        "id": "group-expenses",
-        "name": "Expenses",
-        "type": "INCOMING",
-        "hidden": false,
-        "permanent": true,
         "properties": {}
       }
     ],

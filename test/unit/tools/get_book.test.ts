@@ -34,7 +34,11 @@ function createMockBkperForBookWithGroups(books: BookData[]) {
       }
       
       return {
-        json: (): BookData => book,
+        json: (): BookData => {
+          // Return book data without groups, since they'll be added by the tool
+          const { groups, ...bookWithoutGroups } = book;
+          return bookWithoutGroups as BookData;
+        },
         getGroups: async () => {
           const groupsData = transformGroupsToGroupData(book);
           
@@ -75,7 +79,7 @@ function createMockBkperForBookWithGroups(books: BookData[]) {
             }
             
             // Set children
-            const children = mockGroups.filter((child, childIndex) => 
+            const children = mockGroups.filter((_, childIndex) => 
               groupsData[childIndex].parent?.id === groupData.id
             );
             mockGroup.getChildren = () => children;
