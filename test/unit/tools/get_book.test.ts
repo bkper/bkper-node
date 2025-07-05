@@ -62,7 +62,7 @@ function createMockBkperForBookWithGroups(books: BookData[]) {
             }
           });
           
-          // Second pass: set up parent relationships
+          // Second pass: set up parent-child relationships
           groupsData.forEach((groupData: GroupData, index: number) => {
             const mockGroup = mockGroups[index];
             
@@ -73,6 +73,12 @@ function createMockBkperForBookWithGroups(books: BookData[]) {
                 mockGroup.getParent = () => parent;
               }
             }
+            
+            // Set children
+            const children = mockGroups.filter((child, childIndex) => 
+              groupsData[childIndex].parent?.id === groupData.id
+            );
+            mockGroup.getChildren = () => children;
           });
           
           return mockGroups;
@@ -92,6 +98,8 @@ describe('MCP Server - get_book Tool Registration', function() {
 
   beforeEach(function() {
     setupTestEnvironment();
+    // Clear any existing mock state
+    delete (globalThis as any).__mockBkper;
     // Create a mock that returns book-specific groups
     const mockBkper = createMockBkperForBookWithGroups(mockBooks);
     setMockBkper(mockBkper);
@@ -136,6 +144,8 @@ describe('MCP Server - get_book Tool Calls', function() {
 
   beforeEach(function() {
     setupTestEnvironment();
+    // Clear any existing mock state
+    delete (globalThis as any).__mockBkper;
     // Create a mock that returns book-specific groups
     const mockBkper = createMockBkperForBookWithGroups(mockBooks);
     setMockBkper(mockBkper);

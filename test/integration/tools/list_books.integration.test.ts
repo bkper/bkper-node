@@ -45,30 +45,24 @@ describe('Integration: list_books Tool', function() {
       expect(tool.name).to.equal('list_books');
       expect(tool.description).to.include('List books');
       expect(tool.inputSchema).to.have.property('type', 'object');
-      expect(tool.inputSchema.properties).to.have.property('cursor');
-      expect(tool.inputSchema.properties).to.have.property('name');
+      expect(tool.inputSchema.properties).to.have.property('filter');
+      expect(tool.inputSchema.properties).to.not.have.property('cursor');
     }));
   });
   
   describe('Basic Functionality', function() {
-    it('should list books without any parameters', integrationTest(async () => {
+    it('should list books with filter parameter', integrationTest(async () => {
       const result = await withRetry(() => 
-        context.server.testCallTool('list_books')
+        context.server.testCallTool('list_books', { filter: 'test' })
       );
       
       const response = parseToolResponse(result);
-      logApiResponse('list_books (no params)', response);
+      logApiResponse('list_books (filter: test)', response);
       
       // Validate response structure
       expect(response).to.have.property('total').that.is.a('number');
       expect(response).to.have.property('books').that.is.an('array');
-      expect(response).to.have.property('pagination').that.is.an('object');
-      
-      // Validate pagination structure
-      expect(response.pagination).to.have.property('hasMore').that.is.a('boolean');
-      expect(response.pagination).to.have.property('nextCursor');
-      expect(response.pagination).to.have.property('limit', 50);
-      expect(response.pagination).to.have.property('offset', 0);
+      expect(response).to.not.have.property('pagination');
       
       // Validate each book structure
       if (response.books.length > 0) {
@@ -82,16 +76,14 @@ describe('Integration: list_books Tool', function() {
         });
       }
       
-      // Verify total matches actual count (for first page)
-      if (!response.pagination.hasMore) {
-        expect(response.books).to.have.length(response.total);
-      }
+      // Verify total matches actual count
+      expect(response.books).to.have.length(response.total);
     }));
     
     it('should return consistent results on repeated calls', integrationTest(async () => {
       // First call
       const result1 = await withRetry(() => 
-        context.server.testCallTool('list_books')
+        context.server.testCallTool('list_books', { filter: 'test' })
       );
       const response1 = parseToolResponse(result1);
       
@@ -100,7 +92,7 @@ describe('Integration: list_books Tool', function() {
       
       // Second call
       const result2 = await withRetry(() => 
-        context.server.testCallTool('list_books')
+        context.server.testCallTool('list_books', { filter: 'test' })
       );
       const response2 = parseToolResponse(result2);
       
@@ -115,61 +107,12 @@ describe('Integration: list_books Tool', function() {
     }));
   });
   
-  describe('Pagination', function() {
-    it('should handle pagination correctly when there are many books', integrationTest(async () => {
-      const firstResult = await withRetry(() => 
-        context.server.testCallTool('list_books')
-      );
-      const firstResponse = parseToolResponse(firstResult);
-      
-      // Only test pagination if there are more than 50 books
-      if (firstResponse.pagination.hasMore) {
-        expect(firstResponse.books).to.have.length(50);
-        expect(firstResponse.pagination.nextCursor).to.be.a('string');
-        
-        // Get second page
-        const secondResult = await withRetry(() => 
-          context.server.testCallTool('list_books', {
-            cursor: firstResponse.pagination.nextCursor
-          })
-        );
-        const secondResponse = parseToolResponse(secondResult);
-        
-        logApiResponse('list_books (page 2)', secondResponse);
-        
-        // Validate second page
-        expect(secondResponse.pagination.offset).to.equal(50);
-        expect(secondResponse.books).to.be.an('array');
-        
-        // Books should be different
-        const firstIds = firstResponse.books.map((b: any) => b.id);
-        const secondIds = secondResponse.books.map((b: any) => b.id);
-        const overlap = firstIds.filter((id: string) => secondIds.includes(id));
-        expect(overlap).to.have.length(0, 'Pages should not have overlapping books');
-      } else {
-        console.log('Skipping pagination test - not enough books');
-      }
-    }));
-    
-    it('should handle invalid cursor gracefully', integrationTest(async () => {
-      const result = await withRetry(() => 
-        context.server.testCallTool('list_books', {
-          cursor: 'invalid-cursor-abc123'
-        })
-      );
-      const response = parseToolResponse(result);
-      
-      // Should fall back to first page
-      expect(response.pagination.offset).to.equal(0);
-      expect(response.books).to.be.an('array');
-    }));
-  });
   
-  describe('Name Filtering', function() {
-    it('should filter books by name when parameter is provided', integrationTest(async () => {
+  describe('Filter Parameter', function() {
+    it('should filter books by name or property when filter is provided', integrationTest(async () => {
       // First get all books to find a name to search for
       const allResult = await withRetry(() => 
-        context.server.testCallTool('list_books')
+        context.server.testCallTool('list_books', { filter: 'test' })
       );
       const allResponse = parseToolResponse(allResult);
       
@@ -180,12 +123,12 @@ describe('Integration: list_books Tool', function() {
         
         const filteredResult = await withRetry(() => 
           context.server.testCallTool('list_books', {
-            name: searchTerm
+            filter: searchTerm
           })
         );
         const filteredResponse = parseToolResponse(filteredResult);
         
-        logApiResponse(`list_books (name filter: ${searchTerm})`, filteredResponse);
+        logApiResponse(`list_books (filter: ${searchTerm})`, filteredResponse);
         
         // Should have fewer or equal books
         expect(filteredResponse.total).to.be.at.most(allResponse.total);
@@ -195,29 +138,27 @@ describe('Integration: list_books Tool', function() {
           expect(book.name.toLowerCase()).to.include(searchTerm.toLowerCase());
         });
       } else {
-        console.log('Skipping name filter test - no books available');
+        console.log('Skipping filter test - no books available');
       }
     }));
     
-    it('should return empty results for non-existent book name', integrationTest(async () => {
+    it('should return empty results for non-existent filter', integrationTest(async () => {
       const result = await withRetry(() => 
         context.server.testCallTool('list_books', {
-          name: 'NonExistentBook_' + Date.now()
+          filter: 'NonExistentBook_' + Date.now()
         })
       );
       const response = parseToolResponse(result);
       
       expect(response.total).to.equal(0);
       expect(response.books).to.have.length(0);
-      expect(response.pagination.hasMore).to.be.false;
-      expect(response.pagination.nextCursor).to.be.null;
     }));
   });
   
   describe('API Response Validation', function() {
     it('should return valid book data matching Bkper API types', integrationTest(async () => {
       const result = await withRetry(() => 
-        context.server.testCallTool('list_books')
+        context.server.testCallTool('list_books', { filter: 'test' })
       );
       const response = parseToolResponse(result);
       
@@ -276,12 +217,12 @@ describe('Integration: list_books Tool', function() {
         // Test with an extremely long cursor that might cause issues
         const longCursor = 'a'.repeat(10000);
         const result = await context.server.testCallTool('list_books', {
-          cursor: longCursor
+          filter: 'test'
         });
         const response = parseToolResponse(result);
         
-        // Should handle gracefully and return first page
-        expect(response.pagination.offset).to.equal(0);
+        // Should handle gracefully
+        expect(response.books).to.be.an('array');
       } catch (error) {
         // If it throws, ensure it's a proper error
         expect(error).to.be.an('error');
@@ -294,7 +235,7 @@ describe('Integration: list_books Tool', function() {
       const startTime = Date.now();
       
       const result = await withRetry(() => 
-        context.server.testCallTool('list_books')
+        context.server.testCallTool('list_books', { filter: 'test' })
       );
       
       const endTime = Date.now();
