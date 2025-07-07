@@ -191,7 +191,7 @@ describe('Integration: get_balances Tool', function() {
         logApiResponse(`get_balances (specific account: ${targetAccount.name})`, specificResponse);
         
         // Should return matrix with response (may be empty for specific account)
-        expect(specificResponse.query).to.equal(accountQuery);
+        expect(specificResponse.query).to.equal(accountQuery + ' by:m');
         expect(specificResponse.matrix).to.be.an('array');
         
         // Only check for data if the query actually returns results
@@ -357,6 +357,75 @@ describe('Integration: get_balances Tool', function() {
     }));
   });
   
+  describe('Query Modification', function() {
+    it('should always enforce monthly periodicity', integrationTest(async () => {
+      const result = await withRetry(() => 
+        context.server.testCallTool('get_balances', {
+          bookId: TEST_BOOK_ID,
+          query: 'group:Assets before:$m'
+        })
+      );
+      
+      const response = parseToolResponse(result);
+      expect(response).to.have.property('query', 'group:Assets before:$m by:m');
+    }));
+    
+    it('should replace daily periodicity with monthly', integrationTest(async () => {
+      const result = await withRetry(() => 
+        context.server.testCallTool('get_balances', {
+          bookId: TEST_BOOK_ID,
+          query: 'group:Assets before:$m by:d'
+        })
+      );
+      
+      const response = parseToolResponse(result);
+      expect(response).to.have.property('query', 'group:Assets before:$m by:m');
+    }));
+    
+    it('should replace yearly periodicity with monthly', integrationTest(async () => {
+      const result = await withRetry(() => 
+        context.server.testCallTool('get_balances', {
+          bookId: TEST_BOOK_ID,
+          query: 'group:Assets before:$m by:y'
+        })
+      );
+      
+      const response = parseToolResponse(result);
+      expect(response).to.have.property('query', 'group:Assets before:$m by:m');
+    }));
+    
+    it('should keep monthly periodicity unchanged', integrationTest(async () => {
+      const result = await withRetry(() => 
+        context.server.testCallTool('get_balances', {
+          bookId: TEST_BOOK_ID,
+          query: 'group:Assets before:$m by:m'
+        })
+      );
+      
+      const response = parseToolResponse(result);
+      expect(response).to.have.property('query', 'group:Assets before:$m by:m');
+    }));
+    
+    it('should always use CUMULATIVE type for time-based queries', integrationTest(async () => {
+      const result = await withRetry(() => 
+        context.server.testCallTool('get_balances', {
+          bookId: TEST_BOOK_ID,
+          query: "group:'Assets' after:2013 before:2015"
+        })
+      );
+      
+      const response = parseToolResponse(result);
+      expect(response).to.have.property('query', "group:'Assets' after:2013 before:2015 by:m");
+      
+      // Matrix should have headers for time-based queries with CUMULATIVE type
+      expect(response.matrix).to.be.an('array');
+      if (response.matrix.length > 0) {
+        expect(response.matrix[0]).to.be.an('array');
+        expect(response.matrix[0][0]).to.equal(''); // First header should be empty string
+      }
+    }));
+  });
+
   describe('Data Consistency', function() {
     it('should return consistent results on repeated calls', integrationTest(async () => {
       const query = 'group:Assets before:$m';
@@ -385,6 +454,8 @@ describe('Integration: get_balances Tool', function() {
       // Results should be consistent
       expect(response1.matrix.length).to.equal(response2.matrix.length);
       expect(response1.query).to.equal(response2.query);
+      expect(response1.query).to.equal('group:Assets before:$m by:m');
+      expect(response2.query).to.equal('group:Assets before:$m by:m');
       
       // Matrix values should match (order might vary, so sort by account name)
       const sortedMatrix1 = [response1.matrix[0], ...response1.matrix.slice(1).sort((a: any, b: any) => a[0].localeCompare(b[0]))];

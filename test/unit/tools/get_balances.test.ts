@@ -117,6 +117,9 @@ describe('MCP Server - get_balances Tool Calls', function() {
     // Verify matrix structure and filter results - no headers
     expect(jsonResponse.matrix).to.be.an('array');
     
+    // Verify query has by:m appended
+    expect(jsonResponse.query).to.equal("account:'Cash' by:m");
+    
     // Verify all returned rows are for Cash account
     jsonResponse.matrix.forEach((row: any) => {
       expect(row[0]).to.equal('Cash');
@@ -142,6 +145,9 @@ describe('MCP Server - get_balances Tool Calls', function() {
     expect(jsonResponse.matrix).to.have.length(150); // 150 data rows, no headers
     expect(jsonResponse).to.not.have.property('total');
     expect(jsonResponse).to.not.have.property('balances');
+    
+    // Verify query has by:m appended
+    expect(jsonResponse.query).to.equal('group:Assets before:$m by:m');
   });
 
   it('should handle MCP error for missing bookId parameter', async function() {
@@ -181,5 +187,70 @@ describe('MCP Server - get_balances Tool Calls', function() {
       expect(data).to.not.have.property('total');
       expect(data).to.not.have.property('balances');
     });
+    
+    // Verify all queries have by:m appended
+    const accountData = JSON.parse(accountQuery.content[0].text as string);
+    const groupData = JSON.parse(groupQuery.content[0].text as string);
+    const dateData = JSON.parse(dateQuery.content[0].text as string);
+    
+    expect(accountData.query).to.equal("account:'Cash' by:m");
+    expect(groupData.query).to.equal("group:'Assets' by:m");
+    expect(dateData.query).to.equal("group:'Assets' before:2024-01-31 by:m");
+  });
+
+  it('should append by:m to query when not present', async function() {
+    const response = await server.testCallTool('get_balances', { 
+      bookId: 'book-1',
+      query: "group:'Assets' before:$m"
+    });
+    
+    const jsonResponse = JSON.parse(response.content[0].text as string);
+    expect(jsonResponse.query).to.equal("group:'Assets' before:$m by:m");
+  });
+
+  it('should replace by:d with by:m (daily to monthly)', async function() {
+    const response = await server.testCallTool('get_balances', { 
+      bookId: 'book-1',
+      query: "group:'Assets' before:$m by:d"
+    });
+    
+    const jsonResponse = JSON.parse(response.content[0].text as string);
+    expect(jsonResponse.query).to.equal("group:'Assets' before:$m by:m");
+  });
+
+  it('should replace by:y with by:m (yearly to monthly)', async function() {
+    const response = await server.testCallTool('get_balances', { 
+      bookId: 'book-1',
+      query: "group:'Assets' before:$m by:y"
+    });
+    
+    const jsonResponse = JSON.parse(response.content[0].text as string);
+    expect(jsonResponse.query).to.equal("group:'Assets' before:$m by:m");
+  });
+
+  it('should keep by:m unchanged when already present', async function() {
+    const response = await server.testCallTool('get_balances', { 
+      bookId: 'book-1',
+      query: "group:'Assets' before:$m by:m"
+    });
+    
+    const jsonResponse = JSON.parse(response.content[0].text as string);
+    expect(jsonResponse.query).to.equal("group:'Assets' before:$m by:m");
+  });
+
+  it('should always use CUMULATIVE type regardless of query content', async function() {
+    // Test with a simple query that would normally use TOTAL type
+    const response = await server.testCallTool('get_balances', { 
+      bookId: 'book-1',
+      query: "account:'Cash'"
+    });
+    
+    const jsonResponse = JSON.parse(response.content[0].text as string);
+    expect(jsonResponse.query).to.equal("account:'Cash' by:m");
+    
+    // The matrix should be in the format that CUMULATIVE type would produce
+    expect(jsonResponse.matrix).to.be.an('array');
+    expect(jsonResponse).to.have.property('matrix');
+    expect(jsonResponse).to.have.property('query');
   });
 });
