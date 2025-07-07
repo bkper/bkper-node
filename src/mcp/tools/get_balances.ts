@@ -54,20 +54,27 @@ export async function handleGetBalances(params: GetBalancesParams): Promise<Call
     // Get balances from the book with query (required by bkper-js)
     let actualQuery = params.query;
 
+    // Enforce monthly periodicity by modifying query
+    if (actualQuery.includes('by:d')) {
+      // Replace daily periodicity with monthly
+      actualQuery = actualQuery.replace(/by:d/g, 'by:m');
+    } else if (actualQuery.includes('by:y')) {
+      // Replace yearly periodicity with monthly
+      actualQuery = actualQuery.replace(/by:y/g, 'by:m');
+    } else if (!actualQuery.includes('by:')) {
+      // Append monthly periodicity if no by: operator present
+      actualQuery = actualQuery + ' by:m';
+    }
+    // If by:m is already present, keep it unchanged
 
     // Get the first container to access createDataTable
     const balancesReport = await book.getBalancesReport(actualQuery);
     
-    let type = BalanceType.TOTAL;
+    // Always use CUMULATIVE type
+    const type = BalanceType.CUMULATIVE;
 
     // Use BalancesDataTableBuilder to generate matrix
     let matrix: any[][];
-
-      const isTimeBased = (actualQuery.includes('after:') || actualQuery.includes('before:')) || actualQuery.includes('by:');
-
-      if (isTimeBased) {
-        type = BalanceType.CUMULATIVE;
-      }
 
 
       // Get the first container to access createDataTable
