@@ -101,7 +101,7 @@ describe('Integration: get_balances Tool', function() {
       
       // Validate response structure
       expect(response).to.have.property('matrix').that.is.an('array');
-      expect(response).to.have.property('query', 'group:Assets on:$m');
+      expect(response).to.have.property('query', 'group:Assets on:$m by:m');
       expect(response).to.not.have.property('total');
       expect(response).to.not.have.property('balances');
       
@@ -132,7 +132,7 @@ describe('Integration: get_balances Tool', function() {
       
       // Validate response structure
       expect(response).to.have.property('matrix').that.is.an('array');
-      expect(response).to.have.property('query', 'group:Assets on:$m');
+      expect(response).to.have.property('query', 'group:Assets on:$m by:m');
       expect(response).to.not.have.property('total');
       expect(response).to.not.have.property('balances');
       
@@ -235,7 +235,7 @@ describe('Integration: get_balances Tool', function() {
       
       // Verify response structure
       expect(response).to.have.property('matrix').that.is.an('array');
-      expect(response).to.have.property('query', "group:'Assets' after:2013 before:2015");
+      expect(response).to.have.property('query', "group:'Assets' after:2013 before:2015 by:m");
       
       // Matrix should have data (headers + at least one data row)
       expect(response.matrix).to.have.length.greaterThan(1, 

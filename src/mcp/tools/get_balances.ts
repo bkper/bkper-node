@@ -114,7 +114,7 @@ export async function handleGetBalances(params: GetBalancesParams): Promise<Call
 
 export const getBalancesToolDefinition = {
   name: 'get_balances',
-  description: 'Get groups balances with query filtering. Use get_book first to understand group hierarchy and usage rules.',
+  description: 'Get account balances with query filtering. Use get_book first to understand group hierarchy and usage rules.',
   inputSchema: {
     type: 'object',
     properties: {

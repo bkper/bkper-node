@@ -58,28 +58,18 @@ function buildHierarchicalStructure(groups: Group[]): GroupNode[] {
   return rootGroups;
 }
 
-function loadCombinedDocumentation(): string {
+function loadSystemPrompt(): string {
   try {
-    // Get the directory where this compiled file is located (/lib/mcp/tools/)
-    // and navigate to the docs directory (/lib/docs/)
+    // Get the directory where this file is located and navigate to the parent mcp directory
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = dirname(__filename);
-    const docsPath = join(__dirname, '..', '..', 'docs');
+    const mcpPath = join(__dirname, '..');
     
-    const usageGuide = readFileSync(join(docsPath, 'usage-guide.md'), 'utf-8');
-    const transactionsQuery = readFileSync(join(docsPath, 'transactions-query.md'), 'utf-8');
+    const systemPrompt = readFileSync(join(mcpPath, 'system-prompt.md'), 'utf-8');
     
-    return [
-      '# Bkper MCP Complete Usage Guide',
-      '',
-      usageGuide,
-      '',
-      '---',
-      '',
-      transactionsQuery
-    ].join('\n');
+    return systemPrompt;
   } catch (error) {
-    return `# Bkper MCP Usage Guide\n\nDocumentation not available.\nError: ${error instanceof Error ? error.message : String(error)}\nDocs path attempted: ${join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'docs')}`;
+    return `# Bkper MCP System Prompt\n\nDocumentation not available.\nError: ${error instanceof Error ? error.message : String(error)}\nPath attempted: ${join(dirname(fileURLToPath(import.meta.url)), '..', 'system-prompt.md')}`;
   }
 }
 
@@ -121,7 +111,7 @@ export async function handleGetBook(params: GetBookParams): Promise<CallToolResu
     // Build response with book data and groups
     const response = {
       book: bookJson,
-      readme: loadCombinedDocumentation()
+      readme: loadSystemPrompt()
     };
 
     return {
@@ -156,7 +146,7 @@ export async function handleGetBook(params: GetBookParams): Promise<CallToolResu
 
 export const getBookToolDefinition = {
   name: 'get_book',
-  description: 'Retrieve detailed information about a specific book including its group hierarchy and complete usage documentation',
+  description: 'Retrieve detailed information about a specific book including its group hierarchy and system prompt',
   inputSchema: {
     type: 'object',
     properties: {
