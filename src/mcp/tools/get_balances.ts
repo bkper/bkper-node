@@ -54,9 +54,6 @@ export async function handleGetBalances(params: GetBalancesParams): Promise<Call
     // Get balances from the book with query (required by bkper-js)
     let actualQuery = params.query;
 
-    if (!actualQuery.includes('by:m')) {
-      actualQuery = actualQuery + ' by:m';
-    }
 
     // Get the first container to access createDataTable
     const balancesReport = await book.getBalancesReport(actualQuery);
