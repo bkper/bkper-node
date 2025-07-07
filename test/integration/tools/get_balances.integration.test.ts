@@ -92,7 +92,7 @@ describe('Integration: get_balances Tool', function() {
       const result = await withRetry(() => 
         context.server.testCallTool('get_balances', {
           bookId: TEST_BOOK_ID,
-          query: 'group:Assets on:$m'
+          query: 'group:Assets before:$m'
         })
       );
       
@@ -101,7 +101,7 @@ describe('Integration: get_balances Tool', function() {
       
       // Validate response structure
       expect(response).to.have.property('matrix').that.is.an('array');
-      expect(response).to.have.property('query', 'group:Assets on:$m by:m');
+      expect(response).to.have.property('query', 'group:Assets before:$m by:m');
       expect(response).to.not.have.property('total');
       expect(response).to.not.have.property('balances');
       
@@ -123,7 +123,7 @@ describe('Integration: get_balances Tool', function() {
       const result = await withRetry(() => 
         context.server.testCallTool('get_balances', {
           bookId: TEST_BOOK_ID,
-          query: 'group:Assets on:$m'
+          query: 'group:Assets before:$m'
         })
       );
       
@@ -132,7 +132,7 @@ describe('Integration: get_balances Tool', function() {
       
       // Validate response structure
       expect(response).to.have.property('matrix').that.is.an('array');
-      expect(response).to.have.property('query', 'group:Assets on:$m by:m');
+      expect(response).to.have.property('query', 'group:Assets before:$m by:m');
       expect(response).to.not.have.property('total');
       expect(response).to.not.have.property('balances');
       
@@ -152,7 +152,7 @@ describe('Integration: get_balances Tool', function() {
   describe('Query Functionality', function() {
     it('should handle specific account queries', integrationTest(async () => {
       // Try different group queries to find an account to query specifically
-      const queries = ['group:Assets on:$m', 'on:$m', 'group:Liabilities on:$m', 'group:Equity on:$m'];
+      const queries = ['group:Assets before:$m', 'on:$m', 'group:Liabilities before:$m', 'group:Equity before:$m'];
       let allResponse: any = null;
       
       for (const query of queries) {
@@ -176,7 +176,7 @@ describe('Integration: get_balances Tool', function() {
       if (allResponse && allResponse.matrix.length > 0) {
         // Pick the first account to query specifically
         const targetAccount = { name: allResponse.matrix[0][0] };
-        const accountQuery = `account:'${targetAccount.name}' on:$m`;
+        const accountQuery = `account:'${targetAccount.name}' before:$m`;
         
         console.log(`Testing specific account query: ${accountQuery}`);
         
@@ -213,7 +213,7 @@ describe('Integration: get_balances Tool', function() {
       const result = await withRetry(() => 
         context.server.testCallTool('get_balances', {
           bookId: TEST_BOOK_ID,
-          query: 'group:NonExistentGroup_' + Date.now() + ' on:$m'
+          query: 'group:NonExistentGroup_' + Date.now() + ' before:$m'
         })
       );
       const response = parseToolResponse(result);
@@ -301,7 +301,7 @@ describe('Integration: get_balances Tool', function() {
       try {
         await context.server.testCallTool('get_balances', {
           bookId: 'invalid-book-id-123',
-          query: 'group:Assets on:$m'
+          query: 'group:Assets before:$m'
         });
         expect.fail('Should have thrown an error for invalid bookId');
       } catch (error: any) {
@@ -339,7 +339,7 @@ describe('Integration: get_balances Tool', function() {
       const result = await withRetry(() => 
         context.server.testCallTool('get_balances', {
           bookId: TEST_BOOK_ID,
-          query: 'group:Assets on:$m'
+          query: 'group:Assets before:$m'
         })
       );
       
@@ -359,7 +359,7 @@ describe('Integration: get_balances Tool', function() {
   
   describe('Data Consistency', function() {
     it('should return consistent results on repeated calls', integrationTest(async () => {
-      const query = 'group:Assets on:$m';
+      const query = 'group:Assets before:$m';
       
       // First call
       const result1 = await withRetry(() => 

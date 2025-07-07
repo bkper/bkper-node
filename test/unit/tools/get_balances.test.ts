@@ -63,7 +63,7 @@ describe('MCP Server - get_balances Tool Registration', function() {
         },
         query: {
           type: 'string',
-          description: 'Required query to filter balances (e.g., "account:\'Cash\'", "group:\'Assets\'", "on:2024-01-31")'
+          description: 'Required query to filter balances (e.g., "account:\'Cash\'", "group:\'Assets\'", "before:2024-01-31")'
         }
       },
       required: ['bookId', 'query']
@@ -96,7 +96,7 @@ describe('MCP Server - get_balances Tool Calls', function() {
     try {
       await server.testCallTool('get_balances', { 
         bookId: 'book-1',
-        query: 'on:$m'
+        query: 'before:$m'
       });
       expect.fail('Should have thrown an error for missing group/account operator');
     } catch (error: any) {
@@ -134,7 +134,7 @@ describe('MCP Server - get_balances Tool Calls', function() {
     // Call to get all balances with required query
     const response = await server.testCallTool('get_balances', { 
       bookId: 'book-1',
-      query: 'group:Assets on:$m'
+      query: 'group:Assets before:$m'
     });
     const jsonResponse = JSON.parse(response.content[0].text as string);
     
@@ -167,7 +167,7 @@ describe('MCP Server - get_balances Tool Calls', function() {
     
     const dateQuery = await server.testCallTool('get_balances', { 
       bookId: 'book-1',
-      query: "group:'Assets' on:2024-01-31"
+      query: "group:'Assets' before:2024-01-31"
     });
     
     // All should return valid MCP responses with matrix format

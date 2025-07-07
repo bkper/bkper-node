@@ -35,7 +35,7 @@ export async function handleGetBalances(params: GetBalancesParams): Promise<Call
     if (!params.query.includes('group:') && !params.query.includes('account:')) {
       throw new McpError(
         ErrorCode.InvalidParams,
-        'Query must include either \'group:\' or \'account:\' operator for proper balance filtering. Example: "group:\'Assets\' on:$m" or "account:\'Cash\' on:$m"'
+        'Query must include either \'group:\' or \'account:\' operator for proper balance filtering. Example: "group:\'Assets\' before:$m" or "account:\'Cash\' before:$m"'
       );
     }
 
@@ -121,7 +121,7 @@ export const getBalancesToolDefinition = {
       },
       query: {
         type: 'string',
-        description: 'Required query to filter balances (e.g., "account:\'Cash\'", "group:\'Assets\'", "on:2024-01-31")'
+        description: 'Required query to filter balances (e.g., "account:\'Cash\'", "group:\'Assets\'", "before:2024-01-31")'
       }
     },
     required: ['bookId', 'query']

@@ -1,14 +1,5 @@
 # Bkper MCP Usage Guide
 
-## CRITICAL REQUIREMENT
-
-**⚠️ ALL get_balances queries MUST include either `group:` or `account:` operator.**
-
-Queries without proper filtering (e.g., just `on:$m`) are **NOT ALLOWED** and will throw an error.
-
-✅ **Correct**: `get_balances({ query: "group:'Total Equity' on:$m" })`  
-❌ **Wrong**: `get_balances({ query: "on:$m" })` - Missing group/account filter!
-
 ## Essential Tools
 
 ### Discovery
@@ -38,7 +29,7 @@ Queries without proper filtering (e.g., just `on:$m`) are **NOT ALLOWED** and wi
 Then use `group:'Total Equity'` - NOT `group:'Assets'` or `group:'Liabilities'`
 
 ### 2. Date Filter Matching
-- **Permanent accounts** (ASSET, LIABILITY): Use `on:` dates for point-in-time
+- **Permanent accounts** (ASSET, LIABILITY): Use `before:` dates for point-in-time
 - **Non-permanent accounts** (INCOMING, OUTGOING): Use `after:` and `before:` for periods
 
 ### 3. Correct Tool Selection
@@ -59,7 +50,7 @@ Then use `group:'Total Equity'` - NOT `group:'Assets'` or `group:'Liabilities'`
 // After discovering root group for ASSET + LIABILITY accounts
 get_balances({ 
   bookId: "book-123", 
-  query: "group:'Total Equity' on:$m" 
+  query: "group:'Total Equity' before:$m" 
 })
 ```
 
@@ -77,7 +68,7 @@ get_balances({
 // After discovering both root groups
 const balanceSheet = await get_balances({ 
   bookId: "book-123", 
-  query: "group:'Total Equity' on:$m" 
+  query: "group:'Total Equity' before:$m" 
 });
 
 const pnl = await get_balances({ 
@@ -148,7 +139,7 @@ list_transactions({
 
 ### Query Patterns
 ```
-group:'[ROOT_GROUP_NAME]' on:$m                      // Balance sheet (permanent accounts)
+group:'[ROOT_GROUP_NAME]' before:$m                      // Balance sheet (permanent accounts)
 group:'[ROOT_GROUP_NAME]' after:$m-1 before:$m      // P&L (non-permanent accounts)
 after:2024-01-01 before:2024-12-31                  // Date range
 amount>1000                                          // Amount filter (transactions only)
@@ -168,14 +159,14 @@ When generating financial insights, reports, or analysis, **strongly prefer well
 
 ## Common Mistakes to Avoid
 
-❌ **Wrong**: `get_balances({ query: "on:$m" })` - Missing group/account operator!  
-✅ **Right**: `get_balances({ query: "group:'[ROOT_GROUP]' on:$m" })`
+❌ **Wrong**: `get_balances({ query: "before:$m" })` - Missing group/account operator!  
+✅ **Right**: `get_balances({ query: "group:'[ROOT_GROUP]' before:$m" })`
 
 ❌ **Wrong**: `get_balances({ query: "after:2024-01-01" })` - Missing group/account operator!  
 ✅ **Right**: `get_balances({ query: "group:'[ROOT_GROUP]' after:2024-01-01 before:2024-12-31" })`
 
 ❌ **Wrong**: `get_balances({ query: "group:'Assets'" })` - Using subgroup instead of root group  
-✅ **Right**: `get_balances({ query: "group:'[ROOT_GROUP_WITH_ASSETS]' on:$m" })`
+✅ **Right**: `get_balances({ query: "group:'[ROOT_GROUP_WITH_ASSETS]' before:$m" })`
 
 ❌ **Wrong**: Query without any filtering  
 ✅ **Right**: Always include `group:` or `account:` operator for focused analysis
@@ -183,7 +174,7 @@ When generating financial insights, reports, or analysis, **strongly prefer well
 ❌ **Wrong**: Using `list_transactions` for balance calculations  
 ✅ **Right**: Use `get_balances` for all balance analysis
 
-❌ **Wrong**: Using `on:` dates with non-permanent accounts  
+❌ **Wrong**: Using `before:` without `after:` dates with non-permanent accounts  
 ✅ **Right**: Use `after:` and `before:` with INCOMING/OUTGOING accounts
 
 ❌ **Wrong**: Using different date variables on same query. E.g.`after:$y-1` and `before:$d`
@@ -191,3 +182,7 @@ When generating financial insights, reports, or analysis, **strongly prefer well
 
 ❌ **Wrong**: Assuming fixed root group names  
 ✅ **Right**: Always discover root groups using `get_book()` then navigate its `groups` property
+
+## CRITICAL REQUIREMENT
+
+**⚠️ ALL get_balances queries MUST include either `group:` or `account:` operator.**
