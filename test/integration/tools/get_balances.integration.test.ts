@@ -437,7 +437,7 @@ describe('Integration: get_balances Tool', function() {
       expect(response).to.have.property('query', 'group:Assets before:$m by:m');
     }));
     
-    it('should always use CUMULATIVE type for time-based queries', integrationTest(async () => {
+    it('should use PERIOD type for queries with after: operator', integrationTest(async () => {
       const result = await withRetry(() => 
         context.server.testCallTool('get_balances', {
           bookId: TEST_BOOK_ID,
@@ -447,6 +447,25 @@ describe('Integration: get_balances Tool', function() {
       
       const response = parseToolResponse(result);
       expect(response).to.have.property('query', "group:'Assets' after:2013 before:2015 by:m");
+      
+      // Matrix should have headers for time-based queries with PERIOD type
+      expect(response.matrix).to.be.an('array');
+      if (response.matrix.length > 0) {
+        expect(response.matrix[0]).to.be.an('array');
+        expect(response.matrix[0][0]).to.equal(''); // First header should be empty string
+      }
+    }));
+    
+    it('should use CUMULATIVE type for queries without after: operator', integrationTest(async () => {
+      const result = await withRetry(() => 
+        context.server.testCallTool('get_balances', {
+          bookId: TEST_BOOK_ID,
+          query: "group:'Assets' before:$m"
+        })
+      );
+      
+      const response = parseToolResponse(result);
+      expect(response).to.have.property('query', "group:'Assets' before:$m by:m");
       
       // Matrix should have headers for time-based queries with CUMULATIVE type
       expect(response.matrix).to.be.an('array');

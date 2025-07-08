@@ -238,8 +238,8 @@ describe('MCP Server - get_balances Tool Calls', function() {
     expect(jsonResponse.query).to.equal("group:'Assets' before:$m by:m");
   });
 
-  it('should always use CUMULATIVE type regardless of query content', async function() {
-    // Test with a simple query that would normally use TOTAL type
+  it('should use CUMULATIVE type for queries without after: operator', async function() {
+    // Test with a query without after: operator - should use CUMULATIVE type
     const response = await server.testCallTool('get_balances', { 
       bookId: 'book-1',
       query: "account:'Cash'"
@@ -247,6 +247,54 @@ describe('MCP Server - get_balances Tool Calls', function() {
     
     const jsonResponse = JSON.parse(response.content[0].text as string);
     expect(jsonResponse.query).to.equal("account:'Cash' by:m");
+    
+    // The matrix should be in the format that CUMULATIVE type would produce
+    expect(jsonResponse.matrix).to.be.an('array');
+    expect(jsonResponse).to.have.property('matrix');
+    expect(jsonResponse).to.have.property('query');
+  });
+
+  it('should use PERIOD type for queries with after: operator', async function() {
+    // Test with a query that has after: operator - should use PERIOD type
+    const response = await server.testCallTool('get_balances', { 
+      bookId: 'book-1',
+      query: "group:'Assets' after:2023-01-01"
+    });
+    
+    const jsonResponse = JSON.parse(response.content[0].text as string);
+    expect(jsonResponse.query).to.equal("group:'Assets' after:2023-01-01 by:m");
+    
+    // The matrix should be in the format that PERIOD type would produce
+    expect(jsonResponse.matrix).to.be.an('array');
+    expect(jsonResponse).to.have.property('matrix');
+    expect(jsonResponse).to.have.property('query');
+  });
+
+  it('should use PERIOD type for queries with both after: and before: operators', async function() {
+    // Test with a closed range query - should use PERIOD type due to after: presence
+    const response = await server.testCallTool('get_balances', { 
+      bookId: 'book-1',
+      query: "group:'Assets' after:2023-01-01 before:2023-12-31"
+    });
+    
+    const jsonResponse = JSON.parse(response.content[0].text as string);
+    expect(jsonResponse.query).to.equal("group:'Assets' after:2023-01-01 before:2023-12-31 by:m");
+    
+    // The matrix should be in the format that PERIOD type would produce
+    expect(jsonResponse.matrix).to.be.an('array');
+    expect(jsonResponse).to.have.property('matrix');
+    expect(jsonResponse).to.have.property('query');
+  });
+
+  it('should use CUMULATIVE type for queries with only before: operator', async function() {
+    // Test with only before: operator - should use CUMULATIVE type
+    const response = await server.testCallTool('get_balances', { 
+      bookId: 'book-1',
+      query: "group:'Assets' before:2023-12-31"
+    });
+    
+    const jsonResponse = JSON.parse(response.content[0].text as string);
+    expect(jsonResponse.query).to.equal("group:'Assets' before:2023-12-31 by:m");
     
     // The matrix should be in the format that CUMULATIVE type would produce
     expect(jsonResponse.matrix).to.be.an('array');

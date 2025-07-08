@@ -70,8 +70,8 @@ export async function handleGetBalances(params: GetBalancesParams): Promise<Call
     // Get the first container to access createDataTable
     const balancesReport = await book.getBalancesReport(actualQuery);
     
-    // Always use CUMULATIVE type
-    const type = BalanceType.CUMULATIVE;
+    // Determine balance type based on presence of after: operator
+    const type = actualQuery.includes('after:') ? BalanceType.PERIOD : BalanceType.CUMULATIVE;
 
     // Use BalancesDataTableBuilder to generate matrix
     let matrix: any[][];

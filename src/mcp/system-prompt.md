@@ -29,8 +29,11 @@
 Then use `group:'Total Equity'` - NOT `group:'Assets'` or `group:'Liabilities'`
 
 ### 2. Date Filter Matching
+
 - **Permanent accounts** (ASSET, LIABILITY): Use `before:` dates for point-in-time
 - **Non-permanent accounts** (INCOMING, OUTGOING): Use `after:` and `before:` for periods
+
+- **IMPORTANT:** `after:` is inclusive and `before:` is exclusive, so, for example, to filter the whole 2024 year, the range might be `after:2024-01-01 before:2025-01-01` 
 
 ### 3. Correct Tool Selection
 - **Balance analysis**: Always use `get_balances`
@@ -59,7 +62,7 @@ get_balances({
 // After discovering root group for INCOMING + OUTGOING accounts
 get_balances({ 
   bookId: "book-123", 
-  query: "group:'Profit & Loss' after:$m-1 before:$m" 
+  query: "group:'Profit & Loss' after:$m-12 before:$m" 
 })
 ```
 
@@ -68,7 +71,7 @@ get_balances({
 // After discovering both root groups
 const balanceSheet = await get_balances({ 
   bookId: "book-123", 
-  query: "group:'Total Equity' before:$m" 
+  query: "group:'Total Equity' before:$m+1" 
 });
 
 const pnl = await get_balances({ 
@@ -141,7 +144,7 @@ list_transactions({
 ```
 group:'[ROOT_GROUP_NAME]' before:$m                      // Balance sheet (permanent accounts)
 group:'[ROOT_GROUP_NAME]' after:$m-1 before:$m      // P&L (non-permanent accounts)
-after:2024-01-01 before:2024-12-31                  // Date range
+after:2024-01-01 before:2025-01-01                  // Date range
 amount>1000                                          // Amount filter (transactions only)
 ```
 
@@ -163,7 +166,7 @@ When generating financial insights, reports, or analysis, **strongly prefer well
 ✅ **Right**: `get_balances({ query: "group:'[ROOT_GROUP]' before:$m" })`
 
 ❌ **Wrong**: `get_balances({ query: "after:2024-01-01" })` - Missing group/account operator!  
-✅ **Right**: `get_balances({ query: "group:'[ROOT_GROUP]' after:2024-01-01 before:2024-12-31" })`
+✅ **Right**: `get_balances({ query: "group:'[ROOT_GROUP]' after:2024-01-01 before:2025-01-01" })`
 
 ❌ **Wrong**: `get_balances({ query: "group:'Assets'" })` - Using subgroup instead of root group  
 ✅ **Right**: `get_balances({ query: "group:'[ROOT_GROUP_WITH_ASSETS]' before:$m" })`
