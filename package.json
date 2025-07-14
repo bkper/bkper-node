@@ -1,6 +1,6 @@
 {
   "name": "bkper",
-  "version": "3.3.3",
+  "version": "3.4.0",
   "description": "Node.js command line client for Bkper",
   "bin": {
     "bkper": "./lib/cli.js"
@@ -20,7 +20,11 @@
   "mcp": {
     "server": {
       "command": "node",
-      "args": ["lib/cli.js", "mcp", "start"],
+      "args": [
+        "lib/cli.js",
+        "mcp",
+        "start"
+      ],
       "env": {}
     }
   },
