@@ -34,6 +34,7 @@ yarn global add bkper
 - ```logout```  - Logs out the user by deleting client credentials.
 - ```app -c```  - Create a new App based on ```./bkperapp.yaml``` file.
 - ```app -u```  - Update an existing App based on ```./bkperapp.yaml``` file.
+- ```mcp start``` - Start the Bkper MCP (Model Context Protocol) server.
 
 ### Examples
 ```
@@ -200,6 +201,72 @@ Bkper.setConfig({
   oauthTokenProvider: async () => getOAuthToken(),
 })
 ```
+
+### MCP (Model Context Protocol) Server
+
+Bkper includes an MCP server that allows AI assistants and other tools to interact with your Bkper books through the [Model Context Protocol](https://modelcontextprotocol.io).
+
+#### Starting the MCP Server
+
+```bash
+bkper mcp start
+```
+
+The server runs on stdio and provides the following tools:
+
+- **list_books** - List all books accessible by the authenticated user
+- **get_book** - Get details of a specific book by ID
+- **get_balances** - Get account balances for a specific date or period
+- **list_transactions** - List transactions with filtering options
+
+#### Prerequisites
+
+Before using the MCP server:
+1. Login using `bkper login` to set up authentication
+2. Ensure the `BKPER_API_KEY` environment variable is set
+
+The MCP server uses the same authentication as the CLI, reading credentials from `~/.bkper-credentials.json`.
+
+#### Integration Examples
+
+##### Claude Desktop
+
+Add to your configuration file:
+- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+```json
+{
+  "mcpServers": {
+    "bkper": {
+      "command": "npx",
+      "args": ["bkper", "mcp", "start"],
+      "env": {
+        "BKPER_API_KEY": "your-api-key-here"
+      }
+    }
+  }
+}
+```
+
+##### Other MCP Clients
+
+For other MCP-compatible clients, configure them to run:
+```bash
+BKPER_API_KEY=your-api-key npx bkper mcp start
+```
+
+The server communicates via stdio, so any MCP client that supports stdio transport can connect to it.
+
+#### Available MCP Tools
+
+Once connected, the MCP client can:
+- List your Bkper books
+- Get account balances for any date or period
+- Search and filter transactions
+- Analyze your financial data
+
+For more information about the Model Context Protocol, visit [modelcontextprotocol.io](https://modelcontextprotocol.io).
 
 
 
