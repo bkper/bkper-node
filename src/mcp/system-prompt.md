@@ -39,12 +39,13 @@ Then use `group:'Total Equity'` - NOT `group:'Assets'` or `group:'Liabilities'`
 - **Balance analysis**: Always use `get_balances`
 - **Transaction inspection**: Use `list_transactions` (never for calculations)
 
-### 4. Query Requirements (MANDATORY)
+### 4. Balance Analysis Query Requirements (MANDATORY)
 - **MUST include either `group:` or `account:` operator in EVERY query**
 - Never query subgroups directly (Assets, Liabilities, Revenue, Expenses) - use root groups
 - When using `account:`, be specific about individual accounts
 - Always include appropriate date filters
-- Queries without group/account operators will be rejected with an error
+- Balance analysis queries without group/account operators will be rejected with an error
+- Transaction queries can be without group/account operators
 
 ## Examples
 
