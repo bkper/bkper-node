@@ -1,6 +1,6 @@
-[Bkper REST API]: https://bkper.com/docs/#rest-apis
+[Bkper REST API]: https://bkper.com/docs/#rest-api-enabling
 
-A **command line** utility to create and update [Bkper Apps and Bots](https://bkper.com/docs/)
+A **command line** utility to create and update [Bkper Apps and Bots](https://bkper.com/docs/) as well as to start the [MCP server](https://modelcontextprotocol.io) to support AI assistants and agents to interact with your Bkper books.
 
 ## Installation
 
@@ -32,9 +32,9 @@ yarn global add bkper
 
 - ```login```   - Logs the user in. Saves the client credentials to a ```~/.bkper-credentials.json``` file.
 - ```logout```  - Logs out the user by deleting client credentials.
+- ```mcp start``` - Start the Bkper MCP (Model Context Protocol) server.
 - ```app -c```  - Create a new App based on ```./bkperapp.yaml``` file.
 - ```app -u```  - Update an existing App based on ```./bkperapp.yaml``` file.
-- ```mcp start``` - Start the Bkper MCP (Model Context Protocol) server.
 
 ### Examples
 ```
@@ -43,6 +43,77 @@ npm bkper login
 ```
 yarn bkper login
 ```
+
+### MCP (Model Context Protocol) Server
+
+Bkper includes an MCP server that allows AI assistants and other tools to interact with your Bkper books through the [Model Context Protocol](https://modelcontextprotocol.io).
+
+#### Starting the MCP Server
+
+```bash
+bkper mcp start
+```
+
+The server runs on stdio and provides the following tools:
+
+- **list_books** - List all books accessible by the authenticated user
+- **get_book** - Get details of a specific book by ID
+- **get_balances** - Get account balances for a specific date or period
+- **list_transactions** - List transactions with filtering options
+
+#### Prerequisites
+
+Before using the MCP server:
+1. Login using `bkper login` to set up authentication
+2. Enable the [Bkper REST API]
+3. Ensure the `BKPER_API_KEY` environment variable is set.
+
+The MCP server uses the same authentication as the CLI, reading credentials from `~/.bkper-credentials.json`.
+
+#### Integration Examples
+
+##### Claude Desktop
+
+Add to your configuration file:
+- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+```json
+{
+  "mcpServers": {
+    "bkper": {
+      "command": "npx",
+      "args": ["bkper", "mcp", "start"],
+      "env": {
+        "BKPER_API_KEY": "your-api-key-here"
+      }
+    }
+  }
+}
+```
+
+##### Other MCP Clients
+
+For other MCP-compatible clients, configure them to run:
+```bash
+BKPER_API_KEY=your-api-key npx bkper mcp start
+```
+
+The server communicates via stdio, so any MCP client that supports stdio transport can connect to it.
+
+#### Available MCP Tools
+
+Once connected, the MCP client can:
+- List your Bkper books
+- Get account balances for any date or period
+- Search and filter transactions
+- Analyze your financial data
+
+For more information about the Model Context Protocol, visit [modelcontextprotocol.io](https://modelcontextprotocol.io).
+
+
+
+## Apps and Bots
 
 ### Environment Variables
 The following environment variable is necessary in order to communicate with the [Bkper REST API]:
@@ -201,74 +272,6 @@ Bkper.setConfig({
   oauthTokenProvider: async () => getOAuthToken(),
 })
 ```
-
-### MCP (Model Context Protocol) Server
-
-Bkper includes an MCP server that allows AI assistants and other tools to interact with your Bkper books through the [Model Context Protocol](https://modelcontextprotocol.io).
-
-#### Starting the MCP Server
-
-```bash
-bkper mcp start
-```
-
-The server runs on stdio and provides the following tools:
-
-- **list_books** - List all books accessible by the authenticated user
-- **get_book** - Get details of a specific book by ID
-- **get_balances** - Get account balances for a specific date or period
-- **list_transactions** - List transactions with filtering options
-
-#### Prerequisites
-
-Before using the MCP server:
-1. Login using `bkper login` to set up authentication
-2. Ensure the `BKPER_API_KEY` environment variable is set
-
-The MCP server uses the same authentication as the CLI, reading credentials from `~/.bkper-credentials.json`.
-
-#### Integration Examples
-
-##### Claude Desktop
-
-Add to your configuration file:
-- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
-- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
-
-```json
-{
-  "mcpServers": {
-    "bkper": {
-      "command": "npx",
-      "args": ["bkper", "mcp", "start"],
-      "env": {
-        "BKPER_API_KEY": "your-api-key-here"
-      }
-    }
-  }
-}
-```
-
-##### Other MCP Clients
-
-For other MCP-compatible clients, configure them to run:
-```bash
-BKPER_API_KEY=your-api-key npx bkper mcp start
-```
-
-The server communicates via stdio, so any MCP client that supports stdio transport can connect to it.
-
-#### Available MCP Tools
-
-Once connected, the MCP client can:
-- List your Bkper books
-- Get account balances for any date or period
-- Search and filter transactions
-- Analyze your financial data
-
-For more information about the Model Context Protocol, visit [modelcontextprotocol.io](https://modelcontextprotocol.io).
-
-
 
 ## Documentation
 
