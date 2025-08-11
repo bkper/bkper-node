@@ -1,6 +1,8 @@
 [Bkper REST API]: https://bkper.com/docs/#rest-api-enabling
 
-A **command line** utility to create and update [Bkper Apps and Bots](https://bkper.com/docs/) as well as to start the [MCP server](https://modelcontextprotocol.io) to support AI assistants and agents to interact with your Bkper books.
+A **command line** utility for managing [Bkper Apps and Bots](https://bkper.com/docs/) and running the [Model Context Protocol (MCP) server](https://modelcontextprotocol.io). 
+
+The MCP server enables AI assistants and agents to interact with your Bkper books through a standardized protocol.
 
 [![npm](https://img.shields.io/npm/v/bkper?color=%235889e4)](https://www.npmjs.com/package/bkper)
 
